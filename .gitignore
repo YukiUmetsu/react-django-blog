@@ -1,0 +1,16 @@
+# Default ignored files
+/.idea/workspace.xml
+.idea
+/backend/.env.prod
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+/frontend/.env.prod
+/backend/venv/
+/frontend/node_modules/
+/venv/
+/frontend/.next/

@@ -1,0 +1,54 @@
+version: '3.7'
+
+services:
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - 3000:3000
+    env_file:
+      - ./frontend/.env.prod
+
+  backend:
+    build: ./backend
+    container_name: backend
+    command: sh -c "python manage.py migrate && gunicorn blog.wsgi:application --reload --bind 0.0.0.0:8000"
+    volumes:
+      - ./backend/:/usr/src/blog/
+    ports:
+      - 8000:8000
+    env_file:
+      - backend/.env.prod
+    depends_on:
+      - db
+
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    ports:
+      - 5555:80
+    volumes:
+      - ./backend/:/usr/src/blog/
+    depends_on:
+      - backend
+
+  redis:
+    image: redis:5.0-alpine
+    container_name: redis
+    depends_on:
+      - backend
+    restart: always
+
+  db:
+    image: postgres:12.0-alpine
+    # this ports config is for pgadmin
+    container_name: db
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - backend/.env.prod
+
+volumes:
+  postgres_data:

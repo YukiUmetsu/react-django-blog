@@ -1,0 +1,6 @@
+Django==3.0.3
+psycopg2-binary==2.8.3
+gunicorn==19.9.0
+Pillow==7.0.0
+pytest==5.4.1
+django-redis==4.11.0

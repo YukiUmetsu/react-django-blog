@@ -7,3 +7,7 @@ class Countries(models.Model):
     two_code = models.CharField(blank=False, max_length=20)
     three_code = models.CharField(blank=False, max_length=20)
     description = models.CharField(blank=False, max_length=100)
+
+    class Meta:
+        verbose_name = 'Countries'
+        verbose_name_plural = 'Countries'

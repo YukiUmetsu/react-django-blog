@@ -27,7 +27,14 @@ frontend: create a .env.dev file in frontend folder according to .env.sample.\
 backend: create a .env.dev file in backend folder according to .env.sample.
 
 # tips using pytest
-1. add <code>DJANGO_SETTINGS_MODULE=blog.settings</code> in your .env file.\
+1. add <code>DJANGO_SETTINGS_MODULE=blog.settings</code> in your .env file.<br>
 2. Do NOT add "__init__.py" file under test folder. Otherwise, pytest can't find modules for some reason.<br>
-3. start pytest
+3. start pytest<br>
 <code>docker container exec -it backend sh -c "pytest"</code>
+
+# loading initial data
+1. if "backend/countries/fixtures/countries_fixtures.json" doesn't exist, do the following:<br>
+<code>docker container exec -it backend sh -c "python countries_data_convert.py"</code><br>
+this will create the countries_fixtures.json file.<br>
+2. load the data from the json file<br>
+<code> docker container exec -it backend sh -c "python manage.py loaddata countries/fixtures/countries_fixtures.json"</code>

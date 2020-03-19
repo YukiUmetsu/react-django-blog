@@ -12,5 +12,9 @@ class Media(models.Model):
     path = models.CharField(blank=False, max_length=200)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
 
+    class Meta:
+        verbose_name = 'Media'
+        verbose_name_plural = 'Media data'
+
     def __str__(self):
         return self.path

@@ -14,7 +14,7 @@ RUN apk update \
 # install dependencies
 RUN pip install --upgrade pip
 COPY ./requirements.txt /usr/src/blog/requirements.txt
-RUN pip install -r requirements.txt
+RUN python -m pip install -r requirements.txt
 
 EXPOSE 587
 

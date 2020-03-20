@@ -48,6 +48,12 @@ INSTALLED_APPS = [
     'users',
     'media',
     'countries',
+    'categories',
+    'comments',
+    'post_likes',
+    'posts',
+    'tags',
+    'django_extensions',
 ]
 
 SITE_ID = 1

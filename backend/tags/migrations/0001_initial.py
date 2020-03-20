@@ -12,17 +12,14 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Media',
+            name='Tags',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('type', models.CharField(blank=True, max_length=100)),
-                ('alt', models.CharField(blank=True, max_length=100)),
-                ('path', models.CharField(max_length=200)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('name', models.CharField(max_length=100)),
             ],
             options={
-                'verbose_name': 'Media',
-                'verbose_name_plural': 'Media data',
+                'verbose_name': 'Tags',
+                'verbose_name_plural': 'Tags',
             },
         ),
     ]

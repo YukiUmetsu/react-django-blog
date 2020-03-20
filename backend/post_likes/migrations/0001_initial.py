@@ -12,17 +12,15 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Media',
+            name='PostLikes',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('type', models.CharField(blank=True, max_length=100)),
-                ('alt', models.CharField(blank=True, max_length=100)),
-                ('path', models.CharField(max_length=200)),
+                ('like', models.BooleanField(default=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
             ],
             options={
-                'verbose_name': 'Media',
-                'verbose_name_plural': 'Media data',
+                'verbose_name': 'Post likes',
+                'verbose_name_plural': 'Post likes',
             },
         ),
     ]

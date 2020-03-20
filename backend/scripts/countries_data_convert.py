@@ -2,7 +2,7 @@ import csv
 import json
 data = []
 
-with open('./countries/fixtures/countries_data.csv', mode='r') as csv_file:
+with open('../countries/fixtures/countries_data.csv', mode='r') as csv_file:
     csv_reader = csv.reader(csv_file)
     line_count = 0
 
@@ -23,5 +23,5 @@ with open('./countries/fixtures/countries_data.csv', mode='r') as csv_file:
         })
         line_count += 1
 
-    with open('./countries/fixtures/countries_fixtures.json', 'w') as outfile:
+    with open('../countries/fixtures/countries_fixtures.json', 'w') as outfile:
         json.dump(data, outfile)

@@ -38,3 +38,15 @@ backend: create a .env.dev file in backend folder according to .env.sample.
 this will create the countries_fixtures.json file.<br>
 2. load the data from the json file<br>
 <code> docker container exec -it backend sh -c "python manage.py loaddata countries/fixtures/countries_fixtures.json"</code>
+
+# create superuser
+I created a script to create a super user in one command. <br>
+Edit email and password in backend/scripts/add_superuser.py<br>
+<code>docker container exec -it backend sh -c "python manage.py runscript add_superuser"</code>
+
+# reset migrations
+I created a script reset migrations in dev environment.<br>
+1. drop the database.<br>
+2. remove all the migration files.<br>
+3. make new migration files and migrate again.<br>
+<code>docker container exec -it backend sh -c "python manage.py runscript reset_migrate"</code>

@@ -29,7 +29,6 @@ def remove_migration_files():
 
 def recreate_db():
     with connection.cursor() as cursor:
-        #database = os.environ.get('SQL_DATABASE')
         cursor.execute(f"DROP SCHEMA public CASCADE; CREATE SCHEMA public; GRANT ALL ON SCHEMA public TO public;")
     print("Just reset the database..")
 
@@ -39,8 +38,13 @@ def migrate_again():
     os.system("python manage.py makemigrations && python manage.py migrate")
 
 
+def create_superusers():
+    os.system("python manage.py runscript add_superuser")
+
+
 # CAUTION! reset whole database and remove migration files!!!
 def run():
     recreate_db()
     remove_migration_files()
     migrate_again()
+    #create_superusers()

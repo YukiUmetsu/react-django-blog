@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'posts',
     'tags',
     'django_extensions',
+    'blog_permissions',
 ]
 
 SITE_ID = 1
@@ -175,3 +176,6 @@ ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/api/rest-auth/login/?v
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 AUTH_USER_MODEL = 'users.CustomUser'
+REST_AUTH_SERIALIZERS = {
+    'USER_DETAILS_SERIALIZER': 'users.serializers.UserSerializer',
+}

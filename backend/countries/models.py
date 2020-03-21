@@ -11,3 +11,6 @@ class Countries(models.Model):
     class Meta:
         verbose_name = 'Countries'
         verbose_name_plural = 'Countries'
+
+    def __str__(self):
+        return self.description

@@ -26,5 +26,6 @@ urlpatterns = [
     url(r'^api/rest-auth/registration/', include('rest_auth.registration.urls')),
     url(r'^api/account/', include('allauth.urls')),
     url(r'^api/accounts-rest/registration/account-confirm-email/(?P<key>.*)/$', confirm_email, name='account_confirm_email'),
-    path('api/categories/', include('categories.urls')),
+    path('api/categories/', include('categories.urls'), name='categories'),
+    path('api/countries/', include('countries.urls'), name='countries'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

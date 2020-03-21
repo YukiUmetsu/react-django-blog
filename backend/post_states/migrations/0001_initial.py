@@ -12,15 +12,14 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='PostLikes',
+            name='PostStates',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('like', models.BooleanField(default=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('name', models.CharField(max_length=100)),
             ],
             options={
-                'verbose_name': 'Post likes',
-                'verbose_name_plural': 'Post likes',
+                'verbose_name': 'Post States',
+                'verbose_name_plural': 'Post states',
             },
         ),
     ]

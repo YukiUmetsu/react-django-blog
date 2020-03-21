@@ -1,0 +1,37 @@
+[
+  {
+    "model": "post_states.poststates",
+    "pk": 1,
+    "fields": {
+      "name": "draft"
+    }
+  },
+  {
+    "model": "post_states.poststates",
+    "pk": 2,
+    "fields": {
+      "name": "scheduled"
+    }
+  },
+  {
+    "model": "post_states.poststates",
+    "pk": 3,
+    "fields": {
+      "name": "published"
+    }
+  },
+  {
+    "model": "post_states.poststates",
+    "pk": 4,
+    "fields": {
+      "name": "hidden"
+    }
+  },
+  {
+    "model": "post_states.poststates",
+    "pk": 5,
+    "fields": {
+      "name": "deleted"
+    }
+  }
+]

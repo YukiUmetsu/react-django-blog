@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'tags',
     'django_extensions',
     'blog_permissions',
+    'post_states'
 ]
 
 SITE_ID = 1

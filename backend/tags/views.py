@@ -21,3 +21,15 @@ class TagsViewSet(viewsets.GenericViewSet,
     """Manage tags in the database"""
     queryset = Tags.objects.all()
     serializer_class = serializers.TagsSerializer
+
+    def get_queryset(self):
+        """
+        In listing page, return what you have access to
+        """
+        user = self.request.user
+
+        if user.is_staff:
+            return Tags.objects.all()
+        else:
+            return Tags.objects.filter(user=user.id)
+

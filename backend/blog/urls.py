@@ -28,4 +28,5 @@ urlpatterns = [
     url(r'^api/accounts-rest/registration/account-confirm-email/(?P<key>.*)/$', confirm_email, name='account_confirm_email'),
     path('api/categories/', include('categories.urls'), name='categories'),
     path('api/countries/', include('countries.urls'), name='countries'),
+    path('api/tags/', include('tags.urls'), name='tags'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -1,4 +1,5 @@
 from rest_framework import permissions
+from django.contrib.auth import get_user_model
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
@@ -54,3 +55,33 @@ class IsStaffUserOrReadOnly(permissions.BasePermission):
 
         # Write permissions are only allowed to the owner of the snippet.
         return bool(request.user and request.user.is_staff)
+
+
+class IsOwnerOrStaffUser(permissions.BasePermission):
+    """
+    You need to be the owner of the tag or superuser to read or edit
+    """
+
+    def has_object_permission(self, request, view, obj):
+        if request.user is None:
+            return False
+        if request.user and request.user.is_staff:
+            return True
+
+        return obj.user == request.user
+
+
+class CanCreateOwnObject(permissions.BasePermission):
+    """
+    You can only create your own object, not other people's object
+    """
+
+    def has_permission(self, request, view):
+        if request.method == 'POST':
+            if request.user is None:
+                return False
+
+            logged_in_user = get_user_model().objects.filter(email=request.user)[0]
+            return str(request.data['user']) == str(logged_in_user.id)
+
+        return True

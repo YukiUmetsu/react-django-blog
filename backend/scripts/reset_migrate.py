@@ -42,9 +42,14 @@ def create_superusers():
     os.system("python manage.py runscript add_superuser")
 
 
+def load_initial_data():
+    os.system("python3 manage.py loaddata */fixtures/*.json")
+
+
 # CAUTION! reset whole database and remove migration files!!!
 def run():
     recreate_db()
     remove_migration_files()
     migrate_again()
-    #create_superusers()
+    create_superusers()
+    load_initial_data()

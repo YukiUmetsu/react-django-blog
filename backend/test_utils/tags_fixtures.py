@@ -28,6 +28,14 @@ def tag_obj1(users, tag_payload):
     tag.delete()
 
 
+@pytest.fixture
+def staff_tag_obj0(users, tag_payload):
+    tag_payload['user'] = users['staff'][1]
+    tag = Tags.objects.create(**tag_payload)
+    yield tag
+    tag.delete()
+
+
 def random_string(string_length=10):
     """Generate a random string of fixed length """
     letters = string.ascii_lowercase

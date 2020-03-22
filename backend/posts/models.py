@@ -18,7 +18,7 @@ class Posts(models.Model):
         on_delete=models.CASCADE
     )
     post_state = models.ForeignKey(PostStates, on_delete=models.CASCADE)
-    tags = models.ManyToManyField(Tags)
+    tags = models.ManyToManyField(Tags, blank=True)
 
     class Meta:
         verbose_name = 'Posts'

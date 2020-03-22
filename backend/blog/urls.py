@@ -30,4 +30,5 @@ urlpatterns = [
     path('api/countries/', include('countries.urls'), name='countries'),
     path('api/tags/', include('tags.urls'), name='tags'),
     path('api/post_states/', include('post_states.urls'), name='post_states'),
+    path('api/posts/', include('posts.urls'), name='posts'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

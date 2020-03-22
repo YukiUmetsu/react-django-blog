@@ -71,7 +71,7 @@ class IsOwnerOrStaffUser(permissions.BasePermission):
         return obj.user == request.user
 
 
-class CanCreateOwnObject(permissions.BasePermission):
+class UserCanCreateOwnObject(permissions.BasePermission):
     """
     You can only create your own object, not other people's object
     """
@@ -80,6 +80,9 @@ class CanCreateOwnObject(permissions.BasePermission):
         if request.method == 'POST':
             if request.user is None:
                 return False
+
+            if request.user.is_staff:
+                return True
 
             logged_in_user = get_user_model().objects.filter(email=request.user)[0]
             return str(request.data['user']) == str(logged_in_user.id)

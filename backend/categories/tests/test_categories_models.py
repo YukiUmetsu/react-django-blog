@@ -2,47 +2,20 @@ import pytest
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from rest_framework import status
+from rest_framework.test import APIClient
+from test_utils.users_fixtures import users
+from test_utils.categories_fixtures import category_payload, category_obj
 
 
 pytestmark = pytest.mark.django_db
 
 
 @pytest.mark.django_db
-@pytest.fixture
-def users():
-    users = {'noraml': [], 'staff': [], 'superuser': []}
-    user_info = [
-        ("testuseremail1@test.com", "Hey12345hey!1", False, False, 'normal'),
-        ("testuseremail2@test.com", "Hey12345hey!2", False, False, 'normal'),
-        ("stafftestuseremail3@test.com", "Hey12345hey!3", True, False, 'staff'),
-        ("stafftestuseremail4@test.com", "Hey12345hey!4", True, False, 'staff'),
-        ("superusertestuseremail5@test.com", "Hey12345hey!5", True, True, 'superuser'),
-        ("superusertestuseremail6@test.com", "Hey12345hey!6", True, True, 'superuser'),
-    ]
-
-    for email, password, is_staff, is_superuser, label in user_info:
-        new_user = get_user_model().objects.create_user(
-            email=email,
-            password=password,
-            is_staff=is_staff,
-            is_superuser=is_superuser
-        )
-        users[label].append(new_user)
-
-    yield users
-
-    # should be called after tests are done.
-    for label, user in users:
-        try:
-            user.delete()
-            print("test users successfully deleted.")
-
-        except Exception as e:
-            print(f"there was a problem deleting test users.\r\n{e}")
-
-
-@pytest.mark.django_db
 class TestPublicCategoriesAPI:
+
+    @classmethod
+    def setup_class(cls):
+        cls.client = APIClient()
 
     def test_outsider_can_see_categories(self, client):
         url = reverse('categories:categories-list')
@@ -56,3 +29,72 @@ class TestPublicCategoriesAPI:
         url = reverse('categories:categories-list')
         response = client.post(url, payload)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_outsider_cannot_delete_category(self, category_obj):
+        response = self.client.delete(f'/api/categories/{category_obj.id}/')
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_outsider_cannot_update_category(self, category_payload, category_obj):
+        response = self.client.put(f'/api/categories/{category_obj.id}/', category_payload)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("users")
+class TestPrivateCountriesAPI:
+
+    @classmethod
+    def setup_class(cls):
+        cls.client = APIClient()
+
+    def test_normal_user_cannot_create_categories(self, users, category_payload):
+        url = reverse('categories:categories-list')
+        self.client.force_authenticate(users['normal'][0])
+        response = self.client.post(url, category_payload)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_staff_user_can_create_categories(self, users, category_payload):
+        url = reverse('categories:categories-list')
+        self.client.force_authenticate(users['staff'][0])
+        response = self.client.post(url, category_payload)
+        assert response.status_code == status.HTTP_201_CREATED
+
+    def test_superuser_can_create_categories(self, users, category_payload):
+        url = reverse('categories:categories-list')
+        self.client.force_authenticate(users['superuser'][0])
+        response = self.client.post(url, category_payload)
+        assert response.status_code == status.HTTP_201_CREATED
+
+    def test_normal_user_cannot_delete_categories(self, users, category_obj):
+        self.client.force_authenticate(users['normal'][0])
+        response = self.client.delete(f'/api/categories/{category_obj.id}/')
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_staff_user_can_delete_categories(self, users, category_obj):
+        self.client.force_authenticate(users['staff'][0])
+        response = self.client.delete(f'/api/categories/{category_obj.id}/')
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+    def test_superuser_can_delete_categories(self, users, category_obj):
+        self.client.force_authenticate(users['superuser'][0])
+        response = self.client.delete(f'/api/categories/{category_obj.id}/')
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+    def test_normal_user_cannot_update_categories(self, users, category_payload, category_obj):
+        self.client.force_authenticate(users['normal'][0])
+        response = self.client.put(f'/api/categories/{category_obj.id}/', category_payload)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_staff_user_can_update_categories(self, users, category_payload, category_obj):
+        self.client.force_authenticate(users['staff'][0])
+        category_payload['name'] = "test" + category_payload['name']
+        response = self.client.put(f'/api/categories/{category_obj.id}/', category_payload)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['name'] != category_obj.name
+
+    def test_superuser_can_update_categories(self, users, category_payload, category_obj):
+        self.client.force_authenticate(users['superuser'][0])
+        category_payload['name'] = "test1" + category_payload['name']
+        response = self.client.put(f'/api/categories/{category_obj.id}/', category_payload)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['name'] != category_obj.name

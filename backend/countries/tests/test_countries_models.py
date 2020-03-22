@@ -36,7 +36,6 @@ class TestPublicCountriesAPI:
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
-
 @pytest.mark.django_db
 @pytest.mark.usefixtures("users")
 class TestPrivateCountriesAPI:

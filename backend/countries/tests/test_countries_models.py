@@ -2,56 +2,97 @@ import pytest
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from rest_framework import status
+from test_utils.users_fixtures import users
+from test_utils.countries_fixtures import country_payload, country_obj
+from rest_framework.test import APIClient
+from countries.models import Countries
 
 pytestmark = pytest.mark.django_db
 
 
 @pytest.mark.django_db
-@pytest.fixture
-def users():
-    users = {'noraml': [], 'staff': [], 'superuser': []}
-    user_info = [
-        ("testuseremail1@test.com", "Hey12345hey!1", False, False, 'normal'),
-        ("testuseremail2@test.com", "Hey12345hey!2", False, False, 'normal'),
-        ("stafftestuseremail3@test.com", "Hey12345hey!3", True, False, 'staff'),
-        ("stafftestuseremail4@test.com", "Hey12345hey!4", True, False, 'staff'),
-        ("superusertestuseremail5@test.com", "Hey12345hey!5", True, True, 'superuser'),
-        ("superusertestuseremail6@test.com", "Hey12345hey!6", True, True, 'superuser'),
-    ]
+class TestPublicCountriesAPI:
 
-    for email, password, is_staff, is_superuser, label in user_info:
-        new_user = get_user_model().objects.create_user(
-            email=email,
-            password=password,
-            is_staff=is_staff,
-            is_superuser=is_superuser
-        )
-        users[label].append(new_user)
+    @classmethod
+    def setup_class(cls):
+        cls.client = APIClient()
 
-    yield users
+    def test_outsider_can_see_countries(self):
+        url = reverse('countries:countries-list')
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_200_OK
 
-    # should be called after tests are done.
-    for label, user in users:
-        try:
-            user.delete()
-            print("test users successfully deleted.")
+    def test_outsider_cannot_create_country(self, country_payload):
+        url = reverse('countries:countries-list')
+        response = self.client.post(url, country_payload)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-        except Exception as e:
-            print(f"there was a problem deleting test users.\r\n{e}")
+    def test_outsider_cannot_delete_country(self, country_obj):
+        response = self.client.delete(f'/api/countries/{country_obj.id}/')
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_outsider_cannot_update_country(self, country_payload, country_obj):
+        response = self.client.put(f'/api/countries/{country_obj.id}/', country_payload)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
 
 
 @pytest.mark.django_db
-class TestPublicCountriesAPI:
+@pytest.mark.usefixtures("users")
+class TestPrivateCountriesAPI:
 
-    def test_outsider_can_see_countries(self, client):
+    @classmethod
+    def setup_class(cls):
+        cls.client = APIClient()
+
+    def test_normal_user_cannot_create_countries(self, users, country_payload):
         url = reverse('countries:countries-list')
-        response = client.get(url)
+        self.client.force_authenticate(users['normal'][0])
+        response = self.client.post(url, country_payload)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_staff_user_can_create_countries(self, users, country_payload):
+        url = reverse('countries:countries-list')
+        self.client.force_authenticate(users['staff'][0])
+        response = self.client.post(url, country_payload)
+        assert response.status_code == status.HTTP_201_CREATED
+
+    def test_superuser_can_create_countries(self, users, country_payload):
+        url = reverse('countries:countries-list')
+        self.client.force_authenticate(users['superuser'][0])
+        response = self.client.post(url, country_payload)
+        assert response.status_code == status.HTTP_201_CREATED
+
+    def test_normal_user_cannot_delete_countries(self, users, country_obj):
+        self.client.force_authenticate(users['normal'][0])
+        response = self.client.delete(f'/api/countries/{country_obj.id}/')
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_staff_user_can_delete_countries(self, users, country_obj):
+        self.client.force_authenticate(users['staff'][0])
+        response = self.client.delete(f'/api/countries/{country_obj.id}/')
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+    def test_superuser_can_delete_countries(self, users, country_obj):
+        self.client.force_authenticate(users['superuser'][0])
+        response = self.client.delete(f'/api/countries/{country_obj.id}/')
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+    def test_normal_user_cannot_update_countries(self, users, country_payload, country_obj):
+        self.client.force_authenticate(users['normal'][0])
+        response = self.client.put(f'/api/countries/{country_obj.id}/', country_payload)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_staff_user_can_update_countries(self, users, country_payload, country_obj):
+        self.client.force_authenticate(users['staff'][0])
+        country_payload['description'] = "test" + country_payload['description']
+        response = self.client.put(f'/api/countries/{country_obj.id}/', country_payload)
         assert response.status_code == status.HTTP_200_OK
+        assert response.data['description'] != country_obj.description
 
-    def test_outsider_cannot_create_country(self, client):
-        payload = {
-            'name': 'testcountry'
-        }
-        url = reverse('countries:countries-list')
-        response = client.post(url, payload)
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    def test_superuser_can_update_countries(self, users, country_payload, country_obj):
+        self.client.force_authenticate(users['superuser'][0])
+        country_payload['description'] = "test1" + country_payload['description']
+        response = self.client.put(f'/api/countries/{country_obj.id}/', country_payload)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['description'] != country_obj.description

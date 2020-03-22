@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'allauth',
     'allauth.account',
+    'allauth.socialaccount',
     'rest_auth.registration',
     'base',
     'django.contrib.sites',
@@ -56,6 +57,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'blog_permissions',
     'post_states',
+    'test_utils'
 ]
 
 SITE_ID = 1

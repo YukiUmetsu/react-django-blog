@@ -6,7 +6,12 @@ from blog_permissions.permissions import IsStaffUserOrReadOnly
 
 
 # Create your views here.
-class CountriesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin):
+class CountriesViewSet(viewsets.GenericViewSet,
+                       mixins.ListModelMixin,
+                       mixins.CreateModelMixin,
+                       mixins.RetrieveModelMixin,
+                       mixins.UpdateModelMixin,
+                       mixins.DestroyModelMixin):
     """Base viewset for user owned recipe attributes"""
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsStaffUserOrReadOnly,)

@@ -119,5 +119,4 @@ class PostLikesPermissions(permissions.BasePermission):
         if request.user and obj.user:
             return obj.user == request.user
         else:
-            request_id = request.data.get('ip_address')
             return obj.ip_address == request.data.get('ip_address')

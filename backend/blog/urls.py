@@ -31,4 +31,5 @@ urlpatterns = [
     path('api/tags/', include('tags.urls'), name='tags'),
     path('api/post_states/', include('post_states.urls'), name='post_states'),
     path('api/posts/', include('posts.urls'), name='posts'),
+    path('api/comments/', include('comments.urls'), name='comments'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -14,7 +14,7 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
             return True
 
         # Write permissions are only allowed to the owner of the snippet.
-        return obj.owner == request.user
+        return obj.user == request.user
 
 
 class IsSuperUser(permissions.BasePermission):
@@ -86,5 +86,23 @@ class UserCanCreateOwnObject(permissions.BasePermission):
 
             logged_in_user = get_user_model().objects.filter(email=request.user)[0]
             return str(request.data['user']) == str(logged_in_user.id)
+
+        return True
+
+
+class OwnerCanUpdateOrReadOnly(permissions.BasePermission):
+    """
+    Anyone can read and create
+    Only owner can update
+    Owner and Staff users can delete
+    """
+    def has_object_permission(self, request, view, obj):
+        if request.method in ["PUT", "PATCH"]:
+            return obj.user == request.user
+
+        if request.method == "DELETE":
+            if request.user.is_staff:
+                return True
+            return obj.user == request.user
 
         return True

@@ -10,10 +10,12 @@ class Comments(models.Model):
     name = models.CharField(blank=True, null=True, max_length=100)
     email = models.EmailField(blank=True, null=True, max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
+    is_hidden = models.BooleanField(default=False)
     parent = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        blank=True, null=True
     )
     post = models.ForeignKey(Posts, blank=False, null=False, on_delete=models.CASCADE)
 

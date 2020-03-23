@@ -94,6 +94,21 @@ class TestPrivateTagsAPI:
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data['user'] == users['normal'][0].id
 
+    def test_normal_user_can_create_multiple_tags(self, users, tag_payload):
+        self.client.force_authenticate(users['normal'][0])
+        payload = []
+        tag_payload['user'] = users['normal'][0].id
+        another = {
+            'name': 'another tag name',
+            'user': tag_payload['user']
+        }
+        payload.append(tag_payload)
+        payload.append(another)
+        response = self.client.post("/api/tags/", payload, format='json')
+        assert response.status_code == status.HTTP_201_CREATED
+        tags = Tags.objects.filter(user=users['normal'][0])
+        assert len(tags) == 2
+
     def test_normal_user_cannot_create_others_tag(self, users, tag_payload):
         self.client.force_authenticate(users['normal'][0])
         tag_payload['user'] = users['normal'][1].id
@@ -151,4 +166,3 @@ class TestPrivateTagsAPI:
         self.client.force_authenticate(users['normal'][0])
         response = self.client.delete(get_tag_detail_url(tag_obj1.id))
         assert response.status_code in [status.HTTP_403_FORBIDDEN, status.HTTP_404_NOT_FOUND]
-        tag_obj1.delete()

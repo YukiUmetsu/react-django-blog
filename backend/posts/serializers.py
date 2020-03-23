@@ -4,6 +4,7 @@ from .models import Posts
 
 class PostsSerializer(serializers.ModelSerializer):
     """Serializer for posts"""
+    """TODO: 1. Get post pictures, 2. number of likes of a post, 3. post comments in detail page"""
 
     class Meta:
         model = Posts

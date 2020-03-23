@@ -84,10 +84,18 @@ class UserCanCreateOwnObject(permissions.BasePermission):
             if request.user.is_staff:
                 return True
 
-            logged_in_user = get_user_model().objects.filter(email=request.user)[0]
-            return str(request.data['user']) == str(logged_in_user.id)
+            if isinstance(request.data, list):
+                results = [is_object_owned_by_user(target_obj.get('user'), request.user) for target_obj in request.data]
+                return all(results)
+            else:
+                return is_object_owned_by_user(request.data['user'], request.user)
 
         return True
+
+
+def is_object_owned_by_user(target_obj_user_id, user_email):
+    logged_in_user = get_user_model().objects.filter(email=user_email)[0]
+    return str(target_obj_user_id) == str(logged_in_user.id)
 
 
 class OwnerCanUpdateOrReadOnly(permissions.BasePermission):

@@ -106,3 +106,18 @@ class OwnerCanUpdateOrReadOnly(permissions.BasePermission):
             return obj.user == request.user
 
         return True
+
+
+class PostLikesPermissions(permissions.BasePermission):
+    """
+    ip address and post are unique
+    """
+    def has_object_permission(self, request, view, obj):
+        if request.method not in ["PUT", "PATCH"]:
+            return True
+
+        if request.user and obj.user:
+            return obj.user == request.user
+        else:
+            request_id = request.data.get('ip_address')
+            return obj.ip_address == request.data.get('ip_address')

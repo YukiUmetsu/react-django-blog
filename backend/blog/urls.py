@@ -32,4 +32,5 @@ urlpatterns = [
     path('api/post_states/', include('post_states.urls'), name='post_states'),
     path('api/posts/', include('posts.urls'), name='posts'),
     path('api/comments/', include('comments.urls'), name='comments'),
+    path('api/post_likes/', include('post_likes.urls'), name='post_likes'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

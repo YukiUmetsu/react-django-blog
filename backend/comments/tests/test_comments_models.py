@@ -115,7 +115,7 @@ class TestPrivateCommentsAPI:
         response = self.client.put(f'/api/comments/{comment_obj.id}/', comment_payload)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_staff_user_can_update_others_comments(self, users, comment_payload, comment_obj):
+    def test_staff_user_cannot_update_others_comments(self, users, comment_payload, comment_obj):
         self.client.force_authenticate(users['staff'][0])
         comment_payload['content'] = "test" + comment_payload['content']
         response = self.client.put(f'/api/comments/{comment_obj.id}/', comment_payload)

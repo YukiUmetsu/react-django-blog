@@ -1,0 +1,33 @@
+[
+  {
+    "model": "categories.categories",
+    "pk": 1,
+    "fields": {
+      "name": "JLPT"
+    }
+  },
+  {
+    "model": "categories.categories",
+    "pk": 2,
+    "fields": {
+      "name": "N5",
+      "parent": 1
+    }
+  },
+  {
+    "model": "categories.categories",
+    "pk": 3,
+    "fields": {
+      "name": "N4",
+      "parent": 1
+    }
+  },
+  {
+    "model": "categories.categories",
+    "pk": 4,
+    "fields": {
+      "name": "N3",
+      "parent": 1
+    }
+  }
+]

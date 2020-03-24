@@ -1,0 +1,79 @@
+[
+  {
+    "model": "post_likes.postlikes",
+    "pk": 1,
+    "fields": {
+      "like": 1,
+      "ip_address": "192.168.176.2",
+      "user": 4,
+      "post": 1,
+      "created_at": "2020-03-24 17:04:04.47654+00"
+    }
+  },
+  {
+    "model": "post_likes.postlikes",
+    "pk": 2,
+    "fields": {
+      "like": 1,
+      "ip_address": "192.168.176.4",
+      "user": 5,
+      "post": 1,
+      "created_at": "2020-03-24 17:04:04.47654+00"
+    }
+  },
+  {
+    "model": "post_likes.postlikes",
+    "pk": 3,
+    "fields": {
+      "like": 1,
+      "ip_address": "192.168.176.5",
+      "user": 5,
+      "post": 2,
+      "created_at": "2020-03-24 17:04:04.47654+00"
+    }
+  },
+  {
+    "model": "post_likes.postlikes",
+    "pk": 4,
+    "fields": {
+      "like": 1,
+      "ip_address": "192.168.176.6",
+      "user": 6,
+      "post": 2,
+      "created_at": "2020-03-24 17:04:04.47654+00"
+    }
+  },
+  {
+    "model": "post_likes.postlikes",
+    "pk": 5,
+    "fields": {
+      "like": 1,
+      "ip_address": "192.168.176.6",
+      "user": 6,
+      "post": 3,
+      "created_at": "2020-03-24 17:04:04.47654+00"
+    }
+  },
+  {
+    "model": "post_likes.postlikes",
+    "pk": 6,
+    "fields": {
+      "like": 1,
+      "ip_address": "192.168.176.4",
+      "user": 4,
+      "post": 3,
+      "created_at": "2020-03-24 17:04:04.47654+00"
+    }
+  },
+  {
+    "model": "post_likes.postlikes",
+    "pk": 7,
+    "fields": {
+      "like": 1,
+      "ip_address": "192.168.176.6",
+      "user": 4,
+      "post": 4,
+      "created_at": "2020-03-24 17:04:04.47654+00"
+    }
+  }
+]

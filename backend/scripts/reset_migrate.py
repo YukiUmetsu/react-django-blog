@@ -1,7 +1,7 @@
 import os
 import re
-import django
 from django.db import connection
+from django.core import management
 
 
 # loop through the migrations folder and delete migration files.
@@ -35,16 +35,25 @@ def recreate_db():
 
 def migrate_again():
     print("making migration files and migrate again...")
-    os.system("python manage.py makemigrations && python manage.py migrate")
+    management.call_command("makemigrations")
+    management.call_command("migrate")
 
 
 def create_superusers():
-    os.system("python manage.py runscript add_superuser")
+    print("creating superusers...")
+    management.call_command("runscript", "add_superuser")
+
+
+def create_test_users():
+    management.call_command("runscript", "add_test_users")
 
 
 def load_initial_data():
+    print("loading fixtures...")
     os.system("python3 manage.py loaddata */fixtures/*.json")
-
+    os.system("python3 manage.py loaddata */posts_fixtures/*.json")
+    os.system("python3 manage.py loaddata */post_likes_fixtures/*.json")
+    os.system("python3 manage.py loaddata */comments_fixtures/*.json")
 
 # CAUTION! reset whole database and remove migration files!!!
 def run():
@@ -52,4 +61,5 @@ def run():
     remove_migration_files()
     migrate_again()
     create_superusers()
+    create_test_users()
     load_initial_data()

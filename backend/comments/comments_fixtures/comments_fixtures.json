@@ -1,0 +1,40 @@
+[
+  {
+    "model": "comments.comments",
+    "pk": 1,
+    "fields": {
+      "content": "This is an amazing post!!!",
+      "name": "",
+      "email": "",
+      "user": 4,
+      "is_hidden": 0,
+      "post": 3,
+      "created_at": "2020-03-24 17:04:04.47654+00"
+    }
+  },
+  {
+    "model": "comments.comments",
+    "pk": 2,
+    "fields": {
+      "content": "This is an amazing post x 2!!!",
+      "name": "",
+      "email": "",
+      "user": 5,
+      "is_hidden": 0,
+      "post": 3,
+      "created_at": "2020-03-24 17:04:04.47654+00"
+    }
+  },
+  {
+    "model": "comments.comments",
+    "pk": 3,
+    "fields": {
+      "content": "This is an amazing post x 3!!!",
+      "name": "test name",
+      "email": "test email",
+      "is_hidden": 0,
+      "post": 4,
+      "created_at": "2020-03-24 17:04:04.47654+00"
+    }
+  }
+]

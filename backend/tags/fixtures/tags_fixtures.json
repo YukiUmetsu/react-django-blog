@@ -1,0 +1,50 @@
+[
+  {
+    "model": "tags.tags",
+    "pk": 1,
+    "fields": {
+      "name": "Japanese",
+      "user": 1
+    }
+  },
+  {
+    "model": "tags.tags",
+    "pk": 2,
+    "fields": {
+      "name": "Vocabulary",
+      "user": 1
+    }
+  },
+  {
+    "model": "tags.tags",
+    "pk": 3,
+    "fields": {
+      "name": "Grammar",
+      "user": 1
+    }
+  },
+  {
+    "model": "tags.tags",
+    "pk": 4,
+    "fields": {
+      "name": "Listening",
+      "user": 1
+    }
+  },
+  {
+    "model": "tags.tags",
+    "pk": 5,
+    "fields": {
+      "name": "Writing",
+      "user": 2
+    }
+  },
+  {
+    "model": "tags.tags",
+    "pk": 6,
+    "fields": {
+      "name": "Reading",
+      "user": 2
+    }
+  }
+]

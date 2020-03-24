@@ -3,6 +3,7 @@ from rest_framework.authentication import TokenAuthentication
 from .models import Posts
 from posts import serializers
 from blog_permissions.permissions import IsStaffUserOrReadOnly
+from django.db.models import Count
 
 
 class PostsViewSet(viewsets.GenericViewSet,
@@ -15,6 +16,10 @@ class PostsViewSet(viewsets.GenericViewSet,
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsStaffUserOrReadOnly,)
 
-    """Manage post states in the database"""
     queryset = Posts.objects.all()
     serializer_class = serializers.PostsSerializer
+
+    def get_queryset(self):
+        return Posts.objects.annotate(
+            total_likes=Count('postlikes'),
+        )

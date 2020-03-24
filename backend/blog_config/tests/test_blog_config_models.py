@@ -37,7 +37,7 @@ def config_obj(config_payload, users):
 
 
 @pytest.mark.django_db
-class TestPublicFilesAPI:
+class TestPublicBlogConfigAPI:
 
     @classmethod
     def setup_class(cls):
@@ -51,8 +51,8 @@ class TestPublicFilesAPI:
         assert response.status_code == status.HTTP_200_OK
 
     def test_outsider_cannot_create_config(self, config_payload):
-        response = self.client.post(f'/api/files/', config_payload)
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        response = self.client.post('/api/blog_config/', config_payload)
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
     def test_outsider_cannot_delete_config(self, config_obj):
         response = self.client.delete(config_detail_url(config_obj.id))
@@ -61,13 +61,13 @@ class TestPublicFilesAPI:
     def test_outsider_cannot_update_config(self, config_payload, config_obj):
         config_id = config_obj.id
         config_payload['meta_desc'] = 'something different'
-        response = self.client.patch(f'/api/files/{config_id}/', config_payload)
+        response = self.client.patch(f'/api/blog_config/{config_id}/', config_payload)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 @pytest.mark.django_db
 @pytest.mark.usefixtures("users")
-class TestPrivateFilesAPI:
+class TestPrivateBlogConfigAPI:
 
     @classmethod
     def setup_class(cls):

@@ -35,6 +35,7 @@ urlpatterns = [
     path('api/post_likes/', include('post_likes.urls'), name='post_likes'),
     path('api/files/', include('files.urls'), name='files'),
     path('api/blog_config/', include('blog_config.urls'), name='blog_config'),
+    path('api/quiz_types/', include('quiz_types.urls'), name='quiz_types'),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

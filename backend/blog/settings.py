@@ -58,7 +58,8 @@ INSTALLED_APPS = [
     'post_states',
     'test_utils',
     'files',
-    'blog_config'
+    'blog_config',
+    'quiz_types',
 ]
 
 

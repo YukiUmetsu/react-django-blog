@@ -1,0 +1,15 @@
+[
+  {
+    "model": "blog_config.blogconfig",
+    "pk": 1,
+    "fields": {
+      "title": "Jplaunch",
+      "owned_by": "Jplaunch",
+      "meta_desc": "Pick up Japanese with Jplaunch!",
+      "youtube_url": "https://www.youtube.com/jplaunch",
+      "facebook_url": "https://www.facebook.com/jplaunch",
+      "instagram_url": "https://www.instagram.com/jplaunch/",
+      "author": 1
+    }
+  }
+]

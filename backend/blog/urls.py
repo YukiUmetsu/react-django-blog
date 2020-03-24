@@ -33,4 +33,7 @@ urlpatterns = [
     path('api/posts/', include('posts.urls'), name='posts'),
     path('api/comments/', include('comments.urls'), name='comments'),
     path('api/post_likes/', include('post_likes.urls'), name='post_likes'),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    path('api/files/', include('files.urls'), name='files'),
+]
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -59,7 +59,7 @@ class IsStaffUserOrReadOnly(permissions.BasePermission):
 
 class IsOwnerOrStaffUser(permissions.BasePermission):
     """
-    You need to be the owner of the tag or superuser to read or edit
+    You need to be the owner of the object or superuser to read or edit
     """
 
     def has_object_permission(self, request, view, obj):
@@ -88,7 +88,7 @@ class UserCanCreateOwnObject(permissions.BasePermission):
                 results = [is_object_owned_by_user(target_obj.get('user'), request.user) for target_obj in request.data]
                 return all(results)
             else:
-                return is_object_owned_by_user(request.data['user'], request.user)
+                return is_object_owned_by_user(request.data.get('user'), request.user)
 
         return True
 

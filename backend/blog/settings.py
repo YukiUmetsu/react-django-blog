@@ -29,7 +29,6 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
@@ -44,27 +43,30 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'rest_auth.registration',
-    'base',
     'django.contrib.sites',
+    'django_extensions',
+    'corsheaders',
+    'base',
     'users',
-    'media',
     'countries',
     'categories',
     'comments',
     'post_likes',
     'posts',
     'tags',
-    'django_extensions',
     'blog_permissions',
     'post_states',
-    'test_utils'
+    'test_utils',
+    'files',
 ]
+
 
 SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -182,3 +184,18 @@ AUTH_USER_MODEL = 'users.CustomUser'
 REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'users.serializers.UserSerializer',
 }
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 100
+}
+
+CORS_ORIGIN_WHITELIST = [
+    'http://192.168.176.2:3000',
+    'http://192.168.176.1:3000',
+    'http://localhost:3000',
+    'http://localhost:8000',
+    'http://localhost',
+    'http://192.168.176.6',
+    'http://192.168.176.6:5555',
+]

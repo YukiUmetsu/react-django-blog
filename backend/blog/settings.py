@@ -60,6 +60,8 @@ INSTALLED_APPS = [
     'files',
     'blog_config',
     'quiz_types',
+    'quizzes',
+    'quiz_groups',
 ]
 
 

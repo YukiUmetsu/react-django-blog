@@ -1,5 +1,5 @@
 from django.db import models
-from quizzes import Quizzes
+from quizzes.models import Quizzes
 
 
 class QuizOptions(models.Model):

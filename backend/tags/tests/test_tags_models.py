@@ -49,7 +49,6 @@ class TestPublicTagsAPI:
 
 
 @pytest.mark.django_db
-@pytest.mark.usefixtures("users")
 class TestPrivateTagsAPI:
 
     @classmethod
@@ -62,6 +61,7 @@ class TestPrivateTagsAPI:
 
     def test_normal_user_can_see_own_tags_in_list_view(self, users, tag_payload):
         # create 2 tags with 2 different users
+        Tags.objects.all().delete()
         tag_payload['user'] = users['normal'][0]
         Tags.objects.create(**tag_payload)
         tag_payload['name'] = "something different"
@@ -71,7 +71,7 @@ class TestPrivateTagsAPI:
         # can access only to your tags.
         self.client.force_authenticate(users['normal'][0])
         response = self.client.get("/api/tags/")
-        assert len(response.data) == 1
+        assert len(response.data.get("results")) == 1
 
     def test_normal_user_cannot_see_others_tags_in_detail_view(self, users, tag_payload):
         # create 2 tags with 2 different users

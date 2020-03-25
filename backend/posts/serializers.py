@@ -4,8 +4,8 @@ from .models import Posts
 
 class PostsSerializer(serializers.ModelSerializer):
     """Serializer for posts"""
-    """TODO: 1. Get post pictures, 2. number of likes of a post, 3. post comments in detail page"""
-    total_likes = serializers.IntegerField()
+    """todo: post comments in detail page"""
+    total_likes = serializers.IntegerField(required=False)
 
     class Meta:
         model = Posts
@@ -23,4 +23,4 @@ class PostsSerializer(serializers.ModelSerializer):
             'tags',
             'total_likes',
         )
-        read_only_fields = ('id','total_likes')
+        read_only_fields = ('id', 'total_likes')

@@ -1,0 +1,9 @@
+[
+  {
+    "model": "quiz_types.quiztypes",
+    "pk": 1,
+    "fields": {
+      "name": "multiple choices"
+    }
+  }
+]

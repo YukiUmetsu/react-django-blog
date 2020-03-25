@@ -21,7 +21,7 @@ class TestPublicPostsAPI:
     def test_outsider_can_see_posts(self, post_obj):
         response = self.client.get("/api/posts/")
         assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]['title'] == post_obj.title
+        assert response.data.get('results')[0].get('title') == post_obj.title
 
     def test_outsider_cannot_create_post(self, post_min_payload):
         response = self.client.post("/api/posts/", post_min_payload)

@@ -1,5 +1,6 @@
 from rest_framework import permissions
 from django.contrib.auth import get_user_model
+from quizzes.models import Quizzes
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
@@ -54,7 +55,7 @@ class IsStaffUserOrReadOnly(permissions.BasePermission):
             return True
 
         # Write permissions are only allowed to the owner of the snippet.
-        return bool(request.user and request.user.is_staff)
+        return bool(request.user.is_authenticated and request.user.is_staff)
 
 
 class IsOwnerOrStaffUser(permissions.BasePermission):
@@ -63,7 +64,7 @@ class IsOwnerOrStaffUser(permissions.BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        if request.user is None:
+        if not request.user.is_authenticated:
             return False
         if request.user and request.user.is_staff:
             return True
@@ -78,7 +79,7 @@ class UserCanCreateOwnObject(permissions.BasePermission):
 
     def has_permission(self, request, view):
         if request.method == 'POST':
-            if request.user is None:
+            if not request.user.is_authenticated:
                 return False
 
             if request.user.is_staff:
@@ -104,6 +105,7 @@ class OwnerCanUpdateOrReadOnly(permissions.BasePermission):
     Only owner can update
     Owner and Staff users can delete
     """
+
     def has_object_permission(self, request, view, obj):
         if request.method in ["PUT", "PATCH"]:
             return obj.user == request.user
@@ -120,6 +122,7 @@ class PostLikesPermissions(permissions.BasePermission):
     """
     ip address and post are unique
     """
+
     def has_object_permission(self, request, view, obj):
         if request.method not in ["PUT", "PATCH"]:
             return True
@@ -128,3 +131,32 @@ class PostLikesPermissions(permissions.BasePermission):
             return obj.user == request.user
         else:
             return obj.ip_address == request.data.get('ip_address')
+
+
+class CanSeeQuizIfQuizGroupIsPublic(permissions.BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            # owner and staff can see. otherwise, quiz group has to be public.
+            if request.user and request.user.is_staff:
+                return True
+
+            if obj.user == request.user:
+                return True
+
+            return self.is_quiz_group_public(obj)
+
+        else:
+            # owner or staff users can edit.
+            if not request.user.is_authenticated:
+                return False
+            if request.user and request.user.is_staff:
+                return True
+            return obj.user == request.user
+
+    def is_quiz_group_public(self, obj):
+        if not isinstance(obj, Quizzes):
+            return False
+
+        public_group_count = Quizzes.objects.get(id=obj.id).quizgroups_set.count()
+        return public_group_count > 0

@@ -5,7 +5,8 @@ import shutil
 HELP_TEXT = "please specify app_name and singular_app_name like this: \rpython add_api.py books book"
 SETTINGS_FOLDER = "blog"
 
-def run(app_name, singular_app_name):
+
+def run(app_name, singular_app_name=""):
     app_name_exist = bool(app_name)
     if app_name_exist and not bool(singular_app_name):
         singular_app_name = app_name.rstrip("s")
@@ -33,24 +34,23 @@ def run(app_name, singular_app_name):
 
 
 def remove_original_test_file(target_dir):
-    test_file_path = target_dir+"/tests.py"
+    test_file_path = target_dir + "/tests.py"
     if os.path.exists(test_file_path):
         os.remove(test_file_path)
 
 
 def copy_files(current_dir, target_dir, tmp_dir):
-
     try:
-        original_views_path = target_dir+"/views.py"
+        original_views_path = target_dir + "/views.py"
         if os.path.exists(original_views_path):
             shutil.copy2(original_views_path, tmp_dir)
             os.remove(original_views_path)
 
-        org_files = get_files(current_dir+"/templates")
+        org_files = get_files(current_dir + "/templates")
         for org_file in org_files:
             if "tests" in org_file:
-                os.makedirs(target_dir +"/tests", 0o777, True)
-                shutil.copy2(org_file, target_dir+"/tests")
+                os.makedirs(target_dir + "/tests", 0o777, True)
+                shutil.copy2(org_file, target_dir + "/tests")
             else:
                 shutil.copy2(org_file, target_dir)
 

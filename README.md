@@ -60,3 +60,7 @@ I created a script reset migrations in dev environment.<br>
 This command creates a folder and scripts including default models ...etc like always but also.. <br>
 basic serializers.py, test file in tests folder, urls.py, add basic model views script in views.py<br>
 It also adds the app in the INSTALLED_APPS in the settings.py!!<br>
+
+# commands to create basic serializers.py, urls.py, add basic api scripts to views.py
+<code>docker container exec -it backend sh -c "python manage.py runscript add_api --script-args app_name singular_app_name"</code><br>
+*singular_app_name is optional. If it is empty, singular will be app_name without last plural "s" if any.<br>

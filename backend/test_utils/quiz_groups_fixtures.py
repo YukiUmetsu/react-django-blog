@@ -7,18 +7,20 @@ from test_utils.users_fixtures import users
 
 
 @pytest.fixture
-def quiz_groups_payload(users, quiz_groups_obj):
+def quiz_group_payload(users):
     return {
         'name': "test public group",
+        'description': "this is a great quiz!",
         'is_public': 1,
         'user': users['normal'][0].id
     }
 
 
 @pytest.fixture
-def hidden_quiz_groups_payload(users, quiz_groups_obj):
+def hidden_quiz_group_payload(users):
     return {
         'name': "test public group",
+        'description': "this is a great quiz!",
         'is_public': 0,
         'user': users['normal'][0].id
     }
@@ -29,11 +31,13 @@ def hidden_quiz_groups_payload(users, quiz_groups_obj):
 def quiz_group_obj0(users):
     quiz_groups = QuizGroups.objects.create(
         name="test public group 0",
+        description="this is a great quiz!!",
         is_public=True,
         user=users['normal'][0]
     )
-    yield
-    quiz_groups.delete()
+    yield quiz_groups
+    if quiz_groups.id is not None:
+        quiz_groups.delete()
 
 
 @pytest.fixture
@@ -41,11 +45,27 @@ def quiz_group_obj0(users):
 def quiz_group_obj1(users):
     quiz_groups = QuizGroups.objects.create(
         name="test public group 1",
+        description="this is a great quiz!!",
         is_public=True,
         user=users['normal'][1]
     )
-    yield
-    quiz_groups.delete()
+    yield quiz_groups
+    if quiz_groups.id is not None:
+        quiz_groups.delete()
+
+
+@pytest.fixture
+@pytest.mark.django_db
+def hidden_quiz_g_obj(users):
+    quiz_groups = QuizGroups.objects.create(
+        name="test public group 1",
+        description="this is a great quiz!!",
+        is_public=False,
+        user=users['normal'][0]
+    )
+    yield quiz_groups
+    if quiz_groups.id is not None:
+        quiz_groups.delete()
 
 
 @pytest.fixture
@@ -56,7 +76,7 @@ def staff_quiz_group_obj0(users):
         is_public=True,
         user=users['staff'][0]
     )
-    yield
+    yield quiz_groups
     quiz_groups.delete()
 
 

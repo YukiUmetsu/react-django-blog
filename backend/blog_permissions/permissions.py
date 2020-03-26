@@ -160,3 +160,25 @@ class CanSeeQuizIfQuizGroupIsPublic(permissions.BasePermission):
 
         public_group_count = Quizzes.objects.get(id=obj.id).quizgroups_set.count()
         return public_group_count > 0
+
+
+class CanSeeQuizGroupIfPublic(permissions.BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            # owner and staff can see. otherwise, quiz group has to be public.
+            if request.user and request.user.is_staff:
+                return True
+
+            if obj.user == request.user:
+                return True
+
+            return obj.is_public
+
+        else:
+            # owner or staff users can edit.
+            if not request.user.is_authenticated:
+                return False
+            if request.user and request.user.is_staff:
+                return True
+            return obj.user == request.user

@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'quiz_types',
     'quizzes',
     'quiz_groups',
+    'quiz_options',
 ]
 
 
@@ -165,6 +166,8 @@ CACHES = {
         },
     }
 }
+# Cache time to live is 15 minutes.
+CACHE_TTL = 60 * 15
 
 # django-redis: use redis as session cache
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"

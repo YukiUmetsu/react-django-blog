@@ -64,3 +64,11 @@ It also adds the app in the INSTALLED_APPS in the settings.py!!<br>
 # commands to create basic serializers.py, urls.py, add basic api scripts to views.py
 <code>docker container exec -it backend sh -c "python manage.py runscript add_api --script-args app_name singular_app_name"</code><br>
 *singular_app_name is optional. If it is empty, singular will be app_name without last plural "s" if any.<br>
+
+# Redis cache:
+You should consider caching the result of a request when the following cases are true:<br>
+- rendering the page involves a lot of database queries and/or business logic,<br>
+- the page is visited frequently by your users,<br>
+- the data is the same for every user,<br>
+- and the data does not change often.<br>
+<code>CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)<br>@cache_page(CACHE_TTL)<br>def get_posts():</code>

@@ -51,4 +51,12 @@ I created a script reset migrations in dev environment.<br>
 1. drop the database.<br>
 2. remove all the migration files.<br>
 3. make new migration files and migrate again.<br>
-<code>docker container exec -it backend sh -c "python manage.py runscript reset_migrate"</code>
+<code>docker container exec -it backend sh -c "python manage.py runscript reset_migrate"</code> or <br>
+<code>docker container exec -it backend sh -c "python cmanage.py resetmigrate"</code>
+
+# shortcuts for creating a new app!
+<code>docker container exec -it backend sh -c "python cmanage.py startapp app_name singular_app_name"</code><br>
+*singular_app_name is optional<br>
+This command creates a folder and scripts including default models ...etc like always but also.. <br>
+basic serializers.py, test file in tests folder, urls.py, add basic model views script in views.py<br>
+It also adds the app in the INSTALLED_APPS in the settings.py!!<br>

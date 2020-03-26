@@ -38,6 +38,7 @@ urlpatterns = [
     path('api/quiz_types/', include('quiz_types.urls'), name='quiz_types'),
     path('api/quizzes/', include('quizzes.urls'), name='quizzes'),
     path('api/quiz_groups/', include('quiz_groups.urls'), name='quiz_groups'),
+    path('api/quiz_options/', include('quiz_options.urls'), name='quiz_options'),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

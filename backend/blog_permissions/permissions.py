@@ -1,6 +1,7 @@
 from rest_framework import permissions
 from django.contrib.auth import get_user_model
 from quizzes.models import Quizzes
+from quiz_options.models import QuizOptions
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
@@ -155,11 +156,17 @@ class CanSeeQuizIfQuizGroupIsPublic(permissions.BasePermission):
             return obj.user == request.user
 
     def is_quiz_group_public(self, obj):
-        if not isinstance(obj, Quizzes):
+        if isinstance(obj, Quizzes):
+            public_group_count = Quizzes.objects.get(id=obj.id).quizgroups_set.filter(is_public=True).count()
+            return public_group_count > 0
+        elif isinstance(obj, QuizOptions):
+            quiz = QuizOptions.objects.get(id=obj.id).quiz
+            if not quiz:
+                return False
+            public_group_count = Quizzes.objects.get(id=quiz.id).quizgroups_set.filter(is_public=True).count()
+            return public_group_count > 0
+        else:
             return False
-
-        public_group_count = Quizzes.objects.get(id=obj.id).quizgroups_set.count()
-        return public_group_count > 0
 
 
 class CanSeeQuizGroupIfPublic(permissions.BasePermission):
@@ -182,3 +189,64 @@ class CanSeeQuizGroupIfPublic(permissions.BasePermission):
             if request.user and request.user.is_staff:
                 return True
             return obj.user == request.user
+
+
+class CanSeeQOptionsIfPublicEditIfOwned(permissions.BasePermission):
+
+    def has_permission(self, request, view):
+        if request.method == "POST":
+            return self.check_create_permission(request)
+        return True
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return self.check_read_permission(request, obj)
+        else:
+            return self.check_edit_permission(request, obj)
+
+    def check_create_permission(self, request):
+        if not request.user.is_authenticated:
+            return False
+        if request.user.is_staff:
+            return True
+        if isinstance(request.data, list):
+            results = [self.is_quiz_owned_by_user(target_obj.get('quiz'), request.user) for target_obj in
+                       request.data]
+            return all(results)
+        return self.is_quiz_owned_by_user(request.data.get('quiz'), request.user)
+
+    def check_read_permission(self, request, obj):
+        if request.user and request.user.is_staff:
+            return True
+        if self.is_quiz_owned_by_user(obj.quiz, request.user):
+            return True
+        return self.is_quiz_group_public(obj)
+
+    def check_edit_permission(self, request, obj):
+        if not request.user.is_authenticated:
+            return False
+        if request.user and request.user.is_staff:
+            return True
+        return self.is_quiz_owned_by_user(obj.quiz, request.user)
+
+    def is_quiz_owned_by_user(self, quiz_obj, user):
+        if quiz_obj is None:
+            return False
+        owner = None
+        if isinstance(quiz_obj, (str, int)):
+            owner = Quizzes.objects.get(id=quiz_obj).user
+        if isinstance(quiz_obj, Quizzes):
+            owner = Quizzes.objects.get(id=quiz_obj.id).user
+        if owner is None:
+            return False
+        return str(owner) == str(user)
+
+    def is_quiz_group_public(self, obj):
+        if isinstance(obj, QuizOptions):
+            quiz = QuizOptions.objects.get(id=obj.id).quiz
+            if not quiz:
+                return False
+            public_group_count = Quizzes.objects.get(id=quiz.id).quizgroups_set.filter(is_public=True).count()
+            return public_group_count > 0
+        else:
+            return False

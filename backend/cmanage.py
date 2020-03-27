@@ -27,7 +27,7 @@ if command == "startapp":
                   f"python manage.py runscript add_api --script-args {app_name} {singular_app_name}")
     else:
         os.system(f"python manage.py startapp {app_name} && "
-                  f"python manage.py runscript add_api --script-args {app_name} {0}")
+                  f"python manage.py runscript add_api --script-args {app_name}")
 
 if command == "resetmigrate":
     os.system("python manage.py runscript reset_migrate")

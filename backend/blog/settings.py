@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'quizzes',
     'quiz_groups',
     'quiz_options',
+    'quiz_user_submissions',
 ]
 
 

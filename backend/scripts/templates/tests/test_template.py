@@ -20,8 +20,8 @@ class TestPublicModel__API:
     def setup_class(cls):
         cls.client = APIClient()
 
-    def test_outsider_can_see_public_app_name__(self, client, singular___public):
-        print(f"created quiz in a group: {singular___public}")
+    def test_outsider_can_see_public_app_name__(self, client, singular___obj0):
+        print(f"created quiz in a group: {singular___obj0}")
         response = client.get('/api/app_name__/')
         assert response.status_code == status.HTTP_200_OK
 
@@ -29,13 +29,13 @@ class TestPublicModel__API:
         response = client.post('/api/app_name__/', singular___payload)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_outsider_cannot_delete_singular__(self, singular___public):
-        response = self.client.delete(get_singular___detail_url(singular___public.id))
+    def test_outsider_cannot_delete_singular__(self, singular___obj0):
+        response = self.client.delete(get_singular___detail_url(singular___obj0.id))
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_outsider_cannot_update_singular__(self, singular___payload, singular___public):
+    def test_outsider_cannot_update_singular__(self, singular___payload, singular___obj0):
         singular___payload['name'] = 'something different'
-        response = self.client.put(get_singular___detail_url(singular___public.id), singular___payload)
+        response = self.client.put(get_singular___detail_url(singular___obj0.id), singular___payload)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
@@ -51,21 +51,20 @@ class TestPrivateModel__API:
         cls.client = None
 
     def test_normal_user_can_see_own_app_name___in_list_view(self,
-                                                          users,
-                                                          singular___public,
-                                                          singular___obj1,
-                                                          singular___private_group):
-        # quiz with user0, quiz with user1, quiz with user0 but group is hidden
-        print(f'created app_name__: {singular___public} / {singular___obj1} / {singular___private_group}')
-        # can access only to your quiz and public one.
+                                                             users,
+                                                             singular___obj0,
+                                                             singular___obj1):
+        print(f'created app_name__: {singular___obj0} / {singular___obj1}')
         self.client.force_authenticate(users['normal'][1])
         response = self.client.get("/api/app_name__/", format='json')
-        assert len(response.data.get('results')) == 2
+        assert len(response.data.get('results')) == 1
+        response_detail = self.client.get(get_singular___detail_url(singular___obj1.id))
+        assert response_detail.status_code == status.HTTP_200_OK
 
-    def test_normal_user_cannot_see_others_app_name___in_detail_view(self, users, singular___private_group):
+    def test_normal_user_cannot_see_others_app_name___in_detail_view(self, users, singular___obj0):
         # can not access to other's hidden app_name__.
         self.client.force_authenticate(users['normal'][1])
-        url = get_singular___detail_url(singular___private_group.id)
+        url = get_singular___detail_url(singular___obj0.id)
         response = self.client.get(url)
         assert response.status_code in [status.HTTP_403_FORBIDDEN, status.HTTP_404_NOT_FOUND]
 

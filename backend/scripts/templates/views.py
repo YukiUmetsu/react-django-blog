@@ -11,3 +11,12 @@ class Model__ViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, IsOwnerOrStaffUser)
     queryset = Model__.objects.all()
     serializer_class = serializers.Model__Serializer
+
+    def get_queryset(self):
+        # needed to filter objects in list view since has_object_permission won't work in list view
+        user = self.request.user
+
+        if user.is_staff:
+            return Model__.objects.all()
+        else:
+            return Model__.objects.filter(user=user)

@@ -250,3 +250,27 @@ class CanSeeQOptionsIfPublicEditIfOwned(permissions.BasePermission):
             return public_group_count > 0
         else:
             return False
+
+
+class AnyoneCanCreateButReadEditOwnerOnly(permissions.BasePermission):
+
+    def has_permission(self, request, view):
+        is_post = request.method == 'POST'
+        is_logged_in = request.user.is_authenticated
+        obj = request.data
+        obj_user_exist = obj.get('user') is not None
+        if is_post and is_logged_in and obj_user_exist:
+            return str(request.data.get('user')) == str(request.user.id)
+
+        if not is_post and not request.user.is_authenticated:
+            return False
+
+        return True
+
+    def has_object_permission(self, request, view, obj):
+
+        if not request.user.is_authenticated:
+            return False
+        if request.user and request.user.is_staff:
+            return True
+        return obj.user == request.user

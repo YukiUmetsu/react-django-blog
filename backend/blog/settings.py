@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'quiz_options',
     'quiz_user_submissions',
     'tickets',
+    'blacklist_words',
 ]
 
 

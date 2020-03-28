@@ -41,6 +41,7 @@ urlpatterns = [
     path('api/quiz_options/', include('quiz_options.urls'), name='quiz_options'),
     path('api/quiz_user_submissions/', include('quiz_user_submissions.urls'), name='quiz_user_submissions'),
     path('api/tickets/', include('tickets.urls'), name='tickets'),
+    path('api/blacklist_words/', include('blacklist_words.urls'), name='blacklist_words'),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

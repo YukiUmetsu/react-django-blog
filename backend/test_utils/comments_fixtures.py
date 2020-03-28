@@ -7,6 +7,16 @@ from test_utils.categories_fixtures import category_payload, category_obj
 from test_utils.tags_fixtures import staff_tag_obj0, tag_payload
 from test_utils.post_states_fixtures import all_states
 from test_utils.posts_fixtures import post_min_payload, post_obj
+from blacklist_words.models import BlacklistWords
+
+
+@pytest.fixture
+@pytest.mark.django_db
+def blacklist_word_obj0():
+    obj = BlacklistWords.objects.create(content="fuck", used_in_comments=True, used_in_tickets=True)
+    yield obj
+    if obj.id is not None:
+        obj.delete()
 
 
 @pytest.fixture

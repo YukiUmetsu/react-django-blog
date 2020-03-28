@@ -1,6 +1,5 @@
 from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
 from .models import Tickets
 from blog_permissions.permissions import AnyoneCanCreateButReadEditOwnerOnly
 from tickets import serializers

@@ -5,6 +5,7 @@ from rest_framework.test import APIClient
 from test_utils.users_fixtures import users
 from test_utils.tickets_fixtures import ticket_payload, ticket_payload_for_create, ticket_obj0, ticket_obj1
 from tickets.models import Tickets
+from blacklist_words.models import BlacklistWords
 
 pytestmark = pytest.mark.django_db
 
@@ -12,6 +13,13 @@ pytestmark = pytest.mark.django_db
 def get_ticket_detail_url(ticket_id):
     return f"/api/tickets/{ticket_id}/"
 
+@pytest.fixture
+@pytest.mark.django_db
+def blacklist_word_obj0():
+    obj = BlacklistWords.objects.create(content="fuck", used_in_comments=True, used_in_tickets=True)
+    yield obj
+    if obj.id is not None:
+        obj.delete()
 
 @pytest.mark.django_db
 class TestPublicTicketsAPI:
@@ -37,6 +45,11 @@ class TestPublicTicketsAPI:
         ticket_payload['title'] = 'something different'
         response = self.client.put(get_ticket_detail_url(ticket_obj0.id), ticket_payload)
         assert response.status_code in [status.HTTP_403_FORBIDDEN, status.HTTP_404_NOT_FOUND]
+
+    def test_outsider_cannot_create_ticket_with_blacklist_words(self, ticket_payload, blacklist_word_obj0):
+        ticket_payload["content"] += f" {blacklist_word_obj0.content} "
+        response = self.client.post('/api/tickets/', ticket_payload)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.mark.django_db

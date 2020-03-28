@@ -6,7 +6,7 @@ from test_utils.users_fixtures import users
 from test_utils.categories_fixtures import category_payload, category_obj
 from test_utils.tags_fixtures import tag_payload, staff_tag_obj0
 from test_utils.post_states_fixtures import all_states
-from test_utils.comments_fixtures import comment_payload, comment_min_payload, comment_obj
+from test_utils.comments_fixtures import comment_payload, comment_min_payload, comment_obj, blacklist_word_obj0
 from test_utils.posts_fixtures import post_min_payload, post_obj
 
 
@@ -56,6 +56,13 @@ class TestPublicCommentsAPI:
     def test_outsider_cannot_update_others_comment(self, comment_payload, comment_obj):
         response = self.client.put(f'/api/comments/{comment_obj.id}/', comment_payload)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_outsider_cannot_create_comment_with_blacklist_words(self, comment_min_payload, blacklist_word_obj0):
+        comment_min_payload['post'] = comment_min_payload['post'].id
+        comment_min_payload["content"] += f" {blacklist_word_obj0.content} "
+        response = self.client.post('/api/comments/', comment_min_payload)
+        print(response.data)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.mark.django_db

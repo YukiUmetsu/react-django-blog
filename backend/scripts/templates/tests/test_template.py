@@ -20,13 +20,13 @@ class TestPublicModel__API:
     def setup_class(cls):
         cls.client = APIClient()
 
-    def test_outsider_can_see_public_app_name__(self, client, singular___obj0):
+    def test_outsider_can_see_public_app_name__(self, singular___obj0):
         print(f"created quiz in a group: {singular___obj0}")
-        response = client.get('/api/app_name__/')
+        response = self.client.get('/api/app_name__/')
         assert response.status_code == status.HTTP_200_OK
 
-    def test_outsider_cannot_create_singular__(self, client, singular___payload):
-        response = client.post('/api/app_name__/', singular___payload)
+    def test_outsider_cannot_create_singular__(self, singular___payload):
+        response = self.client.post('/api/app_name__/', singular___payload)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_outsider_cannot_delete_singular__(self, singular___obj0):

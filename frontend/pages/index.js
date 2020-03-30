@@ -1,9 +1,23 @@
 import React from 'react';
+import Layout from "../components/Layout";
+import MainHeader from "../components/MainHeader";
+import Footer from "../components/Footer";
+import AboutUs from "../components/home/AboutUs";
+import RecentBlogArticles from "../components/home/RecentBlogArticles";
+import RecentYoutubeVideos from "../components/home/RecentYoutubeVideos";
 
 class Index extends React.Component {
     render() {
         return (
-            <div>Hello World</div>
+            <Layout>
+                <main>
+                    <MainHeader/>
+                    <AboutUs/>
+                    <RecentBlogArticles/>
+                    <RecentYoutubeVideos/>
+                    <Footer/>
+                </main>
+            </Layout>
         );
     }
 }

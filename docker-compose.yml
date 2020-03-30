@@ -8,6 +8,8 @@ services:
       - 3000:3000
     env_file:
       - ./frontend/.env.prod
+    volumes:
+      - ./frontend/:/usr/src/frontend/
 
   backend:
     build: ./backend
@@ -27,8 +29,6 @@ services:
     container_name: nginx
     ports:
       - 5555:80
-    volumes:
-      - ./backend/:/usr/src/blog/
     depends_on:
       - backend
 

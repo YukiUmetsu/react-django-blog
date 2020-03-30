@@ -1,18 +1,26 @@
 import React from 'react';
-import FlexCardList from "../UI/Cards/FlexCardList";
+import Aux from "../../hoc/Aux/Aux";
+import SiteNavBar from "../../components/SiteNavBar";
+import Footer from "../../components/Footer";
+import CategoryHeader from "../../components/categories/CategoryHeader";
+import FlexCardList from "../../components/UI/Cards/FlexCardList";
 
-const RecentYoutubeVideos = (props) => {
+const Categories = (props) => {
     return (
-        <section className="relative py-20 mb-40">
-            <div className="flex mb-16 justify-center">
-                <h1 className="text-center text-5xl">Popular Youtube Videos</h1>
-            </div>
-            <FlexCardList data={RECENT_VIDEOS} />
-        </section>
+        <Aux>
+            <SiteNavBar/>
+            <CategoryHeader/>
+
+            <section className="relative py-20 mb-40 sm:mx-8 md:mx-8">
+                <FlexCardList data={POSTS} isHorizontal={true} widthSizeClass="w-full" />
+            </section>
+
+            <Footer/>
+        </Aux>
     );
 };
 
-const RECENT_VIDEOS = [
+const POSTS = [
     {
         'title': 'JLPT N5 Vocabulary with sentences #1',
         'img': '/images/header/fuji.jpg',
@@ -62,4 +70,5 @@ const RECENT_VIDEOS = [
         'content': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus nec finibus nisl. Mauris quis erat vitae tellus venenatis lobortis.'
     },
 ];
-export default RecentYoutubeVideos
+
+export default Categories

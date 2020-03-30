@@ -1,6 +1,6 @@
 import React from 'react';
 import Layout from "../components/Layout";
-import MainHeader from "../components/MainHeader";
+import MainHeader from "../components/home/MainHeader";
 import Footer from "../components/Footer";
 import AboutUs from "../components/home/AboutUs";
 import RecentBlogArticles from "../components/home/RecentBlogArticles";

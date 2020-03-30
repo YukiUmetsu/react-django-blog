@@ -14,3 +14,4 @@ db.sqlite3-journal
 /frontend/node_modules/
 /venv/
 /frontend/.next/
+*.DS_Store

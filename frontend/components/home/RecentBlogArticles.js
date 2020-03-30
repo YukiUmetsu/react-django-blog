@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import FlexCardList from "../UI/FlexCardList";
+import FlexCardList from "../UI/Cards/FlexCardList";
 import Aux from "../../hoc/Aux/Aux";
 
 class RecentBlogArticles extends Component {

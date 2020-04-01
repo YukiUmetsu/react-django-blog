@@ -13,8 +13,9 @@ const HorizontalCard = (props) => {
                     <div className="py-12 px-6 max-w-xl lg:max-w-5xl lg:w-1/2">
                         <h2 className="text-3xl text-gray-800 font-bold">{props.title}</h2>
                         <p className="mt-4 text-gray-600">{props.content}</p>
-                        <div className="mt-8">
+                        <div className="mt-8 relative">
                             <a href="#" className="bg-gray-900 text-gray-100 px-5 py-3 font-semibold rounded">Read More</a>
+                            <p className="absolute right-0 bottom-0 text-gray-500">{props.published_at}</p>
                         </div>
                     </div>
                 </div>

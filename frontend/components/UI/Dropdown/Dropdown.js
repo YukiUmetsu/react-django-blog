@@ -12,7 +12,7 @@ const Dropdown = (props) => {
     let createItems = () => {
        return props.items.map(item => {
            return (
-               <li className="w-full">
+               <li className="w-full" key={item}>
                    <a
                        className={`rounded-t ${props.liBgColorClass} hover:${props.liBgHoverColorClass} py-2 px-4 block whitespace-no-wrap`}
                        href="#">

@@ -16,7 +16,8 @@ class FlexCardList extends Component {
             })
         }
         return data.map(item => {
-            return <div key={item.title} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/6 mb-8 ml-8 mr-8 p-25">
+            return <div key={item.title}
+                        className={`w-full sm:${this.props.cardSMWidthClass} md:${this.props.cardMDWidthClass} lg:${this.props.cardLGWidthClass} xl:${this.props.cardXLWidthClass} mb-8 ml-8 mr-8 p-25`}>
                 <Card {...item}/>
             </div>
         })
@@ -32,12 +33,21 @@ class FlexCardList extends Component {
 }
 
 FlexCardList.propTypes = {
-  isHorizontal: PropTypes.bool,
+    data: PropTypes.array,
+    isHorizontal: PropTypes.bool,
     widthSizeClass: PropTypes.string,
+    cardSMWidthClass: PropTypes.string,
+    cardMDWidthClass: PropTypes.string,
+    cardLGWidthClass: PropTypes.string,
+    cardXLWidthClass: PropTypes.string,
 };
 
 FlexCardList.defaultProps = {
-  isHorizontal: true
+    isHorizontal: true,
+    cardSMWidthClass: 'w-1/2',
+    cardMDWidthClass: 'w-1/3',
+    cardLGWidthClass: 'w-1/4',
+    cardXLWidthClass: 'w-1/6',
 };
 
 export default FlexCardList;

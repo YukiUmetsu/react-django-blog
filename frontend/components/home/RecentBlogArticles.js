@@ -1,6 +1,9 @@
 import React, { Component } from "react";
 import FlexCardList from "../UI/Cards/FlexCardList";
 import Aux from "../../hoc/Aux/Aux";
+import Dropdown from "../UI/Dropdown/Dropdown";
+import {DUMMY_CATEGORY_DROPDOWN_ITEMS, DUMMY_POSTS, SORT_BY_DROPDOWN_ITEMS} from "../../constants";
+import PostFilterDropdown from "../UI/PostsFilters/PostFilterDropdown";
 
 class RecentBlogArticles extends Component {
     constructor(props){
@@ -15,71 +18,12 @@ class RecentBlogArticles extends Component {
                     <div className="flex mb-16 justify-center">
                         <h1 className="text-center text-5xl">Recent Blog Articles</h1>
                     </div>
-                    <FlexCardList data={POSTS} />
+                    <PostFilterDropdown/>
+                    <FlexCardList data={DUMMY_POSTS} />
                 </section>
             </Aux>
         );
     }
 }
-
-const POSTS = [
-    {
-        'title': 'JLPT N5 Vocabulary with sentences #1',
-        'img': '/images/header/fuji.jpg',
-        'tags': 'Fuji',
-        'published_at': '2020/02/28',
-        'content': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus nec finibus nisl. Mauris quis erat vitae tellus venenatis lobortis.'
-    },
-    {
-        'title': 'JLPT N5 Vocabulary with sentences #2',
-        'img': '/images/header/odaiba.jpg',
-        'tags': 'Odaiba',
-        'published_at': '2020/02/28',
-        'content': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus nec finibus nisl. Mauris quis erat vitae tellus venenatis lobortis.'
-    },
-    {
-        'title': 'JLPT N5 Vocabulary with sentences #3',
-        'img': '/images/header/osakajo.jpg',
-        'tags': 'Osakajo',
-        'published_at': '2020/02/28',
-        'content': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus nec finibus nisl. Mauris quis erat vitae tellus venenatis lobortis.'
-    },
-    {
-        'title': 'JLPT N5 Vocabulary with sentences #4',
-        'img': '/images/header/shibuya.jpg',
-        'tags': 'Shibuya',
-        'published_at': '2020/02/28',
-        'content': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus nec finibus nisl. Mauris quis erat vitae tellus venenatis lobortis.'
-    },
-    {
-        'title': 'JLPT N5 Vocabulary with sentences #5',
-        'img': '/images/header/fuji.jpg',
-        'tags': 'Fuji',
-        'published_at': '2020/02/28',
-        'content': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus nec finibus nisl. Mauris quis erat vitae tellus venenatis lobortis.'
-    },
-    {
-        'title': 'JLPT N5 Vocabulary with sentences #6',
-        'img': '/images/header/odaiba.jpg',
-        'tags': 'Odaiba',
-        'published_at': '2020/02/28',
-        'content': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus nec finibus nisl. Mauris quis erat vitae tellus venenatis lobortis.'
-    },
-    {
-        'title': 'JLPT N5 Vocabulary with sentences #7',
-        'img': '/images/header/osakajo.jpg',
-        'tags': 'Osakajo',
-        'published_at': '2020/02/28',
-        'content': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus nec finibus nisl. Mauris quis erat vitae tellus venenatis lobortis.'
-    },
-    {
-        'title': 'JLPT N5 Vocabulary with sentences #8',
-        'img': '/images/header/shibuya.jpg',
-        'tags': 'Shibuya',
-        'published_at': '2020/02/28',
-        'content': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus nec finibus nisl. Mauris quis erat vitae tellus venenatis lobortis.'
-    },
-];
-
 
 export default RecentBlogArticles;

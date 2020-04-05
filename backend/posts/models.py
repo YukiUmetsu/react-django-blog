@@ -2,6 +2,7 @@ from django.db import models
 from categories.models import Categories
 from tags.models import Tags
 from post_states.models import PostStates
+from files.models import Files
 from django.conf import settings
 
 
@@ -18,6 +19,7 @@ class Posts(models.Model):
         on_delete=models.CASCADE
     )
     post_state = models.ForeignKey(PostStates, on_delete=models.CASCADE)
+    main_img = models.ForeignKey(Files, on_delete=models.CASCADE, related_name='main_img')
     tags = models.ManyToManyField(Tags, blank=True)
 
     class Meta:

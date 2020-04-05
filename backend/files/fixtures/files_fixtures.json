@@ -1,0 +1,46 @@
+[
+  {
+    "model": "files.files",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "type": "image",
+      "desc": "fuji",
+      "file": "/uploads/2020/04/05/fuji.jpg",
+      "created_at": "2020-03-24 17:04:04.47654+00"
+    }
+  },
+  {
+    "model": "files.files",
+    "pk": 2,
+    "fields": {
+      "user": 1,
+      "type": "image",
+      "desc": "odaiba",
+      "file": "/uploads/2020/04/05/odaiba.jpg",
+      "created_at": "2020-03-24 17:04:04.47654+00"
+    }
+  },
+  {
+    "model": "files.files",
+    "pk": 3,
+    "fields": {
+      "user": 1,
+      "type": "image",
+      "desc": "osakajo",
+      "file": "/uploads/2020/04/05/osakajo.jpg",
+      "created_at": "2020-03-24 17:04:04.47654+00"
+    }
+  },
+  {
+    "model": "files.files",
+    "pk": 4,
+    "fields": {
+      "user": 1,
+      "type": "image",
+      "desc": "shibuya",
+      "file": "/uploads/2020/04/05/shibuya.jpg",
+      "created_at": "2020-03-24 17:04:04.47654+00"
+    }
+  }
+]

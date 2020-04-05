@@ -1,3 +1,5 @@
+export const IMG_HOST = 'http://localhost:8000/';
+
 export const DUMMY_CATEGORY_DROPDOWN_ITEMS = {
   'name': 'Select Category',
   'items': [

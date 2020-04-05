@@ -1,9 +1,8 @@
 import React, { Component } from "react";
 import FlexCardList from "../UI/Cards/FlexCardList";
 import Aux from "../../hoc/Aux/Aux";
-import Dropdown from "../UI/Dropdown/Dropdown";
-import {DUMMY_CATEGORY_DROPDOWN_ITEMS, DUMMY_POSTS, SORT_BY_DROPDOWN_ITEMS} from "../../constants";
 import PostFilterDropdown from "../UI/PostsFilters/PostFilterDropdown";
+import convertPosts from "../../lib/postDataConvert";
 
 class RecentBlogArticles extends Component {
     constructor(props){
@@ -19,7 +18,7 @@ class RecentBlogArticles extends Component {
                         <h1 className="text-center text-5xl">Recent Blog Articles</h1>
                     </div>
                     <PostFilterDropdown/>
-                    <FlexCardList data={DUMMY_POSTS} />
+                    <FlexCardList data={convertPosts(this.props.posts)} />
                 </section>
             </Aux>
         );

@@ -4,7 +4,7 @@ import { IMG_HOST } from "../constants/index";
 const convertPosts = (data) => {
 
     const convertImageHost  = (imagePath) => {
-        let regex = /^(http|https):\/\/[a-z:0-9]*\/?/;
+        let regex = /^(http|https):\/\/[a-z:0-9\.-]*\/?/;
         return imagePath.replace(regex, IMG_HOST)
     };
 

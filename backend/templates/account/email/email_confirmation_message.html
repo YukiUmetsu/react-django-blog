@@ -1,0 +1,13 @@
+{% load account %}
+{% user_display user as user_display %}
+{% load i18n %}
+{% autoescape off %}
+{% block content %}
+<h1>Greeting from Jplaunch!</h1>
+<p>You're receiving this e-mail because user {{ user_display }} has given yours as an e-mail address to connect their account.</p>
+<p>To confirm this is correct, please click <a href="http://localhost:3000/users/confirm-email?url={{ activate_url }}">here:</a></p>
+http://localhost:3000/users/confirm-email?url={{ activate_url }}<br><br><br>
+Thank you,<br/>
+<p>Jplaunch</p>
+{% endblock %}
+{% endautoescape %}

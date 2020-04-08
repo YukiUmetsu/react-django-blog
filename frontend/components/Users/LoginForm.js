@@ -13,6 +13,9 @@ const LoginForm = (props) => {
     const { register, handleSubmit, errors, triggerValidation } = useForm({reValidateMode: 'onChange', submitFocusError: true});
 
     const onSubmit = async data => {
+        if(typeof window === 'undefined'){
+            return;
+        }
         let current_login_fail = parseInt(cookie.get('login_fail'));
         if(isNaN(current_login_fail)){
             current_login_fail = 0;

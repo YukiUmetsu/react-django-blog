@@ -3,9 +3,14 @@ import Router from 'next/router'
 import nextCookie from 'next-cookies'
 import cookie from 'js-cookie'
 import fetch from 'isomorphic-unfetch'
-import {LOGIN_API} from "../constants";
+import {CONFIRM_TOKEN_API, LOGIN_API, LOGOUT_API} from "../constants";
+import {isEmpty} from "./utils";
 
 const loginURL = '/users/login';
+const defaultHeader = {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+};
 
 export const login = ({ token }) => {
     cookie.set('token', token, { expires: 1 });
@@ -28,10 +33,21 @@ export const auth = ctx => {
     return token
 };
 
-export const logout = () => {
+export const logout = async () => {
+    const headers = defaultHeader;
+    const token = cookie.get('token');
+    const csrf_token = cookie.get('csrf_token');
+    if (csrf_token!== 'undefined') {
+        headers['X-CSRFToken'] = csrf_token
+    }
+    const response = await fetch(LOGOUT_API, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({token: token}),
+    });
+
     cookie.remove('token');
     // to support logging out from all windows
-
     window.localStorage.setItem('logout', Date.now());
     Router.push(loginURL)
 };
@@ -71,10 +87,7 @@ export const withAuthSync = WrappedComponent => {
 };
 
 export const loginFetch = async (data) => {
-    const headers = {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-    };
+    const headers = defaultHeader;
     if (data['csrf_token'] !== 'undefined') {
         headers['X-CSRFToken'] = data['csrf_token']
     }
@@ -98,5 +111,37 @@ export const loginFetch = async (data) => {
 
     } catch (error) {
         return error;
+    }
+};
+
+let includeConfirmedCookie = (cookie) => {
+    if(typeof cookie === 'undefined'){
+        return false;
+    }
+    if(cookie.includes("have confirmed")){
+        return true;
+    }
+    return false;
+};
+
+export const confirmEmailFetch = async (confirmToken) => {
+    let alreadyConfirmed = !isEmpty(cookie.get("confirm-email-successful"));
+    let confirmURL = CONFIRM_TOKEN_API + confirmToken + "/";
+    const headers = defaultHeader;
+    const csrf_token = cookie.get('csrf_token');
+    if (csrf_token!== 'undefined') {
+        headers['X-CSRFToken'] = csrf_token
+    }
+    if(alreadyConfirmed){
+        return true;
+    }
+    const response = await fetch(confirmURL, {headers: headers});
+
+    if([302,200].includes(response.status) || includeConfirmedCookie(cookie.get("messages"))){
+        cookie.set("confirm-email-successful", true);
+        //Router.push('/users/login');
+        return true;
+    } else {
+        Router.push('/users/confirm-email?badRequest=true');
     }
 };

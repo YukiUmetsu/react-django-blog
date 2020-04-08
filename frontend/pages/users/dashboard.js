@@ -1,4 +1,5 @@
 import React from 'react';
+import {withAuthSync} from "../../lib/auth";
 
 const UsersDashboard = (props) => {
     return (
@@ -6,4 +7,4 @@ const UsersDashboard = (props) => {
     );
 };
 
-export default UsersDashboard
+export default withAuthSync(UsersDashboard)

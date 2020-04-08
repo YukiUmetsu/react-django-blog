@@ -86,8 +86,10 @@ export const loginFetch = async (data) => {
             body: JSON.stringify(data),
         });
         if (response.status === 200) {
-            const { token } = await response.json();
-            await login({ token })
+            const responseData = await response.json();
+            const token = responseData.key;
+            await login({ token });
+            return {token: token, response: response};
         } else {
             let error = new Error(response.statusText);
             error.response = response;

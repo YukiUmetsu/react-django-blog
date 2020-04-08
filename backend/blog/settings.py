@@ -30,6 +30,7 @@ ALLOWED_HOSTS = ['backend', 'localhost']
 
 # Application definition
 INSTALLED_APPS = [
+    'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_auth',
@@ -45,7 +46,6 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'django.contrib.sites',
     'django_extensions',
-    'corsheaders',
     'base',
     'users',
     'countries',

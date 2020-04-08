@@ -1,29 +1,36 @@
 import React from 'react';
 import { useForm } from 'react-hook-form'
 import OutsideComponentAlerter from "../../hoc/Aux/OutsideComponentAlerter";
+import {EMAIL_VALIDATION_RULE, PASSWORD_VALIDATION_RULE} from "../../constants";
+import CSRFTokenInput from "./CSRFTokenInput";
+import {loginFetch} from "../../lib/auth";
+import cookie from 'js-cookie'
+import PropTypes from 'prop-types';
+
 
 const LoginForm = (props) => {
 
-    const { register, handleSubmit, watch, errors, formState, triggerValidation } = useForm({reValidateMode: 'onChange', submitFocusError: true});
-    const onSubmit = data => { console.log(data) };
-    const emailValidationRegister = register(
-        {
-            required: 'Email is required!',
-            pattern: {
-                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
-                message: 'invalid email address'
-            }
+    const { register, handleSubmit, errors, triggerValidation } = useForm({reValidateMode: 'onChange', submitFocusError: true});
+
+    const onSubmit = async data => {
+        let current_login_fail = parseInt(cookie.get('login_fail'));
+        if(isNaN(current_login_fail)){
+            current_login_fail = 0;
+            cookie.set('login_fail', 0, { expires: 1 });
         }
-    );
-    const passwordValidationRegister = register(
-        {
-            required: 'Password is required!',
-            minLength: {
-                value: 8,
-                message: 'Minimum length is 8!'
-            }
+        if (current_login_fail > props.maxLoginFailure) {
+            await props.onMaxLoginFailureCallback();
+            return;
         }
-    );
+        let responseData = await loginFetch(data);
+        if (!responseData.response.ok) {
+           props.onServerError();
+           cookie.set('login_fail', current_login_fail+1, { expires: 1 });
+        }
+    };
+
+    const emailValidationRegister = register(EMAIL_VALIDATION_RULE);
+    const passwordValidationRegister = register(PASSWORD_VALIDATION_RULE);
     let emailErrorMessage = "";
     if (errors.email) {
         emailErrorMessage = <p className="text-red-500 text-xs italic">{errors.email.message}</p>
@@ -58,13 +65,19 @@ const LoginForm = (props) => {
                     ref={passwordValidationRegister}
                 />
                 {passwordErrorMessage}
-
+                <CSRFTokenInput/>
                 <button type="submit" className="w-full text-center py-3 rounded bg-green-600 text-white hover:bg-green-900 focus:outline-none">
                     Login
                 </button>
             </form>
         </OutsideComponentAlerter>
     );
+};
+
+LoginForm.propTypes = {
+    onServerError: PropTypes.func,
+    maxLoginFailure: PropTypes.number,
+    onMaxLoginFailureCallback: PropTypes.func
 };
 
 export default LoginForm

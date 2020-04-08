@@ -1,4 +1,22 @@
 export const IMG_HOST = 'http://localhost:8000/';
+export const LOGIN_API = 'http://localhost:8000/api/rest-auth/login/';
+export const SIGN_UP_API = 'http://localhost:8000/api/rest-auth/registration/';
+
+export const EMAIL_VALIDATION_RULE = {
+    required: 'Email is required!',
+    pattern: {
+        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+        message: 'invalid email address'
+    }
+};
+
+export const PASSWORD_VALIDATION_RULE = {
+    required: 'Password is required!',
+    minLength: {
+        value: 8,
+        message: 'Minimum length is 8!'
+    }
+};
 
 export const DUMMY_CATEGORY_DROPDOWN_ITEMS = {
   'name': 'Select Category',

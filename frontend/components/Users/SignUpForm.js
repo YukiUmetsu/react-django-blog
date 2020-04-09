@@ -3,13 +3,24 @@ import { useForm } from 'react-hook-form'
 import {EMAIL_VALIDATION_RULE, PASSWORD_VALIDATION_RULE} from "../../constants";
 import OutsideComponentAlerter from "../../hoc/Aux/OutsideComponentAlerter";
 import CSRFTokenInput from "./CSRFTokenInput";
+import {signUpFetch} from "../../lib/auth";
+import Router from "next/router";
+import PropTypes from 'prop-types';
+
 
 const SignUpForm = (props) => {
 
     const { register, handleSubmit, watch, errors, formState, triggerValidation } = useForm({reValidateMode: 'onChange', submitFocusError: true});
     const password = useRef({});
     password.current = watch("password", "");
-    const onSubmit = data => { console.log(data) };
+    const onSubmit = data => {
+        let result = signUpFetch(data);
+        if(result === true) {
+            Router.push('/users/login');
+        } else {
+            props.onServerError();
+        }
+    };
 
     const emailValidationRegister = register(EMAIL_VALIDATION_RULE);
     const passwordValidationRegister = register(PASSWORD_VALIDATION_RULE);
@@ -93,6 +104,10 @@ const SignUpForm = (props) => {
         </form>
         </OutsideComponentAlerter>
     );
+};
+
+SignUpForm.propTypes = {
+    onServerError: PropTypes.func,
 };
 
 export default SignUpForm

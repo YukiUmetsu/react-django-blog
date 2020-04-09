@@ -5,6 +5,9 @@ from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
 from users.models import CustomUser
 from django.utils.translation import gettext as _
+from django.contrib.auth.forms import PasswordResetForm
+from rest_auth.serializers import PasswordResetSerializer
+from django.conf import settings
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -54,3 +57,42 @@ class RegisterSerializer(serializers.Serializer):
         setup_user_email(request, user, [])
         user.save()
         return user
+
+
+class PasswordResetSerializer(PasswordResetSerializer):
+    """
+        Serializer for requesting a password reset e-mail.
+        """
+    # email = serializers.EmailField()
+    #
+    # password_reset_form_class = PasswordResetForm
+
+    def get_email_options(self):
+        request = self.context.get('request')
+        opts = {
+            'use_https': request.is_secure(),
+            'from_email': getattr(settings, 'DEFAULT_FROM_EMAIL'),
+            'request': request,
+            'email_template_name': 'password_reset_email.html',
+        }
+        return opts
+
+    # def validate_email(self, value):
+    #     # Create PasswordResetForm with the serializer
+    #     self.reset_form = self.password_reset_form_class(data=self.initial_data)
+    #     if not self.reset_form.is_valid():
+    #         raise serializers.ValidationError(self.reset_form.errors)
+    #
+    #     return value
+    #
+    # def save(self):
+    #     request = self.context.get('request')
+    #     # Set some values to trigger the send_email method.
+    #     opts = {
+    #         'use_https': request.is_secure(),
+    #         'from_email': getattr(settings, 'DEFAULT_FROM_EMAIL'),
+    #         'request': request,
+    #     }
+    #
+    #     opts.update(self.get_email_options())
+    #     self.reset_form.save(**opts)

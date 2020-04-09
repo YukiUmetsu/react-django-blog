@@ -52,7 +52,7 @@ const Login = (props) => {
                     </div>
 
                     <div className="text-grey-dark mt-6">
-                        <Link href="/">
+                        <Link href="/users/forgot-password">
                             <a className="text-blue-600">Forgot password?</a>
                         </Link>
                     </div>

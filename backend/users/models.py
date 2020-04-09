@@ -22,6 +22,8 @@ class CustomUser(AbstractUser):
     country = models.ForeignKey(Countries, null=True, blank=True, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
 
+    def clean_email(self):
+        return self.cleaned_data['email'].lower()
 
     def __str__(self):
         return self.email

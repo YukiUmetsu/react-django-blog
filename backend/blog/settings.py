@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'quiz_user_submissions',
     'tickets',
     'blacklist_words',
+    'reset_password',
 ]
 
 
@@ -202,7 +203,6 @@ DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER')
 AUTH_USER_MODEL = 'users.CustomUser'
 REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'users.serializers.UserSerializer',
-    'PASSWORD_RESET_SERIALIZER':'users.serializers.PasswordResetSerializer',
 }
 REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER': 'users.serializers.RegisterSerializer',

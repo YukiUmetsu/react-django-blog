@@ -30,7 +30,8 @@ backend: create a .env.dev file in backend folder according to .env.sample.
 1. add <code>DJANGO_SETTINGS_MODULE=blog.settings</code> in your .env file.<br>
 2. Do NOT add "__init__.py" file under test folder. Otherwise, pytest can't find modules for some reason.<br>
 3. start pytest<br>
-<code>docker container exec -it backend sh -c "pytest"</code>
+<code>docker container exec -it backend sh -c "pytest"</code><br>
+<code>pytest -v (verbose, show more detail)</code>
 
 # loading initial data
 1. if "backend/countries/fixtures/countries_fixtures.json" doesn't exist, do the following:<br>

@@ -13,10 +13,10 @@ const SignUpForm = (props) => {
     const { register, handleSubmit, watch, errors, formState, triggerValidation } = useForm({reValidateMode: 'onChange', submitFocusError: true});
     const password = useRef({});
     password.current = watch("password", "");
-    const onSubmit = data => {
-        let result = signUpFetch(data);
+    const onSubmit = async data => {
+        let result = await signUpFetch(data);
         if(result === true) {
-            Router.push('/users/login');
+            Router.push('/users/login?create=success');
         } else {
             props.onServerError();
         }

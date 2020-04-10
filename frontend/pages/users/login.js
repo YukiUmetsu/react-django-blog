@@ -2,25 +2,35 @@ import React, { useState, useEffect } from 'react';
 import LoginForm from "../../components/Users/LoginForm";
 import Link from "next/link";
 import Alert from "../../components/UI/Notifications/Alert";
+import { useRouter } from 'next/router'
 
 const Login = (props) => {
-
+    const router = useRouter()
     const [ hasServerError, setHasServerError ] = useState(false);
     const [ overMaxLoginFailure, setOverMaxLoginFailure ] = useState(false);
+    const [ createdSuccess, setCreatedSuccess ] = useState(false);
+    const [ showedCreatedSuccess, setShowedCreatedSuccess ] = useState(false);
 
     useEffect(() => {
+        let createParam = router.query.create;
+        if(createParam === 'success'){
+            setCreatedSuccess(true)
+        } else {
+            setShowedCreatedSuccess(false)
+        }
         renderAlert();
     });
 
     let renderAlert = () => {
         if(overMaxLoginFailure){
-            return (<div className="flex flex-col min-w-1/3 sm:w-1/3 md:min-w-1/2 lg:min-w-1/3 xl:min-w-1/3 mx-auto mb-5">
+            return (
+                <div className="flex flex-col min-w-1/3 sm:w-1/3 md:min-w-1/2 lg:min-w-1/3 xl:min-w-1/3 mx-auto mb-5">
                 <Alert
                     title="Oh NO!"
                     content="You reached today's login tries! Comeback tomorrow!"
                     closeCallback={() => ""}
                 />
-            </div>
+                </div>
             );
         }
         if(hasServerError){
@@ -33,6 +43,21 @@ const Login = (props) => {
                     />
                 </div>
                 );
+        }
+        if(createdSuccess && !showedCreatedSuccess){
+            setTimeout(() => setShowedCreatedSuccess(true), 3000);
+            return (
+                <div className="flex flex-col min-w-1/3 sm:w-1/3 md:min-w-1/2 lg:min-w-1/3 xl:min-w-1/3 mx-auto mb-5">
+                <Alert
+                    bgColor="teal"
+                    textColor="teal"
+                    exitColor="green"
+                    title="Your account was created! "
+                    content="Please check your email and login."
+                    closeCallback={() => setCreatedSuccess(false)}
+                />
+                </div>
+            );
         }
         return "";
     };

@@ -4,7 +4,7 @@ import {EMAIL_VALIDATION_RULE} from "../../constants";
 import CSRFTokenInput from "./CSRFTokenInput";
 import PropTypes from 'prop-types';
 import {useForm} from "react-hook-form";
-import {loginFetch, resetPasswordFetch} from "../../lib/auth";
+import {resetPasswordFetch} from "../../lib/auth";
 import {isEmpty} from "../../lib/utils";
 
 const ForgotPasswordForm = (props) => {
@@ -50,7 +50,9 @@ const ForgotPasswordForm = (props) => {
         </OutsideComponentAlerter>
     );
 };
+
 ForgotPasswordForm.propTypes = {
     onRequestSent: PropTypes.func,
+    ip: PropTypes.string
 };
 export default ForgotPasswordForm

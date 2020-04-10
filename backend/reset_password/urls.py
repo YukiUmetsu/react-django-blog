@@ -4,6 +4,7 @@ from reset_password import views
 
 router = DefaultRouter()
 router.register('', views.ResetPasswordViewSet)
+router.register('confirm', views.ResetPasswordConfirmViewSet)
 
 app_name = 'reset_password'
 

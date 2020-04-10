@@ -31,7 +31,7 @@ const forgotPassword = (props) => {
                 <div className="container w-full max-w-sm mx-auto flex-1 flex flex-col items-center justify-center">
                     <div className="bg-white px-6 py-8 rounded shadow-md text-black w-full">
                         <h1 className="mb-8 text-3xl text-center">Forgot Password?</h1>
-                        <ForgotPasswordForm onRequestSent={() => setWasRequestSent(true)}/>
+                        <ForgotPasswordForm onRequestSent={() => setWasRequestSent(true)} ip={props.ip}/>
                     </div>
                 </div>
             </div>

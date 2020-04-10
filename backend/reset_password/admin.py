@@ -4,10 +4,10 @@ from .models import ResetPassword
 
 # Register your models here.
 class ResetPasswordAdmin(admin.ModelAdmin):
-    list_display = ('email', 'reset_token', 'last_changed', 'request_ip', 'user')
+    list_display = ('email', 'reset_token', 'last_changed', 'user')
     ordering = ('last_changed',)
     list_display_links = ('email', 'reset_token')
-    search_fields = ('email', 'user', 'request_ip', 'last_changed')
+    search_fields = ('email', 'user', 'last_changed')
     list_per_page = 25
 
 

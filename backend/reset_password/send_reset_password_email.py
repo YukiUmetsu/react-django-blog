@@ -29,3 +29,26 @@ def send(email, reset_token):
     )
     msg.attach_alternative(email_html_message, "text/html")
     msg.send()
+
+
+def send_password_changed_email(email):
+    site_name = Site.objects.get_current().name
+    context = {
+        'site_name': site_name,
+        'email': email,
+    }
+    email_html_message = render_to_string('email/user_password_changed.html', context)
+    email_plaintext_message = render_to_string('email/user_password_changed.txt', context)
+
+    msg = EmailMultiAlternatives(
+        # title:
+        "Your Password Changed for {title}".format(title=site_name),
+        # message:
+        email_plaintext_message,
+        # from:
+        settings.DEFAULT_FROM_EMAIL,
+        # to:
+        [email]
+    )
+    msg.attach_alternative(email_html_message, "text/html")
+    msg.send()

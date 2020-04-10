@@ -3,7 +3,14 @@ import Router from 'next/router'
 import nextCookie from 'next-cookies'
 import cookie from 'js-cookie'
 import fetch from 'isomorphic-unfetch'
-import {CONFIRM_TOKEN_API, LOGIN_API, LOGOUT_API, PASSWORD_RESET_API, SIGN_UP_API} from "../constants";
+import {
+    CONFIRM_TOKEN_API,
+    LOGIN_API,
+    LOGOUT_API,
+    PASSWORD_RESET_API,
+    PASSWORD_RESET_CONFIRM_API,
+    SIGN_UP_API
+} from "../constants";
 import {isEmpty} from "./utils";
 
 const loginURL = '/users/login';
@@ -136,7 +143,6 @@ export const signUpFetch = async (data) => {
             headers: headers,
             body: JSON.stringify(data),
         });
-        console.log(response);
         if (response.status === 201) {
             return true;
         } else {
@@ -184,7 +190,7 @@ export const resetPasswordFetch = async (data) => {
         const response = await fetch(PASSWORD_RESET_API, {
             method: 'POST',
             headers: headers,
-            body: JSON.stringify({email: email}),
+            body: JSON.stringify({'email': email}),
         });
         if (response.status === 200) {
             return true;
@@ -196,6 +202,31 @@ export const resetPasswordFetch = async (data) => {
 
     } catch (error) {
         console.log(error);
+        return error;
+    }
+};
+
+export const resetPasswordConfirmFetch = async (data) => {
+    const headers = defaultHeader;
+    if (!isEmpty(data['csrf_token'])) {
+        headers['X-CSRFToken'] = data['csrf_token']
+    }
+
+    try {
+        const response = await fetch(PASSWORD_RESET_CONFIRM_API, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(data),
+        });
+        if (response.status === 200) {
+            return true;
+        } else {
+            let error = new Error(response.statusText);
+            error.response = response;
+            throw error
+        }
+
+    } catch (error) {
         return error;
     }
 };

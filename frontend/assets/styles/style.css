@@ -1,3 +1,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@responsive {
+    .rotateY-0 {
+        transform: rotateY(0deg);
+    }
+    .rotateY-90 {
+        transform: rotateY(90deg);
+    }
+    .rotateY-180 {
+        transform: rotateY(180deg);
+    }
+    .rotateY--180 {
+        transform: rotateY(-180deg);
+    }
+}

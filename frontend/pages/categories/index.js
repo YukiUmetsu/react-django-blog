@@ -4,8 +4,8 @@ import SiteNavBar from "../../components/SiteNavBar";
 import Footer from "../../components/Footer";
 import CategoryHeader from "../../components/categories/CategoryHeader";
 import FlexCardList from "../../components/UI/Cards/FlexCardList";
-import {DUMMY_POSTS} from "../../constants";
 import PostFilterDropdown from "../../components/UI/PostsFilters/PostFilterDropdown";
+import {DUMMY_POSTS} from "../../constants";
 
 const Categories = (props) => {
     return (

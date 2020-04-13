@@ -22,7 +22,7 @@ const dataFactory = Factory.define("data")
     .sequence("id")
     .extend(personFactory);
 
-const userData = dataFactory.buildList(50);
+const userData = dataFactory.buildList(200);
 
 const AdminPanelUsersTable = (props) => {
 

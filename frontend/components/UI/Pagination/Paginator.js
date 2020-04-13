@@ -67,18 +67,43 @@ const Paginator = (props) => {
     };
 
     let renderBody = () => {
-        // create an array of empty x totalPageCount and iterate it.
+        if(totalPageCount < 8){
+            // create an array of empty x totalPageCount and iterate it.
+            return Array(totalPageCount).fill().map((x,i) => {
+                return renderItem(i+1);
+            });
+        }
+        // too many to list every item.
+        // always show first last. otherwise +-2 pages around the current page
         return Array(totalPageCount).fill().map((x,i) => {
             return renderItem(i+1);
         });
     };
 
     let renderItem = (index) => {
+        let isFirstItem = (index === 1);
+        let isLastItem = (index === totalPageCount);
+        let shouldShow = isFirstItem || isLastItem|| (index<=currentPage+props.onShowRange && index>=currentPage-props.onShowRange);
+        if(!shouldShow){
+            return;
+        }
         let isActive = index === currentPage;
         let itemClassName = `block ${props.hoverTextColorClass} ${props.hoverBgColorClass} px-3 py-2`;
         if(!isActive){
             itemClassName = baseClass
         }
+        let renderContent = (index) => {
+            let outOfRangeLess = (index < currentPage - props.onShowRange - 1);
+            let outOfRangeMore = (index > currentPage + props.onShowRange + 1);
+            if (isFirstItem && outOfRangeLess) {
+                return <a>&#60;&#60;</a>
+            } else if(isLastItem && outOfRangeMore){
+                return <a>&#62;&#62;</a>
+            } else {
+                return <a>{index}</a>
+            }
+        };
+
         return (
             <li
                 key={index}
@@ -87,13 +112,14 @@ const Paginator = (props) => {
                     props.onItemClicked(index);
                 }}
                 className={itemClassName} >
-                <a>{index}</a>
+                {renderContent(index)}
             </li>
         );
     };
 
     let itemCountChangeHandler = (e) => {
         setItemCountPerPage(e.target.value);
+        setCurrentPage(1);
     };
 
     return (
@@ -124,17 +150,22 @@ const Paginator = (props) => {
 
 Paginator.defaultProps = {
     originalData: [],
+    onShowRange: 3,
     textColorClass: 'text-blue-500',
     bgColorClass: 'bg-blue-500',
     hoverBgColorClass: 'bg-blue-500',
     hoverTextColorClass: 'text-white',
     disabledTextColorClass: 'text-gray-800',
     disabledBgColorClass: 'bg-gray-300',
+    onPreviousClicked: () => {},
+    onNextClicked: () => {},
+    onItemClicked: () => {},
 };
 
 Paginator.propTypes = {
     originalData: PropTypes.array,
     //-------------optional↓---------------//
+    onShowRange: PropTypes.number,
     onPreviousClicked: PropTypes.func,
     onNextClicked: PropTypes.func,
     onItemClicked: PropTypes.func,

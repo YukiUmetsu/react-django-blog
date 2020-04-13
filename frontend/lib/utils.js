@@ -23,3 +23,8 @@ export const isEmpty = (target) => {
     }
     return target;
 };
+
+export const dateObjToStr = (dateObj) => {
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    return dateObj.toLocaleDateString(undefined, options);
+};

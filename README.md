@@ -118,3 +118,32 @@ Example of using Image slider component.
     </ImageSliderItem>
 </ImageSliderManager>
 ```
+
+2. Pagination higher order component <br/>
+this hoc will create pagination functionality in the table.<br />
+- pass data to originalData<br />
+- pagination hoc will pass paginated data to children component as "data" props.<br/>
+```html
+<Paginator originalData={userData}>
+    <SelectableTable actionsRequired={true} columns={ADMIN_USER_TABLE_COLUMNS}/>
+</Paginator>
+```
+
+
+# Next.js CSS Module, Component-level styles
+https://nextjs.org/blog/next-9-2#built-in-css-module-support-for-component-level-styles<br>
+css: [component name].module.css<br>
+<code>
+.error {
+  color: white;
+  background-color: red;
+}
+</code>
+
+component:
+```html
+ import styles from './Button.module.css'
+
+ <button className={styles.error} >click</button>
+```
+

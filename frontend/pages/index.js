@@ -1,10 +1,10 @@
 import React from 'react';
 import Layout from "../components/Layout";
-import MainHeader from "../components/home/MainHeader";
+import MainHeader from "../components/Home/MainHeader";
 import Footer from "../components/Footer";
-import AboutUs from "../components/home/AboutUs";
-import RecentBlogArticles from "../components/home/RecentBlogArticles";
-import RecentYoutubeVideos from "../components/home/RecentYoutubeVideos";
+import AboutUs from "../components/Home/AboutUs";
+import RecentBlogArticles from "../components/Home/RecentBlogArticles";
+import RecentYoutubeVideos from "../components/Home/RecentYoutubeVideos";
 import getConfig from 'next/config';
 import { fetcherWithHeader } from "../lib/fetch";
 

@@ -2,7 +2,7 @@ import React from 'react';
 import Aux from "../../hoc/Aux/Aux";
 import SiteNavBar from "../../components/SiteNavBar";
 import Footer from "../../components/Footer";
-import CategoryHeader from "../../components/categories/CategoryHeader";
+import CategoryHeader from "../../components/Categories/CategoryHeader";
 import FlexCardList from "../../components/UI/Cards/FlexCardList";
 import PostFilterDropdown from "../../components/UI/PostsFilters/PostFilterDropdown";
 import {DUMMY_POSTS} from "../../constants";

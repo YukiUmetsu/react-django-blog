@@ -3,9 +3,9 @@ import SiteNavBar from "../../components/SiteNavBar";
 import Aux from "../../hoc/Aux/Aux";
 import PropTypes from "prop-types";
 import Footer from "../../components/Footer";
-import PostDetailHeader from "../../components/posts/PostDetailHeader";
+import PostDetailHeader from "../../components/Posts/PostDetailHeader";
 import Subscribe from "../../components/UI/Subscribe";
-import PostDetailRecommendation from "../../components/posts/PostDetailRecommendation";
+import PostDetailRecommendation from "../../components/Posts/PostDetailRecommendation";
 
 const PostDetail = (props) => {
 

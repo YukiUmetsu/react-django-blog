@@ -1,5 +1,28 @@
 const IMG_HOST = 'http://localhost:8000/';
 
+export const DUMMY_TABLE_ACTIONS = [
+    {
+        label: 'Actions',
+        value: '',
+        callback: (selectedItems) => {console.log('not selected'); console.log(selectedItems);}
+    },
+    {
+        label: 'delete users',
+        value: 'delete',
+        callback: (selectedItems) => {console.log('delete'); console.log(selectedItems);}
+    },
+    {
+        label: 'make them staff',
+        value: 'staff',
+        callback: (selectedItems) => {console.log('staff'); console.log(selectedItems);}
+    },
+    {
+        label: 'make them super admin',
+        value: 'superuser',
+        callback: (selectedItems) => {console.log('superuser'); console.log(selectedItems);}
+    },
+];
+
 export const DUMMY_TABLE = {
     header: ["#", "Category", "Title", "Access", "Change"],
     body: [

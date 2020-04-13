@@ -5,7 +5,7 @@ import { Factory } from "rosie"; // dev dependency
 import Aux from '../../../hoc/Aux/Aux';
 import matchSorter from 'match-sorter'
 import SelectableTable from "../../UI/Table/SelectableTable/SelectableTable";
-import {ADMIN_USER_TABLE_COLUMNS} from "../../../constants";
+import {ADMIN_USER_TABLE_COLUMNS, DUMMY_TABLE_ACTIONS} from "../../../constants";
 import Paginator from "../../UI/Pagination/Paginator";
 
 
@@ -26,10 +26,16 @@ const userData = dataFactory.buildList(200);
 
 const AdminPanelUsersTable = (props) => {
 
+    let isActionRequired = true;
+
     return (
         <Aux>
-            <Paginator originalData={userData}>
-                <SelectableTable actionsRequired={true} columns={ADMIN_USER_TABLE_COLUMNS}/>
+            <Paginator originalData={userData} isActionRequired={isActionRequired} columns={ADMIN_USER_TABLE_COLUMNS}>
+                <SelectableTable
+                    isActionsRequired={isActionRequired}
+                    columns={ADMIN_USER_TABLE_COLUMNS}
+                    actionData={DUMMY_TABLE_ACTIONS}
+                />
             </Paginator>
         </Aux>
     )

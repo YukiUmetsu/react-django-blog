@@ -1,12 +1,15 @@
-import React, {useEffect, useState} from 'react';
+import React, {createContext, useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import Aux from "../../../hoc/Aux/Aux";
+import {sortObjects} from "../../../lib/utils";
+export const SortCallbackContext = createContext({});
 
 const Paginator = (props) => {
 
     const [currentPage, setCurrentPage] = useState(1);
     const [itemCountPerPage, setItemCountPerPage] = useState(15);
-    const [data, setData] = useState(props.originalData.slice(0,itemCountPerPage-1));
+    const [totalData, setTotalData] = useState(props.originalData);
+    const [data, setData] = useState(totalData.slice(0,itemCountPerPage-1));
 
     const childrenElements = React.Children.map(props.children, child => {
         return React.cloneElement(child, {
@@ -15,16 +18,16 @@ const Paginator = (props) => {
     });
 
     useEffect(() => {
-        if(props.originalData.length <= itemCountPerPage){
-            setData(props.originalData);
+        if(totalData.length <= itemCountPerPage){
+            setData(totalData);
         } else {
-            setData( props.originalData.slice((currentPage-1)*itemCountPerPage, (currentPage*itemCountPerPage)));
+            setData( totalData.slice((currentPage-1)*itemCountPerPage, (currentPage*itemCountPerPage)));
         }
 
-    },[currentPage, itemCountPerPage]);
+    },[currentPage, itemCountPerPage, totalData]);
 
 
-    let totalPageCount = Math.ceil(props.originalData.length / itemCountPerPage);
+    let totalPageCount = Math.ceil(totalData.length / itemCountPerPage);
     let baseClass = `block hover:${props.hoverTextColorClass} hover:${props.hoverBgColorClass} ${props.textColorClass} px-3 py-2`;
     let disabledClass = `select-none block ${props.disabledTextColorClass} ${props.disabledBgColorClass} px-3 py-2`;
 
@@ -122,15 +125,31 @@ const Paginator = (props) => {
         setCurrentPage(1);
     };
 
+    let sortDataAsc = (columnAccessor) => {
+        let [{type: selectedColumnType}, ...rest] = props.columns.filter(column => {
+            return column.accessor === columnAccessor
+        });
+        let sortedData = sortObjects(totalData, columnAccessor, selectedColumnType,'asc');
+        setTotalData(sortedData);
+    };
+
+    let sortDataDesc = (columnAccessor) => {
+        let [{type: selectedColumnType}, ...rest] = props.columns.filter(column => {
+            return column.accessor === columnAccessor
+        });
+        setTotalData(sortObjects(totalData, columnAccessor, selectedColumnType,'desc'));
+    };
+
     return (
         <Aux>
-            <div className="flex w-1/5 h-10 mb-4">
-                <p className="w-full bold">Rows Per Page</p>
+            <SortCallbackContext.Provider value={{asc: sortDataAsc, desc: sortDataDesc}} >
+            <div className={`flex w-full sm:w-full md:w-full lg:w-1/4 lg:w-1/5 h-10 mb-4 float-right ${props.isActionRequired?'lg:-mb-10 xl:-mb-10': ''}`}>
+                <p className="w-full bold self-center">Rows Per Page</p>
                 <select
                     id="itemCountPerPage"
                     onChange={(e) => itemCountChangeHandler(e)}
                     value={itemCountPerPage}
-                    className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
+                    className="block w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
                     <option>15</option>
                     <option>25</option>
                     <option>50</option>
@@ -144,12 +163,14 @@ const Paginator = (props) => {
                     {renderNext()}
                 </ul>
             </div>
+            </SortCallbackContext.Provider>
         </Aux>
     );
 };
 
 Paginator.defaultProps = {
     originalData: [],
+    columns: [],
     onShowRange: 3,
     textColorClass: 'text-blue-500',
     bgColorClass: 'bg-blue-500',
@@ -164,6 +185,7 @@ Paginator.defaultProps = {
 
 Paginator.propTypes = {
     originalData: PropTypes.array,
+    columns: PropTypes.array,
     //-------------optional↓---------------//
     onShowRange: PropTypes.number,
     onPreviousClicked: PropTypes.func,

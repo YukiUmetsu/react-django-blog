@@ -152,4 +152,10 @@ export const ADMIN_USER_TABLE_COLUMNS = [
     }
 ];
 
+export const SELECTABLE_TABLE_CONSTS = {
+    HEADER_SORT_NORMAL: 0,
+    HEADER_SORT_ASC: 1,
+    HEADER_SORT_DESC: 2,
+};
+
 export * from "./DummyData";

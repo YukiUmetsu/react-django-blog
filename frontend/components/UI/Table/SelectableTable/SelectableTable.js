@@ -1,33 +1,48 @@
-import React, {useEffect, useState, createContext} from 'react';
+import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import TableCSS from '../Table.module.css';
 import SelectableTableRow from "./SelectableTableRow";
-import {removeFromArray, sortObjects} from "../../../../lib/utils";
 import SelectableTableHeader from "./SelectableTableHeader";
 
 const SelectableTable = (props) => {
 
-    let [ selectedItems, setSelectedItems ] = useState([]);
+    let [ selectedItems, setSelectedItems ] = useState(new Set());
     let [ data, setData ] = useState(props.data);
+    let [ checkboxAllOn, setCheckboxAllOnOffStatus] = useState(false);
 
     useEffect(()=> {
         setData(props.data);
+        let isAllSelected = true;
+        for (let i = 0; i < data.length; i++) {
+            if(!selectedItems.has(parseInt(data[i].id))){
+                isAllSelected = false;
+            }
+        }
+        setCheckboxAllOnOffStatus(isAllSelected);
     }, [props.data, data]);
 
     let inputChangedHandler = (event) => {
         let id = parseInt(event.target.id);
-        let isSelected = selectedItems.includes(id);
+        let isSelected = selectedItems.has(id);
         if(isSelected){
-            let copyArr = [...selectedItems];
-            removeFromArray(copyArr, id);
-            setSelectedItems(copyArr);
+            let copySet = new Set(selectedItems);
+            copySet.delete(id);
+            setSelectedItems(copySet);
             return;
         }
         addToSelectedItems([id]);
     };
 
     let addToSelectedItems = (items=[]) => {
-        setSelectedItems([...selectedItems, ...items]);
+        let copySet = new Set(selectedItems);
+        items.forEach(item => copySet.add(item));
+        setSelectedItems(copySet);
+    };
+
+    let removeFromSelectedItems = (items = []) =>  {
+        let copySet = new Set(selectedItems);
+        items.forEach(item => copySet.delete(item));
+        setSelectedItems(copySet);
     };
 
     let renderBody = (bodyItems) => {
@@ -40,9 +55,21 @@ const SelectableTable = (props) => {
                     isActionsRequired={props.isActionsRequired}
                     columnData={getColumnData()}
                     onInputChanged={(e)=>{inputChangedHandler(e)}}
-                    isRowSelected={selectedItems.includes(parseInt(rowObj.id))}
+                    isRowSelected={selectedItems.has(parseInt(rowObj.id))}
                 />);
         })
+    };
+
+    let toggleCheckboxAllOn = () => {
+        let allIds = data.map(item =>item.id);
+        if(checkboxAllOn){
+            // turn off => unselect all
+            removeFromSelectedItems(allIds);
+        } else {
+            // turn on => select all
+            addToSelectedItems(allIds);
+        }
+        setCheckboxAllOnOffStatus(!checkboxAllOn);
     };
 
     let renderActionSelectors = () => {
@@ -78,7 +105,7 @@ const SelectableTable = (props) => {
 
     let bunchActionConfirmed = async () => {
         let selectedAction = document.getElementById("actions-in-bunch").value;
-        if(selectedItems.length > 0){
+        if(selectedItems.size > 0){
             let selectedActionItem;
             let rest;
             [selectedActionItem, ...rest] = props.actionData.filter(item => {
@@ -118,7 +145,7 @@ const SelectableTable = (props) => {
         <div className={TableCSS["table-responsive"]}>
             {renderActionSelectors()}
             <table className={`${TableCSS.table} text-grey-darkest border border-solid border-gray-300`}>
-                <SelectableTableHeader{...props}/>
+                <SelectableTableHeader {...props} onSelectAllCallback={toggleCheckboxAllOn} checkboxAllOn={checkboxAllOn}/>
                 <tbody>
                 {renderBody(props.data)}
                 </tbody>

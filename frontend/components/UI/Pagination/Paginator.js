@@ -13,7 +13,8 @@ const Paginator = (props) => {
 
     const childrenElements = React.Children.map(props.children, child => {
         return React.cloneElement(child, {
-            data: data
+            data: data,
+            originalData: props.originalData,
         });
     });
 

@@ -117,6 +117,12 @@ export const ADMIN_SIDE_BAR_ITEMS = [
     },
 ];
 
+export const SORT_ORDER = {
+    NONE: "NONE",
+    ASC: "ASC",
+    DESC: "DESC",
+};
+
 export const ADMIN_USER_TABLE_COLUMNS = [
     {
         label: 'Icon',
@@ -126,14 +132,18 @@ export const ADMIN_USER_TABLE_COLUMNS = [
     {
         label: 'First Name',
         accessor: 'first_name',
+        type: 'text',
     },
     {
         label: 'Last Name',
         accessor: 'last_name',
+        type: 'text',
     },
     {
         label: 'Email',
         accessor: 'email',
+        type: 'text',
+        searchType: 'equal'
     },
     {
         label: "staff?",

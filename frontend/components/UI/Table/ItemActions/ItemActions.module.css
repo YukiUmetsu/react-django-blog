@@ -1,0 +1,29 @@
+.tooltip-top {
+    /*bottom: 125%;*/
+    /*left: 50%;*/
+    /*margin-left: -60px;*/
+}
+
+.tooltip-top::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+.tooltip-text {
+    font-size: 0.75rem;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    padding: 5px 8px;
+    border-radius: 6px;
+    position: absolute;
+    z-index: 1;
+    top: -2rem;
+    left: -1rem;
+}

@@ -1,15 +1,20 @@
 import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import TableRowItem from "../TableRowItem";
-import ItemActions from "../ItemActions";
+import ItemActions from "../ItemActions/ItemActions";
 
 const SelectableTableRow = (props) => {
 
     let [ isInputSelected, setIsInputSelected ] = useState(false);
+    let [ rowObj, setRowObj ] = useState(props.rowObj);
 
     useEffect(() => {
         setIsInputSelected(props.isRowSelected);
     }, [props.isRowSelected, props.rowObj.id]);
+
+    useEffect(() => {
+        setRowObj(props.rowObj);
+    },[props.rowObj]);
 
     let renderItems = (rowObj) => {
         return props.columnData.columns.map((column, index) => {
@@ -22,6 +27,8 @@ const SelectableTableRow = (props) => {
                    isDate={isDateColumn(index)}
                    increase={isIncreaseColumn(index)}
                    decrease={isDecreaseColumn(index)}
+                   columnAccessor={column.accessor}
+                   rowObjId={rowObj.id}
                />);
         })
     };
@@ -78,7 +85,6 @@ const SelectableTableRow = (props) => {
 };
 
 SelectableTableRow.propTypes = {
-    rowCount: PropTypes.number,
     rowObj: PropTypes.object,
     isActionsRequired: PropTypes.bool,
     columnData: PropTypes.object,

@@ -4,7 +4,7 @@ import NumberIncreaseDisplay from "../Statistics/NumberDisplay/NumberIncreaseDis
 import NumberDecreaseDisplay from "../Statistics/NumberDisplay/NumberDecreaseDisplay";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {faCheck, faTimes} from "@fortawesome/free-solid-svg-icons";
-import {dateObjToStr} from "../../../lib/utils";
+import {formatDate} from "../../../lib/utils";
 
 const TableRowItem = (props) => {
 
@@ -14,18 +14,16 @@ const TableRowItem = (props) => {
         } else if (props.decrease){
             return <td><NumberDecreaseDisplay content={props.content}/></td>
         } else if(props.isImage){
-            return <td><img className="h-14 w-14 rounded-full" src={props.content} alt="" /></td>
+            return <td><img className="h-11 w-10 rounded-full" src={props.content} alt="" /></td>
         } else if(props.isBoolean){
             return (
                 <td>
-                    {props.content === 'true' || props.content === true ?
-                        <FontAwesomeIcon icon={faCheck} className="text-teal-700"/> :
-                        <FontAwesomeIcon icon={faTimes} className="text-gray-500"/>
-                    }
+                    {props.content === true ?
+                        <FontAwesomeIcon id={`${props.columnAccessor}-${props.rowObjId}`} icon={faCheck} className="text-teal-700"/>: " "}
                 </td>
             );
         } else if(props.isDate){
-            return <td>{dateObjToStr(props.content)}</td>
+            return <td>{formatDate(props.content)}</td>
         }
         return <td>{props.content}</td>
     };
@@ -40,6 +38,8 @@ TableRowItem.defaultProps = {
     isImage: false,
     isDate: false,
     isBoolean: false,
+    columnAccessor: "",
+    rowObjId: 0,
 };
 
 TableRowItem.propTypes = {
@@ -49,6 +49,8 @@ TableRowItem.propTypes = {
     isImage: PropTypes.bool,
     isDate: PropTypes.bool,
     isBoolean: PropTypes.bool,
+    columnAccessor: PropTypes.string,
+    rowObjId: PropTypes.number,
 };
 
 export default TableRowItem

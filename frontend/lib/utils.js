@@ -1,3 +1,6 @@
+import moment from 'moment'
+import {SORT_ORDER} from "../constants";
+
 export const isEmpty = (target) => {
     let objType = typeof target;
     if(objType === 'undefined'){
@@ -6,27 +9,33 @@ export const isEmpty = (target) => {
     if(target === null){
         return true;
     }
-    if(objType === 'object'){
-        return Object.keys(target).length === 0;
-    }
     if(objType === 'string'){
         return target.length < 1;
     }
-    if(isNaN(target)){
-        return true;
-    }
     if(objType === 'number'){
+        if(isNaN(target)){
+            return true;
+        }
         return target === 0;
     }
     if(objType === 'boolean'){
         return target;
     }
+    if(Array.isArray(target)){
+        return target.length < 1;
+    }
+    if(objType === 'object'){
+        let isDate = typeof target.getMonth === 'function';
+        if(isDate){
+            return false;
+        }
+        return Object.keys(target).length === 0;
+    }
     return target;
 };
 
-export const dateObjToStr = (dateObj = new Date()) => {
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return dateObj.toLocaleDateString(undefined, options);
+export const formatDate = (dateObj, formatStr='MMMM Do YYYY') => {
+    return moment(dateObj).format(formatStr);
 };
 
 export const removeFromArray = (array=[], value) => {
@@ -35,6 +44,14 @@ export const removeFromArray = (array=[], value) => {
         array.splice( index, 1 );
     }
     return array;
+};
+
+export const createSortOrderMap = () => {
+    let map = {};
+    map[SORT_ORDER.NONE] = SORT_ORDER.ASC;
+    map[SORT_ORDER.ASC] = SORT_ORDER.DESC;
+    map[SORT_ORDER.DESC] = SORT_ORDER.ASC;
+    return map;
 };
 
 /***

@@ -1,32 +1,57 @@
 import React, {createContext, useEffect, useState} from 'react';
+import moment from "moment";
+import sort from 'fast-sort';
+import cloneDeep from 'lodash/cloneDeep';
 import PropTypes from 'prop-types';
 import Aux from "../../../hoc/Aux/Aux";
-import {sortObjects} from "../../../lib/utils";
+import {createSortOrderMap} from "../../../lib/utils";
+import {SORT_ORDER} from "../../../constants";
+
 export const SortCallbackContext = createContext({});
 
 const Paginator = (props) => {
 
     const [currentPage, setCurrentPage] = useState(1);
     const [itemCountPerPage, setItemCountPerPage] = useState(15);
-    const [totalData, setTotalData] = useState(props.originalData);
+    const [totalData, setTotalData] = useState(props.preSortData);
     const [data, setData] = useState(totalData.slice(0,itemCountPerPage-1));
+    const sortOrderMap = createSortOrderMap();
+    const createColumnTypeMap = () => {
+        let map = {};
+        for (let i = 0; i < props.columns.length; i++) {
+            map[props.columns[i].accessor] = props.columns[i].type
+        }
+        return map;
+    };
+    const [columnTypeMap, setColumnTypeMap] = useState(createColumnTypeMap());
 
-    const childrenElements = React.Children.map(props.children, child => {
-        return React.cloneElement(child, {
-            data: data,
-            originalData: props.originalData,
-        });
-    });
+    // example [{first_name: ASC}, {last_name: DESC}]
+    const [sortState, setSortState] = useState([]);
+    const [selectedColumnsForSort, setSelectedColumnsForSort] = useState(new Set());
 
     useEffect(() => {
+        setTotalData(props.preSortData);
+    },[props.preSortData]);
+
+    let setDataFromTotalData = () => {
         if(totalData.length <= itemCountPerPage){
             setData(totalData);
         } else {
             setData( totalData.slice((currentPage-1)*itemCountPerPage, (currentPage*itemCountPerPage)));
         }
+    };
 
-    },[currentPage, itemCountPerPage, totalData]);
+    useEffect(() => {
+        setDataFromTotalData();
+    }, [currentPage, itemCountPerPage, totalData]);
 
+    useEffect(() => {
+        sortData();
+    }, [props.preSortData, sortState, selectedColumnsForSort]);
+
+    useEffect(() => {
+        setColumnTypeMap(createColumnTypeMap());
+    }, [props.columns]);
 
     let totalPageCount = Math.ceil(totalData.length / itemCountPerPage);
     let baseClass = `block hover:${props.hoverTextColorClass} hover:${props.hoverBgColorClass} ${props.textColorClass} px-3 py-2`;
@@ -126,24 +151,91 @@ const Paginator = (props) => {
         setCurrentPage(1);
     };
 
-    let sortDataAsc = (columnAccessor) => {
-        let [{type: selectedColumnType}, ...rest] = props.columns.filter(column => {
-            return column.accessor === columnAccessor
-        });
-        let sortedData = sortObjects(totalData, columnAccessor, selectedColumnType,'asc');
-        setTotalData(sortedData);
+    let updateSortState = (columnAccessor) => {
+        if(selectedColumnsForSort.size < 1){
+            let newObj = {};
+            newObj[columnAccessor] = SORT_ORDER.ASC;
+            setSortState([newObj]);
+            setSelectedColumnsForSort(new Set([columnAccessor]));
+            return;
+        }
+
+        let alreadySelected = selectedColumnsForSort.has(columnAccessor);
+        let newSortState = cloneDeep(sortState);
+
+        if(!alreadySelected){
+            let newObj = {};
+            newObj[columnAccessor] = SORT_ORDER.ASC;
+            newSortState.push(newObj);
+            setSortState(newSortState);
+            let newSelectedColumnsForSort = new Set(selectedColumnsForSort);
+            newSelectedColumnsForSort.add(columnAccessor);
+            setSelectedColumnsForSort(newSelectedColumnsForSort);
+            return;
+        }
+
+        for (let i = 0; i < sortState.length; i++) {
+            if(columnAccessor in sortState[i]){
+                // if found, remove old one and add new one on the back.
+                let currentOrder = sortState[i][columnAccessor];
+                newSortState.splice(i, 1);
+                let newObj = {};
+                newObj[columnAccessor] = sortOrderMap[currentOrder];
+                newSortState.push(newObj);
+            }
+        }
+        setSortState(newSortState);
     };
 
-    let sortDataDesc = (columnAccessor) => {
-        let [{type: selectedColumnType}, ...rest] = props.columns.filter(column => {
-            return column.accessor === columnAccessor
-        });
-        setTotalData(sortObjects(totalData, columnAccessor, selectedColumnType,'desc'));
+    let clearSortStates = () => {
+        setSortState([]);
+        setSelectedColumnsForSort(new Set());
+        props.postClearingSortStateCallback();
     };
+
+    let sortData = () => {
+        if(props.clearSortState){
+            clearSortStates();
+            return;
+        }
+        if(selectedColumnsForSort.size < 1){
+            return;
+        }
+        let fastSortArr = createFastSortArray();
+        let newData = sort(cloneDeep(totalData)).by(fastSortArr);
+        setTotalData(newData);
+        setDataFromTotalData();
+    };
+
+    let createFastSortArray = () => {
+        let result = [];
+        for (let i = sortState.length-1; i >= 0; i--) {
+            let accessor = Object.keys(sortState[i])[0];
+            let sortOrder = sortState[i][accessor];
+            let targetColumnType = columnTypeMap[accessor];
+            let sortFunction = u => u[accessor];
+            if(targetColumnType === 'date'){
+                sortFunction = u => moment(u[accessor]).unix();
+            }
+
+            if(sortOrder === SORT_ORDER.ASC){
+                result.push({asc: sortFunction});
+            } else {
+                result.push({desc: sortFunction});
+            }
+        }
+        return result;
+    };
+
+    const childrenElements = React.Children.map(props.children, child => {
+        return React.cloneElement(child, {
+            data: data,
+        });
+    });
 
     return (
         <Aux>
-            <SortCallbackContext.Provider value={{asc: sortDataAsc, desc: sortDataDesc}} >
+            <SortCallbackContext.Provider value={{updateSortState: updateSortState}} >
             <div className={`flex w-full sm:w-full md:w-full lg:w-1/4 lg:w-1/5 h-10 mb-4 float-right ${props.isActionRequired?'lg:-mb-10 xl:-mb-10': ''}`}>
                 <p className="w-full bold self-center">Rows Per Page</p>
                 <select
@@ -171,7 +263,10 @@ const Paginator = (props) => {
 
 Paginator.defaultProps = {
     originalData: [],
+    preSortData: [],
     columns: [],
+    clearSortState: false,
+    postClearingSortStateCallback: () => {},
     onShowRange: 3,
     textColorClass: 'text-blue-500',
     bgColorClass: 'bg-blue-500',
@@ -186,8 +281,11 @@ Paginator.defaultProps = {
 
 Paginator.propTypes = {
     originalData: PropTypes.array,
+    preSortData: PropTypes.array,
     columns: PropTypes.array,
     //-------------optional↓---------------//
+    clearSortState: PropTypes.bool,
+    postClearingSortStateCallback: PropTypes.func,
     onShowRange: PropTypes.number,
     onPreviousClicked: PropTypes.func,
     onNextClicked: PropTypes.func,

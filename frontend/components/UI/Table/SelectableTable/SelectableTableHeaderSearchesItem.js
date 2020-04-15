@@ -1,21 +1,13 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import PropTypes from 'prop-types';
-import DatePicker from "react-datepicker";
+import DateRangePicker from "../../Filters/DateRangePicker";
+import YesNoPicker from "../../Filters/YesNoPicker";
+import InputSearchItem from "../../Filters/InputSearchItem";
+import {SearchCallbackContext} from "../../Filters/DataSearcher";
 
 const SelectableTableHeaderSearchesItem = (props) => {
 
-    let [ selectedStartDate, setSelectedStartDate ] = useState(null);
-    let [ selectedEndDate, setSelectedEndDate ] = useState(null);
-
-    let selectedStartDateHandler = (date) => {
-        // TODO date picked
-        setSelectedStartDate(date);
-    };
-
-    let selectedEndDateHandler = (date) => {
-        // TODO
-        setSelectedEndDate(date);
-    };
+    const {updateSearchState: updateSearchState} = useContext(SearchCallbackContext);
 
     let renderSearches = () => {
         if(!props.isSortableColumn){
@@ -23,46 +15,27 @@ const SelectableTableHeaderSearchesItem = (props) => {
         }
         if(props.type === 'date'){
             return (
-                <div className={`text-gray-600 leading-tight`} style={{width: 'min-content'}}>
-                    <DatePicker
-                        selected={selectedStartDate}
-                        onChange={date => selectedStartDateHandler(date)}
-                        locale="en-US"
-                        selectsStart
-                        showYearDropdown
-                        className="shadow h-full py-1 rounded border border-gray-300"
-                        placeholderText="Start Date"
-                    />
-                    <DatePicker
-                        selected={selectedEndDate}
-                        onChange={date => selectedEndDateHandler(date)}
-                        locale="en-US"
-                        selectsEnd
-                        minDate={selectedStartDate}
-                        showYearDropdown
-                        className="shadow h-full py-1 rounded border border-gray-300"
-                        placeholderText="End Date"
-                    />
-                </div>
+                <DateRangePicker
+                    onDateRangeChanged={updateSearchState}
+                    onDateRangeChangedArguments={[props.accessor]}
+                />
             );
         }
         if(props.type === 'boolean'){
             return (
-                <select
-                    className="block appearance-none border rounded w-full text-gray-700 py-2 px-4 pr-8 leading-tight focus:outline-none focus:shadow-outline"
-                    id="grid-state">
-                    <option value="">Yes/No</option>
-                    <option value={true}>Yes</option>
-                    <option value={false}>No</option>
-                </select>
+                <YesNoPicker
+                    onValueChanged={updateSearchState}
+                    onValueChangedArguments={[props.accessor]}
+                    selectElementId={props.accessor}
+                />
             );
         }
         return (
-            <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id={props.accessor}
-                type="text"
+            <InputSearchItem
+                elementId={props.accessor}
                 placeholder={`Search by ${props.label}`}
+                onChangedCallback={updateSearchState}
+                onChangedCallbackArguments={[props.accessor]}
             />
         );
     };

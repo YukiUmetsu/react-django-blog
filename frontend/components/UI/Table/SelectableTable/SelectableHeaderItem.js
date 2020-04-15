@@ -8,7 +8,7 @@ import {SortCallbackContext} from "../../Pagination/Paginator";
 const CON = SELECTABLE_TABLE_CONSTS;
 
 const SelectableHeaderItem = (props) => {
-    const {asc: sortAscCallBack, desc: sortDescCallBack} = useContext(SortCallbackContext);
+    const {updateSortState: updateSortState} = useContext(SortCallbackContext);
 
 
     let [ sortState, setSortState ] = useState(CON.HEADER_SORT_NORMAL);
@@ -29,10 +29,10 @@ const SelectableHeaderItem = (props) => {
 
     let onClickHandler = () => {
         if(sortState === CON.HEADER_SORT_ASC){
-            sortDescCallBack(props.accessor);
+            updateSortState(props.accessor);
             setSortState(CON.HEADER_SORT_DESC);
         } else {
-            sortAscCallBack(props.accessor);
+            updateSortState(props.accessor);
             setSortState(CON.HEADER_SORT_ASC);
         }
     };

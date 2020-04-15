@@ -12,14 +12,24 @@ const SelectableTable = (props) => {
 
     useEffect(()=> {
         setData(props.data);
+    }, [props.data]);
+
+    useEffect(() => {
+        setCheckboxAllOnOffStatus(isAllSelected());
+    }, [data]);
+
+    let isAllSelected = () => {
         let isAllSelected = true;
+        if(data.length < 1){
+            return false;
+        }
         for (let i = 0; i < data.length; i++) {
             if(!selectedItems.has(parseInt(data[i].id))){
                 isAllSelected = false;
             }
         }
-        setCheckboxAllOnOffStatus(isAllSelected);
-    }, [props.data, data]);
+        return isAllSelected;
+    };
 
     let inputChangedHandler = (event) => {
         let id = parseInt(event.target.id);
@@ -45,13 +55,12 @@ const SelectableTable = (props) => {
         setSelectedItems(copySet);
     };
 
-    let renderBody = (bodyItems) => {
-        return bodyItems.map((rowObj, index) => {
+    let renderBody = () => {
+        return data.map(rowObj => {
             return (
                 <SelectableTableRow
-                    rowCount={index}
                     rowObj={rowObj}
-                    key={index}
+                    key={rowObj.id}
                     isActionsRequired={props.isActionsRequired}
                     columnData={getColumnData()}
                     onInputChanged={(e)=>{inputChangedHandler(e)}}
@@ -117,7 +126,7 @@ const SelectableTable = (props) => {
     };
 
     let getColumnData = () => {
-        let data = {
+        let newColumnData = {
             imageColumns: [],
             booleanColumns: [],
             dateColumns: [],
@@ -126,19 +135,19 @@ const SelectableTable = (props) => {
         };
         props.columns.map((column,index) => {
             if (column.type === 'image') {
-                data.imageColumns.push(index);
+                newColumnData.imageColumns.push(index);
             } else if(column.type === 'boolean'){
-                data.booleanColumns.push(index);
+                newColumnData.booleanColumns.push(index);
             } else if(column.type === 'date'){
-                data.dateColumns.push(index);
+                newColumnData.dateColumns.push(index);
             } else if(column.type === 'increase'){
-                data.increaseColumns.push(index);
+                newColumnData.increaseColumns.push(index);
             } else if(column.type === 'decrease'){
-                data.decreaseColumns.push(index);
+                newColumnData.decreaseColumns.push(index);
             }
         });
-        data.columns = props.columns;
-        return data;
+        newColumnData.columns = props.columns;
+        return newColumnData;
     };
 
     return (
@@ -147,7 +156,7 @@ const SelectableTable = (props) => {
             <table className={`${TableCSS.table} text-grey-darkest border border-solid border-gray-300`}>
                 <SelectableTableHeader {...props} onSelectAllCallback={toggleCheckboxAllOn} checkboxAllOn={checkboxAllOn}/>
                 <tbody>
-                {renderBody(props.data)}
+                {renderBody()}
                 </tbody>
             </table>
         </div>

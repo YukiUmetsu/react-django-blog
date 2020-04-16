@@ -11,25 +11,36 @@ const ItemActions = (props) => {
     let [showEditTooltip, setShowEditTooltip] = useState(false);
     let [showDeleteTooltip, setShowDeleteTooltip] = useState(false);
 
+    // show modals
+    let [showEditModal, setShowEditModal] = useState(false);
+
+    let editClickedHandler = () => {
+        setShowEditModal(!showEditModal);
+        props.onEditClicked();
+    };
+
     return (
         <Aux>
-            <a className="bg-teal-700 cursor-pointer rounded p-1 mx-1 my-1 text-white relative"
-               onClick={() => props.onViewClicked()}
-               onMouseEnter={() => setShowDetailTooltip(true)}
-               onMouseLeave={() => setShowDetailTooltip(false)}
-            >
-                <FontAwesomeIcon icon={faEye}/>
-                <span className={`${showDetailTooltip ? "" : "invisible"} ${styles['tooltip-text']} ${styles['tooltip-top']}`}>Detail</span>
-            </a>
+            {props.showViewButton ? (
+                <a className="bg-teal-700 cursor-pointer rounded p-1 mx-1 my-1 text-white relative"
+                   onClick={() => props.onViewClicked()}
+                   onMouseEnter={() => setShowDetailTooltip(true)}
+                   onMouseLeave={() => setShowDetailTooltip(false)}
+                >
+                    <FontAwesomeIcon icon={faEye}/>
+                    <span className={`${showDetailTooltip ? "" : "invisible"} ${styles['tooltip-text']} ${styles['tooltip-top']}`}>Detail</span>
+                </a>) : ""}
+
             <a
                 className="bg-teal-700 cursor-pointer rounded p-1 mx-1 text-white relative"
-                onClick={() => props.onEditClicked()}
+                onClick={() => editClickedHandler()}
                 onMouseEnter={() => setShowEditTooltip(true)}
                 onMouseLeave={() => setShowEditTooltip(false)}
             >
                 <FontAwesomeIcon icon={faEdit}/>
                 <span className={`${showEditTooltip ? "" : "invisible"} ${styles['tooltip-text']} ${styles['tooltip-top']}`}>Edit</span>
             </a>
+
             <a
                 className="bg-red-700 cursor-pointer rounded p-1 mx-1 text-white relative"
                 onClick={() => props.onDeleteClicked()}
@@ -44,12 +55,15 @@ const ItemActions = (props) => {
     );
 };
 ItemActions.defaultProps = {
+    showViewButton: false,
     onViewClicked: () => {},
     onEditClicked: () => {},
     onDeleteClicked: () => {},
 };
 
 ItemActions.propTypes = {
+    object: PropTypes.object,
+    showViewButton: PropTypes.bool,
     onViewClicked: PropTypes.func,
     onEditClicked: PropTypes.func,
     onDeleteClicked: PropTypes.func,

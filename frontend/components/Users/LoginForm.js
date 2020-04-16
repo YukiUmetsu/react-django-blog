@@ -2,7 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form'
 import OutsideComponentAlerter from "../../hoc/Aux/OutsideComponentAlerter";
 import {EMAIL_VALIDATION_RULE, PASSWORD_VALIDATION_RULE} from "../../constants";
-import CSRFTokenInput from "./CSRFTokenInput";
+import CSRFTokenInput from "../UI/Form/CSRFTokenInput";
 import {loginFetch} from "../../lib/auth";
 import cookie from 'js-cookie'
 import PropTypes from 'prop-types';

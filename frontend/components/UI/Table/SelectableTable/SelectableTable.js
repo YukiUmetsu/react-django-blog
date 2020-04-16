@@ -1,14 +1,25 @@
-import React, {useEffect, useState} from 'react';
+import React, {createContext, useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import TableCSS from '../Table.module.css';
 import SelectableTableRow from "./SelectableTableRow";
 import SelectableTableHeader from "./SelectableTableHeader";
+import Modal from "../../Modal/Modal";
+import Form from "../../Form/Form";
+import {FORM_DATA} from "../../../../constants/FormDataConst";
+import AlertModal from "../../Modal/AlertModal";
+import {isEmpty} from "../../../../lib/utils";
+import OutsideComponentAlerter from "../../../../hoc/Aux/OutsideComponentAlerter";
+
+export const DataMutationContext = createContext({});
 
 const SelectableTable = (props) => {
 
     let [ selectedItems, setSelectedItems ] = useState(new Set());
     let [ data, setData ] = useState(props.data);
     let [ checkboxAllOn, setCheckboxAllOnOffStatus] = useState(false);
+    let [ editModalState, setEditModalState ] = useState({isOpen: false, rowObj: {}});
+    let [ deleteModalState, setDeleteModalState ] = useState({isOpen: false, rowObj: {}});
+    let [ resetEditForm, setResetEditForm ] = useState(false);
 
     useEffect(()=> {
         setData(props.data);
@@ -53,6 +64,22 @@ const SelectableTable = (props) => {
         let copySet = new Set(selectedItems);
         items.forEach(item => copySet.delete(item));
         setSelectedItems(copySet);
+    };
+
+    let updateEditModalState = (rowObj, newIsEditOpen = null) => {
+        if(newIsEditOpen !== null){
+            setEditModalState({isOpen: newIsEditOpen, rowObj: rowObj});
+            return;
+        }
+        setEditModalState({isOpen: !editModalState.isOpen, rowObj: rowObj});
+    };
+
+    let updateDeleteModalState = (rowObj, newIsOpen = null) => {
+        if(newIsOpen !== null){
+            setDeleteModalState({isOpen: newIsOpen, rowObj: rowObj});
+            return;
+        }
+        setDeleteModalState({isOpen: !deleteModalState.isOpen, rowObj: rowObj});
     };
 
     let renderBody = () => {
@@ -150,16 +177,79 @@ const SelectableTable = (props) => {
         return newColumnData;
     };
 
-    return (
-        <div className={TableCSS["table-responsive"]}>
-            {renderActionSelectors()}
-            <table className={`${TableCSS.table} text-grey-darkest border border-solid border-gray-300`}>
-                <SelectableTableHeader {...props} onSelectAllCallback={toggleCheckboxAllOn} checkboxAllOn={checkboxAllOn}/>
+    let renderOnDeleteMessage = (rowObj) => {
+        let shownColumns = props.columns.map(column => {
+            if(!column.showOnDelete){
+                return;
+            }
+            return ({label: column.label, accessor: column.accessor, type: column.type});
+        }).filter(x => x!== undefined);
+
+        let headerRows = shownColumns.map(column => {
+            return (<th className="px-4 py-2" key={column.label}>{column.label}</th>);
+        });
+
+        let bodyRows = shownColumns.map(column => {
+            let content = rowObj[column.accessor];
+            if(column.type === "boolean"){
+                content = isEmpty(rowObj[column.accessor]) ? "No" : "Yes";
+            }
+            return <td className="px-4 py-2" key={column.accessor}>{content}</td>
+        });
+
+        return (
+            <table className="table-auto">
+                <thead>
+                <tr>
+                    {headerRows}
+                </tr>
+                </thead>
                 <tbody>
-                {renderBody()}
+                <tr>
+                    {bodyRows}
+                </tr>
                 </tbody>
             </table>
-        </div>
+        );
+    };
+
+    return (
+        <DataMutationContext.Provider value={{updateEditModalState: updateEditModalState, updateDeleteModalState: updateDeleteModalState}}>
+            <div className={`${TableCSS["table-responsive"]} ${(editModalState.isOpen||deleteModalState.isOpen)? "pointer-events-none": ""}`}>
+                {renderActionSelectors()}
+                <table className={`${TableCSS.table} text-grey-darkest border border-solid border-gray-300`}>
+                    <SelectableTableHeader {...props} onSelectAllCallback={toggleCheckboxAllOn} checkboxAllOn={checkboxAllOn}/>
+                    <tbody>
+                    {renderBody()}
+                    </tbody>
+                </table>
+            </div>
+
+            <OutsideComponentAlerter callback={() => updateEditModalState({}, false)}>
+                <Modal
+                    onCloseCallback={() => {updateEditModalState(editModalState.rowObj); setResetEditForm(true);}}
+                    modalOpen={editModalState.isOpen}
+                    onOpenCallback={() => setResetEditForm(false)}>
+                    <Form
+                        object={editModalState.rowObj}
+                        formData={FORM_DATA.USER_DISPLAY}
+                        onSubmitCallback={() => {console.log("submitted!")}}
+                        resetForm={resetEditForm}
+                    />
+                </Modal>
+            </OutsideComponentAlerter>
+
+            <OutsideComponentAlerter callback={() => updateDeleteModalState({}, false)}>
+                <AlertModal
+                    modalOpen={deleteModalState.isOpen}
+                    onCloseCallback={() => updateDeleteModalState({}, false)}
+                    title="Are you sure to delete?"
+                    onConfirmedCallback={() => {updateDeleteModalState({}, false); console.log("confirmed!!"); }}>
+                    {renderOnDeleteMessage(deleteModalState.rowObj)}
+                </AlertModal>
+            </OutsideComponentAlerter>
+
+        </DataMutationContext.Provider>
     );
 };
 
@@ -173,6 +263,8 @@ SelectableTable.propTyles = {
     data: PropTypes.array,
     isActionsRequired: PropTypes.bool,
     actionData: PropTypes.array,
+    updateObjApiUrl: PropTypes.string,
+    deleteObjApiUrl: PropTypes.string,
 };
 
 export default SelectableTable

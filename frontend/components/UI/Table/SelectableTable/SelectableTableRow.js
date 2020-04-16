@@ -1,10 +1,12 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import TableRowItem from "../TableRowItem";
 import ItemActions from "../ItemActions/ItemActions";
+import {DataMutationContext} from "./SelectableTable";
 
 const SelectableTableRow = (props) => {
 
+    let {updateEditModalState: updateEditModalState, updateDeleteModalState: updateDeleteModalState} = useContext(DataMutationContext);
     let [ isInputSelected, setIsInputSelected ] = useState(false);
     let [ rowObj, setRowObj ] = useState(props.rowObj);
 
@@ -54,7 +56,10 @@ const SelectableTableRow = (props) => {
         if(props.isActionsRequired) {
             return (
                 <td className="whitespace-no-wrap">
-                    <ItemActions/>
+                    <ItemActions
+                        object={props.rowObj}
+                        onEditClicked={() => updateEditModalState(rowObj)}
+                        onDeleteClicked={() => updateDeleteModalState(rowObj)}/>
                 </td>
             );
         }

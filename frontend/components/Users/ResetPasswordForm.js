@@ -1,5 +1,5 @@
 import React, {useRef} from 'react';
-import CSRFTokenInput from "./CSRFTokenInput";
+import CSRFTokenInput from "../UI/Form/CSRFTokenInput";
 import OutsideComponentAlerter from "../../hoc/Aux/OutsideComponentAlerter";
 import {EMAIL_VALIDATION_RULE, PASSWORD_VALIDATION_RULE} from "../../constants";
 import { useForm } from 'react-hook-form'

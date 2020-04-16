@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 const FlashCardBack = (props) => {
     let classesHide = ["h-full", "w-full", "absolute", "top-0", "transition", `duration-${props.animationTime}`, "ease-out", "transform", "origin-center", "opacity-0", "rotateY-180"];
-    let classesShow = ["h-full", "w-full", "absolute", "top-0", "transition", `duration-${props.animationTime}`, "ease-out", "transform", "origin-center", "z-50"];
+    let classesShow = ["h-full", "w-full", "absolute", "top-0", "transition", `duration-${props.animationTime}`, "ease-out", "transform", "origin-center", "z-10"];
     let notActiveInitialClasses = ["w-full", "absolute", "top-0", "rotateY--180", "hidden", "z-0"];
     let initialClasses = props.isActive ? new Set() : new Set(notActiveInitialClasses);
     let [ classes , setClasses ] = useState(initialClasses);

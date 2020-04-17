@@ -15,6 +15,9 @@ export const CONFIRM_TOKEN_API = 'http://localhost:8000/api/accounts-rest/regist
 export const PASSWORD_RESET_API = 'http://localhost:8000/api/reset_password/';
 export const PASSWORD_RESET_CONFIRM_API = 'http://localhost:8000/api/reset_password/confirm/';
 
+export const ICON_FILE_SIZE = 50;
+export const ICON_SUPPORTED_FORMATS = ['image/jpg', 'image/jpeg', 'image/gif', 'image/png'];
+
 export const EMAIL_VALIDATION_RULE = {
     required: 'Email is required!',
     pattern: {

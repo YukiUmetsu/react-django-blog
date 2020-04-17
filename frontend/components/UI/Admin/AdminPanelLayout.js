@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import AdminHeader from "./AdminHeader";
 import AdminSideBar from "./SideBar/AdminSideBar";
 import PropTypes from 'prop-types';
+import NavigationSelection from "./SideBar/NavigationSelection";
 
 const AdminPanelLayout = (props) => {
 
@@ -15,6 +16,8 @@ const AdminPanelLayout = (props) => {
                     {isSideBarVisible?<AdminSideBar/>: ""}
 
                     <main className="bg-white-300 flex-1 p-3 overflow-hidden my-8">
+                        {isSideBarVisible? <NavigationSelection/>: ""}
+
                         <div className="flex flex-col">
                             <div className="flex flex-1 flex-col md:flex-row lg:flex-row mx-2">
                                 <div className="rounded overflow-hidden bg-white mx-2 w-full">

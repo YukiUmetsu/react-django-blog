@@ -11,11 +11,11 @@ const Modal = (props) => {
 
     useEffect(() => {
         if(props.modalOpen){
-            openModalHandler();
+          let timer = openModalHandler();
+          return async () => {clearTimeout(await timer);}
         } else {
             setModalOpen(props.modalOpen);
         }
-
     }, [props.modalOpen]);
 
     let closeModalHandler = async () => {
@@ -27,7 +27,7 @@ const Modal = (props) => {
     let openModalHandler = async () => {
         await props.onOpenCallback();
         setModalOpen(true); // display:none =>  normal
-        await setTimeout(() => setOpacity(100), 200); // opacity 0 => 100
+        return setTimeout(() => setOpacity(100), 200); // opacity 0 => 100
     };
 
 

@@ -190,4 +190,23 @@ export const SELECTABLE_TABLE_CONSTS = {
     HEADER_SORT_DESC: 2,
 };
 
+export const BLOG_EDITOR_OPTIONS = {
+    buttonList: [
+        ['undo', 'redo'],
+        ['font', 'fontSize', 'formatBlock'],
+        ['paragraphStyle', 'blockquote'],
+        ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+        ['fontColor', 'hiliteColor', 'textStyle'],
+        ['removeFormat'],
+        ['outdent', 'indent'],
+        ['align', 'horizontalRule', 'list', 'lineHeight'],
+        ['table', 'link', 'image', 'video'],
+        ['fullScreen', 'showBlocks', 'codeView'],
+        ['preview', 'print'],
+        ['save', 'template'],
+    ],
+    charCounter: true,
+    imageRotation: true
+};
+
 export * from "./DummyData";

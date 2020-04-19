@@ -39,7 +39,8 @@
     "react-transition-group": "^4.3.0",
     "suneditor-react": "^2.10.0",
     "tailwindcss": "^1.2.0",
-    "yup": "^0.28.3"
+    "yup": "^0.28.3",
+    "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
     "faker": "^4.1.0",

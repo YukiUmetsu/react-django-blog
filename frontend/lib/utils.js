@@ -29,6 +29,9 @@ export const isEmpty = (target) => {
         if(isDate){
             return false;
         }
+        if(target instanceof File){
+            return false;
+        }
         return Object.keys(target).length === 0;
     }
     return target;

@@ -1,4 +1,5 @@
-import {string, boolean, mixed, array, object} from "yup";
+import {string, boolean, mixed} from "yup";
+import zxcvbn from 'zxcvbn';
 import {ADMIN_USER_TABLE_COLUMNS, ICON_FILE_SIZE, ICON_SUPPORTED_FORMATS} from "./index";
 
 export const checkIfFilesAreTooBig = (files) => {
@@ -24,6 +25,10 @@ export const checkIfFilesAreCorrectType = (files) => {
         }
     }
     return valid
+};
+
+export const passwordStrengthCheck = (password) => {
+    return zxcvbn(password).score >= 3;
 };
 
 export const FORM_DATA = {
@@ -99,7 +104,7 @@ export const FORM_DATA = {
             first_name: string().required(),
             last_name: string().required(),
             email: string().email().required(),
-            password: string().min(8).required(),
+            password: string().min(8).required().test('password', 'The password is too common', value => passwordStrengthCheck(value)),
             is_staff: boolean().required(),
             is_superuser: boolean().required(),
         },

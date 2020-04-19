@@ -8,6 +8,7 @@ import Toggle from "./Toggle";
 import * as yup from "yup";
 import {isEmpty} from "../../../lib/utils";
 import {IMG_HOST} from "../../../constants";
+import PasswordStrengthMeter from "./PasswordStrengthMeter";
 
 const Form = (props) => {
 
@@ -114,6 +115,9 @@ const Form = (props) => {
                     onChange={(e)=> updateFormDataState(id, e.target.value)}
                 />
                 {error? <p className="text-red-500 text-xs italic">{error.message}</p> : ""}
+                <div className="mt-2 mb-4">
+                    {id === 'password' ? <PasswordStrengthMeter password={formDataState['password']}/> : ""}
+                </div>
             </div>
         );
     };
@@ -214,6 +218,9 @@ const Form = (props) => {
 
     let imageChangedHandler = (accessor, e) => {
         const files = Array.from(e.target.files);
+        if(isEmpty(files[0])){
+            return;
+        }
         let tempImageURL = URL.createObjectURL(files[0]);
         imageElementRef.current.src = tempImageURL;
         updateFormDataState(accessor, files[0]);

@@ -45,7 +45,7 @@ def create_superusers():
 
 
 def create_test_users():
-    management.call_command("runscript", "add_test_users")
+    management.call_command("runscript", "seed_users")
 
 
 def load_initial_data():

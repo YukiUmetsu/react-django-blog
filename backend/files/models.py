@@ -18,4 +18,4 @@ class Files(models.Model):
         verbose_name_plural = 'Files'
 
     def __str__(self):
-        return self.file
+        return str(self.file)

@@ -1,6 +1,9 @@
 from django.contrib.auth import get_user_model
 import pytest
-
+from faker import Faker
+fake = Faker()
+from countries.models import Countries
+from test_utils.countries_fixtures import country_obj, country_payload
 
 @pytest.mark.django_db
 @pytest.fixture
@@ -33,3 +36,52 @@ def users():
                 user.delete()
             except Exception as e:
                 print(f"\r\nthere was a problem deleting test users:\r\n{e}")
+
+
+@pytest.fixture
+def user_payload():
+    return {
+        'email': fake.email(),
+        'first_name': fake.first_name(),
+        'last_name': fake.last_name(),
+        'password': fake.password(length=8),
+        'is_staff': False,
+        'is_superuser': False,
+        'country': ''
+    }
+
+@pytest.fixture
+def user_payload_with_country(country_obj):
+    return {
+        'email': fake.email(),
+        'first_name': fake.first_name(),
+        'last_name': fake.last_name(),
+        'password': fake.password(length=8),
+        'is_staff': False,
+        'is_superuser': False,
+        'country': country_obj.id
+    }
+
+@pytest.fixture
+def staff_user_payload():
+    return {
+        'email': fake.email(),
+        'first_name': fake.first_name(),
+        'last_name': fake.last_name(),
+        'password': fake.password(length=8),
+        'is_staff': True,
+        'is_superuser': False,
+        'country': ''
+    }
+
+@pytest.fixture
+def superuser_payload():
+    return {
+        'email': fake.email(),
+        'first_name': fake.first_name(),
+        'last_name': fake.last_name(),
+        'password': fake.password(length=8),
+        'is_staff': True,
+        'is_superuser': True,
+        'country': ''
+    }

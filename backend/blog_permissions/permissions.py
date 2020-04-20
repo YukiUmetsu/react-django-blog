@@ -274,3 +274,30 @@ class AnyoneCanCreateButReadEditOwnerOnly(permissions.BasePermission):
         if request.user and request.user.is_staff:
             return True
         return obj.user == request.user
+
+
+class AdminCrudUserPermission(permissions.BasePermission):
+    # staff can create normal user but not other staff nor superuser
+
+    def has_permission(self, request, view):
+        if not request.user.is_authenticated:
+            return False
+
+        if not request.user.is_staff:
+            return False
+
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        # unsafe methods
+        is_self_superuser = request.user.is_superuser
+        is_new_user_staff = str(request.data['is_staff']).lower() == 'true'
+        is_new_user_superuser = str(request.data['is_superuser']).lower() == 'true'
+
+        if not is_new_user_staff and not is_new_user_superuser:
+            return True
+
+        if is_self_superuser:
+            return True
+
+        return False

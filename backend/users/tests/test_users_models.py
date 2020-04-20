@@ -57,18 +57,36 @@ class TestPrivateUsersAPI:
     def test_normal_user_cannot_access_to_other_user_data_in_list_view(self, users):
         self.client.force_authenticate(users['normal'][1])
         response = self.client.get(USERS_API_URL)
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert len(response.data.get('results')) == 1
 
-    def test_outsider_cannot_access_to_other_user_data_in_detail_view(self, users):
+    def test_normal_user_cannot_access_to_other_user_data_in_detail_view(self, users):
         self.client.force_authenticate(users['normal'][1])
         detail_view_url = get_user_detail_url(users['normal'][0].id)
         response = self.client.get(detail_view_url)
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.status_code in [status.HTTP_403_FORBIDDEN, status.HTTP_404_NOT_FOUND]
 
-    def test_outsider_cannot_create_user(self, users, user_payload):
+    def test_normal_user_can_access_to_own_user_data_in_detail_view(self, users):
+        self.client.force_authenticate(users['normal'][0])
+        detail_view_url = get_user_detail_url(users['normal'][0].id)
+        response = self.client.get(detail_view_url)
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_normal_user_can_access_to_own_user_data_in_me_detail_view(self, users):
+        self.client.force_authenticate(users['normal'][0])
+        response = self.client.get("/api/users/me/")
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data.get("id") == users['normal'][0].id
+
+    def test_normal_user_cannot_create_user(self, users, user_payload):
         self.client.force_authenticate(users['normal'][1])
         response = self.client.post(USERS_API_URL, user_payload)
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_normal_user_cannot_edit_another_user(self, users):
+        self.client.force_authenticate(users['normal'][0])
+        new_first_name = 'new_first_name!'
+        response = self.client.patch(get_user_detail_url(users['normal'][1].id), {'first_name': new_first_name})
+        assert response.status_code in [status.HTTP_403_FORBIDDEN, status.HTTP_404_NOT_FOUND]
 
     def test_staff_user_can_access_user_list(self, users):
         self.client.force_authenticate(users['staff'][0])
@@ -91,9 +109,21 @@ class TestPrivateUsersAPI:
         response = self.client.post(USERS_API_URL, staff_user_payload)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    def test_staff_cannot_edit_another_staff(self, users):
+        self.client.force_authenticate(users['staff'][0])
+        new_first_name = 'new_first_name!'
+        response = self.client.patch(get_user_detail_url(users['staff'][1].id), {'first_name': new_first_name})
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
     def test_staff_cannot_create_superuser(self, users, superuser_payload):
         self.client.force_authenticate(users['staff'][0])
         response = self.client.post(USERS_API_URL, superuser_payload)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_staff_cannot_edit_superuser(self, users):
+        self.client.force_authenticate(users['staff'][0])
+        new_first_name = 'new_first_name!'
+        response = self.client.patch(get_user_detail_url(users['superuser'][0].id), {'first_name': new_first_name})
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_superuser_can_create_staff_user(self, users, staff_user_payload):
@@ -109,6 +139,15 @@ class TestPrivateUsersAPI:
         assert response.status_code == status.HTTP_201_CREATED
         user = get_user_model().objects.get(email=superuser_payload.get('email', ''))
         assert user.is_superuser == True
+
+    def test_superuser_can_edit_another_superuser(self, users):
+        self.client.force_authenticate(users['superuser'][0])
+        new_first_name = 'Your new first_name'
+        payload = {'first_name': new_first_name}
+        response = self.client.patch(get_user_detail_url(users['superuser'][1].id), payload)
+        assert response.status_code == status.HTTP_200_OK
+        user = get_user_model().objects.get(id=users['superuser'][1].id)
+        assert user.first_name == new_first_name
 
     def test_can_create_user_with_country(self, users, user_payload_with_country):
         self.client.force_authenticate(users['staff'][0])

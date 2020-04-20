@@ -283,21 +283,49 @@ class AdminCrudUserPermission(permissions.BasePermission):
         if not request.user.is_authenticated:
             return False
 
-        if not request.user.is_staff:
-            return False
-
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        # unsafe methods
-        is_self_superuser = request.user.is_superuser
-        is_new_user_staff = str(request.data['is_staff']).lower() == 'true'
-        is_new_user_superuser = str(request.data['is_superuser']).lower() == 'true'
+        if request.method == 'POST':
+            is_self_superuser = request.user.is_superuser
+            if is_self_superuser:
+                return True
 
-        if not is_new_user_staff and not is_new_user_superuser:
+            is_new_user_staff_user = str(request.data.get('is_staff')).lower() == 'true'
+            is_new_user_superuser = str(request.data.get('is_superuser')).lower() == 'true'
+
+            if not is_new_user_staff_user and not is_new_user_superuser:
+                # staff can create normal user
+                return request.user.is_staff
+
+            if is_new_user_superuser or is_new_user_staff_user:
+                return is_self_superuser
+
+        return True
+
+    def has_object_permission(self, request, view, obj):
+
+        if not request.user.is_authenticated:
+            return False
+
+        if request.user.is_superuser:
             return True
 
-        if is_self_superuser:
+        if obj.id == request.user.id:
+            # can access to own user data
+            return True
+
+        is_self_staff = request.user.is_staff
+        is_safe_method = request.method in permissions.SAFE_METHODS
+        is_obj_superuser = obj.is_superuser
+        is_obj_staff = obj.is_staff
+
+        if is_self_staff and is_safe_method:
+            # staff can see everything
+            return True
+
+        if is_self_staff and not is_obj_superuser and not is_obj_staff:
+            # staff can edit normal user, not other staff or superuser
             return True
 
         return False

@@ -9,6 +9,7 @@ import {FORM_DATA} from "../../../../constants/FormDataConst";
 import AlertModal from "../../Modal/AlertModal";
 import {isEmpty} from "../../../../lib/utils";
 import OutsideComponentAlerter from "../../../../hoc/Aux/OutsideComponentAlerter";
+import PackmanSpinner from "../../Spinner/PackmanSpinner";
 
 export const DataMutationContext = createContext({});
 
@@ -83,6 +84,16 @@ const SelectableTable = (props) => {
     };
 
     let renderBody = () => {
+        if(isEmpty(data)){
+            return (
+                <tr className="mx-auto self-center">
+                    <td><PackmanSpinner/></td>
+                </tr>
+                );
+        }
+        if(!Array.isArray(data)){
+            return;
+        }
         return data.map(rowObj => {
             return (
                 <SelectableTableRow

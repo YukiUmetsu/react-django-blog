@@ -6,6 +6,8 @@ import {
     faTachometerAlt, faUser
 } from "@fortawesome/free-solid-svg-icons";
 import {faWpforms} from "@fortawesome/free-brands-svg-icons";
+import Fetcher from "../lib/fetch";
+import cookie from 'js-cookie'
 
 export const IMG_HOST = 'http://localhost:8000/';
 export const LOGIN_API = 'http://localhost:8000/api/rest-auth/login/';
@@ -14,6 +16,7 @@ export const SIGN_UP_API = 'http://localhost:8000/api/rest-auth/registration/';
 export const CONFIRM_TOKEN_API = 'http://localhost:8000/api/accounts-rest/registration/account-confirm-email/';
 export const PASSWORD_RESET_API = 'http://localhost:8000/api/reset_password/';
 export const PASSWORD_RESET_CONFIRM_API = 'http://localhost:8000/api/reset_password/confirm/';
+export const USERS_LIST_API = 'http://localhost:8000/api/users/';
 
 export const ICON_FILE_SIZE = 50;
 export const ICON_SUPPORTED_FORMATS = ['image/jpg', 'image/jpeg', 'image/gif', 'image/png'];
@@ -207,6 +210,16 @@ export const BLOG_EDITOR_OPTIONS = {
     ],
     charCounter: true,
     imageRotation: true
+};
+
+export const DEFAULT_HEADERS = {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+};
+
+export const SWR_FETCH = async url => {
+    const fetchObj = new Fetcher(url);
+    return fetchObj.start();
 };
 
 export * from "./DummyData";

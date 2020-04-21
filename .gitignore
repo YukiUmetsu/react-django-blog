@@ -17,3 +17,4 @@ db.sqlite3-journal
 *.DS_Store
 /frontend/pages/test.js
 /backend/**/migrations/**
+/frontend/contexts/DataSearchContext.js

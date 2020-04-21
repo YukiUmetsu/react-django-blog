@@ -8,7 +8,7 @@ from rest_framework.response import Response
 
 class UsersViewSet(viewsets.ModelViewSet):
 
-    authentication_class = (TokenAuthentication,)
+    authentication_classes = (TokenAuthentication,)
     permission_classes = (AdminCrudUserPermission,)
     queryset = get_user_model().objects.all()
     serializer_class = serializers.UserSerializer

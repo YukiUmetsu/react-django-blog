@@ -36,6 +36,10 @@ const DataSearcher = (props) => {
         performSearch();
     }, [searchState, searchKeys]);
 
+    useEffect(() => {
+        setData(props.originalData);
+    }, [props.originalData]);
+
     let isSearchStateEmpty = (givenState= {}) => {
         let keys = Object.keys(givenState);
         let flags = keys.map((key) => {
@@ -116,19 +120,32 @@ const DataSearcher = (props) => {
         });
     };
 
-    const childrenElements = React.Children.map(props.children, child => {
-        return React.cloneElement(child, {
-            preSortData: data,
-            originalData: props.originalData,
-            clearSortState: clearSortState,
-            postClearingSortStateCallback: () => setClearSortState(false)
-        });
-    });
+    const getClearSortState = () => {
+        return clearSortState;
+    };
+
+    const updateClearSortState = (newState = null) => {
+        if(newState !== null){
+            setClearSortState(newState);
+            return;
+        }
+        return setClearSortState(!clearSortState);
+    };
+
+    const getPreSortData = () => {
+        return data;
+    };
 
     return (
         <OutsideComponentAlerter callback={performSearch}>
-            <SearchCallbackContext.Provider value={{updateSearchState: updateSearchState}} >
-                {childrenElements}
+            <SearchCallbackContext.Provider value={{
+                getClearSortState: getClearSortState,
+                updateClearSortState: updateClearSortState,
+                getPreSortData: getPreSortData,
+                updateSearchState: updateSearchState,
+                preSortData: data,
+            }} >
+                {props.children}
             </SearchCallbackContext.Provider>
         </OutsideComponentAlerter>
     );

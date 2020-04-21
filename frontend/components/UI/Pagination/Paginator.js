@@ -1,20 +1,29 @@
-import React, {createContext, useEffect, useState} from 'react';
+import React, {createContext, useContext, useEffect, useState} from 'react';
 import moment from "moment";
 import sort from 'fast-sort';
 import cloneDeep from 'lodash/cloneDeep';
 import PropTypes from 'prop-types';
 import Aux from "../../../hoc/Aux/Aux";
-import {createSortOrderMap} from "../../../lib/utils";
+import {createSortOrderMap, isEmpty} from "../../../lib/utils";
 import {SORT_ORDER} from "../../../constants";
+import {SearchCallbackContext} from "../Filters/DataSearcher";
 
 export const SortCallbackContext = createContext({});
 
 const Paginator = (props) => {
 
+    const {
+        getClearSortState: getClearSortState,
+        updateClearSortState: updateClearSortState,
+        getPreSortData: getPreSortData,
+        preSortData: preSortData,
+    } = useContext(SearchCallbackContext);
+
     const [currentPage, setCurrentPage] = useState(1);
     const [itemCountPerPage, setItemCountPerPage] = useState(15);
-    const [totalData, setTotalData] = useState(props.preSortData);
-    const [data, setData] = useState(totalData.slice(0,itemCountPerPage-1));
+    const [totalData, setTotalData] = useState(getPreSortData());
+    let initialData = (!isEmpty(totalData)) ? totalData.slice(0,itemCountPerPage-1) : [];
+    const [data, setData] = useState(initialData);
     const sortOrderMap = createSortOrderMap();
     const createColumnTypeMap = () => {
         let map = {};
@@ -30,10 +39,13 @@ const Paginator = (props) => {
     const [selectedColumnsForSort, setSelectedColumnsForSort] = useState(new Set());
 
     useEffect(() => {
-        setTotalData(props.preSortData);
-    },[props.preSortData]);
+        setTotalData(getPreSortData());
+    },[preSortData, props.originalData]);
 
     let setDataFromTotalData = () => {
+        if(isEmpty(totalData)){
+            return;
+        }
         if(totalData.length <= itemCountPerPage){
             setData(totalData);
         } else {
@@ -53,7 +65,7 @@ const Paginator = (props) => {
         setColumnTypeMap(createColumnTypeMap());
     }, [props.columns]);
 
-    let totalPageCount = Math.ceil(totalData.length / itemCountPerPage);
+    let totalPageCount = (isEmpty(totalData)) ? 1 : Math.ceil(totalData.length / itemCountPerPage);
     let baseClass = `block hover:${props.hoverTextColorClass} hover:${props.hoverBgColorClass} ${props.textColorClass} px-3 py-2`;
     let disabledClass = `select-none block ${props.disabledTextColorClass} ${props.disabledBgColorClass} px-3 py-2`;
 
@@ -190,11 +202,11 @@ const Paginator = (props) => {
     let clearSortStates = () => {
         setSortState([]);
         setSelectedColumnsForSort(new Set());
-        props.postClearingSortStateCallback();
+        updateClearSortState(false);
     };
 
     let sortData = () => {
-        if(props.clearSortState){
+        if(getClearSortState()){
             clearSortStates();
             return;
         }

@@ -29,7 +29,7 @@ export const isEmpty = (target) => {
         if(isDate){
             return false;
         }
-        if(target instanceof File){
+        if(typeof window !== 'undefined' && target instanceof File){
             return false;
         }
         return Object.keys(target).length === 0;
@@ -55,6 +55,52 @@ export const createSortOrderMap = () => {
     map[SORT_ORDER.ASC] = SORT_ORDER.DESC;
     map[SORT_ORDER.DESC] = SORT_ORDER.ASC;
     return map;
+};
+
+
+export const dClone = (o) => {
+    let output, v, key;
+    output = Array.isArray(o) ? [] : {};
+    for (key in o) {
+        v = o[key];
+        output[key] = (typeof v === "object") ? Object.assign({}, v) : v;
+    }
+    return output;
+};
+
+export const getObjIdsToAdd = (newData, totalIdPool) => {
+    let idsToAdd = [];
+    for (let i = 0; i < newData.length; i++) {
+        let id = newData[i]['id'];
+        if(!totalIdPool.includes(id)){
+            idsToAdd.push(id);
+        }
+    }
+    return idsToAdd;
+};
+
+export const getObjsToAdd = (newData, totalIdPool) => {
+    let objsToAdd = [];
+    for (let i = 0; i < newData.length; i++) {
+        let id = newData[i]['id'];
+        if(!totalIdPool.includes(id)){
+            objsToAdd.push(newData[i]);
+        }
+    }
+    return objsToAdd;
+};
+
+export const removeDuplicatesById = (data = []) => {
+    let ids = [];
+    let newData = [];
+    for (let i = 0; i < data.length; i++) {
+        let id = data[i].id;
+        if(!ids.includes(id)){
+            ids.push(id);
+            newData.push(data[i]);
+        }
+    }
+    return newData;
 };
 
 /***

@@ -9,15 +9,6 @@ import {faWpforms} from "@fortawesome/free-brands-svg-icons";
 import Fetcher from "../lib/fetch";
 import cookie from 'js-cookie'
 
-export const IMG_HOST = 'http://localhost:8000/';
-export const LOGIN_API = 'http://localhost:8000/api/rest-auth/login/';
-export const LOGOUT_API = 'http://localhost:8000/api/rest-auth/logout/';
-export const SIGN_UP_API = 'http://localhost:8000/api/rest-auth/registration/';
-export const CONFIRM_TOKEN_API = 'http://localhost:8000/api/accounts-rest/registration/account-confirm-email/';
-export const PASSWORD_RESET_API = 'http://localhost:8000/api/reset_password/';
-export const PASSWORD_RESET_CONFIRM_API = 'http://localhost:8000/api/reset_password/confirm/';
-export const USERS_LIST_API = 'http://localhost:8000/api/users/';
-
 export const ICON_FILE_SIZE = 50;
 export const ICON_SUPPORTED_FORMATS = ['image/jpg', 'image/jpeg', 'image/gif', 'image/png'];
 
@@ -222,4 +213,9 @@ export const SWR_FETCH = async url => {
     return fetchObj.start();
 };
 
+
+export const IS_STAFF_COOKIE_NAME = "stf";
+export const IS_SUPERUSER_COOKIE_NAME = "stfspad";
+
 export * from "./DummyData";
+export * from "./API";

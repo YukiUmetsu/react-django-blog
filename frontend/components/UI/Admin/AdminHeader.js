@@ -1,6 +1,8 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import AdminHeaderCSS from './AdminHeader.module.css';
+import Link from "next/link";
+import {LOGOUT_URL} from "../../../constants/URLs";
 
 const AdminHeader = (props) => {
     let [ isProfileDropdownOpen, setIsSetProfileDropdownOpen ] = useState(false);
@@ -18,16 +20,19 @@ const AdminHeader = (props) => {
                 </div>
                 <div className="p-1 flex flex-row" onClick={() => setIsSetProfileDropdownOpen(!isProfileDropdownOpen)}>
                     <img className="inline-block h-8 w-8 rounded-full" src={props.profile_img} alt="user icon" />
-                        <a href="#" className="text-white p-2 no-underline hidden md:block lg:block">{fullName}</a>
+                        <a href="#" className={`text-white p-2 no-underline ${isProfileDropdownOpen? "": "hidden"} md:block lg:block`}>{fullName}</a>
                         <div
                             id="ProfileDropDown"
-                            className={`${isProfileDropdownOpen ? "": "hidden"} rounded hidden shadow-md bg-white absolute pin-t mt-12 mr-1 pin-r`}>
+                            className={`${isProfileDropdownOpen ? "": "hidden"} rounded shadow-md bg-white absolute pin-t mt-12 mr-1 pin-r`}>
                             <ul className="list-reset">
                                 <li><a href="#" className="no-underline px-4 py-2 block text-black hover:bg-grey-light">My account</a></li>
                                 <li><a href="#" className="no-underline px-4 py-2 block text-black hover:bg-grey-light">Notifications</a>
                                 </li>
                                 <li><hr className="border-t mx-2 border-grey-ligght" /></li>
-                                <li><a href="#" className="no-underline px-4 py-2 block text-black hover:bg-grey-light">Logout</a>
+                                <li>
+                                    <Link href={LOGOUT_URL}>
+                                        <a className="no-underline px-4 py-2 block text-black hover:bg-grey-light">Logout</a>
+                                    </Link>
                                 </li>
                             </ul>
                         </div>

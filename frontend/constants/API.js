@@ -1,0 +1,9 @@
+export const IMG_HOST = 'http://localhost:8000/';
+export const LOGIN_API = 'http://localhost:8000/api/rest-auth/login/';
+export const LOGOUT_API = 'http://localhost:8000/api/rest-auth/logout/';
+export const SIGN_UP_API = 'http://localhost:8000/api/rest-auth/registration/';
+export const CONFIRM_TOKEN_API = 'http://localhost:8000/api/accounts-rest/registration/account-confirm-email/';
+export const PASSWORD_RESET_API = 'http://localhost:8000/api/reset_password/';
+export const PASSWORD_RESET_CONFIRM_API = 'http://localhost:8000/api/reset_password/confirm/';
+export const USERS_LIST_API = 'http://localhost:8000/api/users/';
+export const USER_DETAIL_FROM_TOKEN_API = 'http://localhost:8000/api/users/me/';

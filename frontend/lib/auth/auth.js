@@ -4,15 +4,17 @@ import nextCookie from 'next-cookies'
 import cookie from 'js-cookie'
 import fetch from 'isomorphic-unfetch'
 import {
-    CONFIRM_TOKEN_API, IS_STAFF_COOKIE_NAME, IS_SUPERUSER_COOKIE_NAME,
+    ANGO_SESSION_NAME,
+    CONFIRM_TOKEN_API, IS_STAFF_SESSION_NAME,
     LOGIN_API,
     LOGOUT_API,
     PASSWORD_RESET_API,
     PASSWORD_RESET_CONFIRM_API,
-    SIGN_UP_API, USER_DETAIL_FROM_TOKEN_API
-} from "../constants";
-import {isEmpty} from "./utils";
-import {ADMIN_DASHBOARD_URL, ADMIN_LOGIN_URL, LOGIN_URL} from "../constants/URLs";
+    SIGN_UP_API, USER_DETAIL_FROM_TOKEN_API, USER_ID_SESSION_NAME
+} from "../../constants";
+import {isEmpty} from "../utils";
+import {ADMIN_LOGIN_URL, LOGIN_URL} from "../../constants/URLs";
+import {code} from "../crypto";
 
 const defaultHeader = {
     'Accept': 'application/json',
@@ -57,10 +59,9 @@ export const logout = async () => {
     // to support logging out from all windows
     window.localStorage.setItem('logout', Date.now());
 
-    let is_staff = cookie.get(IS_STAFF_COOKIE_NAME);
+    let is_staff = sessionStorage.getItem(IS_STAFF_SESSION_NAME) === '1';
     if(is_staff){
-        cookie.remove(IS_STAFF_COOKIE_NAME);
-        cookie.remove(IS_SUPERUSER_COOKIE_NAME);
+        sessionStorage.clear();
         return Router.push(ADMIN_LOGIN_URL);
     }
     Router.push(LOGIN_URL)
@@ -129,53 +130,6 @@ export const loginFetch = async (data, noTransfer = false) => {
         return error;
     }
 };
-
-export const AdminLoginFetch = async data => {
-    let loginRespond = await loginFetch(data, true);
-    let wasLoginSuccess = !isEmpty(loginRespond.token);
-    if(!wasLoginSuccess){
-        return error;
-    }
-    cookie.set('token', loginRespond.token, { expires: 1 });
-    let csrf_token = cookie.get('csrf_token');
-    const headers = defaultHeader;
-    if (data['csrf_token'] !== 'undefined') {
-        headers['X-CSRFToken'] = data['csrf_token']
-    } else if(!isEmpty(csrf_token)){
-        headers['X-CSRFToken'] = csrf_token;
-    }
-    headers['Authorization'] = `Token ${loginRespond.token}`;
-
-    try {
-        const response = await fetch(USER_DETAIL_FROM_TOKEN_API, {
-            headers: headers,
-        });
-        if (response.status === 200) {
-            const userData = await response.json();
-            adminLogin(userData.is_staff, userData.is_superuser);
-            return {userData: userData, response: response};
-        } else {
-            let error = new Error(response.statusText);
-            error.response = response;
-            throw error
-        }
-
-    } catch (error) {
-        return error;
-    }
-};
-
-let adminLogin = (is_staff, is_superuser) => {
-    if(!is_staff){
-        return Router.push(ADMIN_LOGIN_URL);
-    }
-    cookie.set(IS_STAFF_COOKIE_NAME, true, { expires: 1 });
-    if(is_superuser){
-        cookie.set(IS_SUPERUSER_COOKIE_NAME, true, { expires: 1 });
-    }
-    Router.push(ADMIN_DASHBOARD_URL) ;
-};
-
 
 let includeConfirmedCookie = (cookie) => {
     if(typeof cookie === 'undefined'){

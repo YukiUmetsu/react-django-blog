@@ -4,7 +4,7 @@ import {EMAIL_VALIDATION_RULE} from "../../constants";
 import CSRFTokenInput from "../UI/Form/CSRFTokenInput";
 import PropTypes from 'prop-types';
 import {useForm} from "react-hook-form";
-import {resetPasswordFetch} from "../../lib/auth";
+import {resetPasswordFetch} from "../../lib/auth/auth";
 import {isEmpty} from "../../lib/utils";
 
 const ForgotPasswordForm = (props) => {

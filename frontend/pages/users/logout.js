@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { logout } from "../../lib/auth";
+import { logout } from "../../lib/auth/auth";
 
 const Logout = (props) => {
     const [isComponentMounted, setIsComponentMounted] = useState(false);

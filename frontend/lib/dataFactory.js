@@ -1,9 +1,10 @@
 import faker from "faker";  // dev dependency
-import { Factory } from "rosie"; // dev dependency
+import { Factory } from "rosie";
+import {API_BASE} from "../constants"; // dev dependency
 
 export const createUserData = (listNumber) => {
     const personFactory = Factory.define("person")
-        .attr("profile_img", "http://localhost:8000/media/uploads/2020/04/05/yuki-profile.jpg")
+        .attr("profile_img", API_BASE+"/media/uploads/2020/04/05/yuki-profile.jpg")
         .attr("first_name", faker.name.firstName)
         .attr("last_name", faker.name.lastName)
         .attr("is_staff", faker.random.boolean)

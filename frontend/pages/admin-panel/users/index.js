@@ -3,7 +3,7 @@ import AdminPanelLayout from "../../../components/UI/Admin/AdminPanelLayout";
 import {DUMMY_ADMIN_USER_FOR_HEADER} from "../../../constants";
 import AdminPanelUsersTable from "../../../components/AdminPanel/Users/UsersTable";
 import AddNewUser from "../../../components/AdminPanel/Users/AddNewUser";
-import {withAuthSync} from "../../../lib/auth";
+import {withAdminAuth} from "../../../lib/auth/adminAuth";
 
 const AdminPanelUsers = (props) => {
 
@@ -19,4 +19,4 @@ const AdminPanelUsers = (props) => {
     );
 };
 
-export default withAuthSync(AdminPanelUsers)
+export default withAdminAuth(AdminPanelUsers)

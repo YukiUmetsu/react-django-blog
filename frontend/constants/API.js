@@ -1,9 +1,14 @@
-export const IMG_HOST = 'http://localhost:8000/';
-export const LOGIN_API = 'http://localhost:8000/api/rest-auth/login/';
-export const LOGOUT_API = 'http://localhost:8000/api/rest-auth/logout/';
-export const SIGN_UP_API = 'http://localhost:8000/api/rest-auth/registration/';
-export const CONFIRM_TOKEN_API = 'http://localhost:8000/api/accounts-rest/registration/account-confirm-email/';
-export const PASSWORD_RESET_API = 'http://localhost:8000/api/reset_password/';
-export const PASSWORD_RESET_CONFIRM_API = 'http://localhost:8000/api/reset_password/confirm/';
-export const USERS_LIST_API = 'http://localhost:8000/api/users/';
-export const USER_DETAIL_FROM_TOKEN_API = 'http://localhost:8000/api/users/me/';
+import getConfig from 'next/config'
+const { publicRuntimeConfig } = getConfig();
+
+export const API_BASE = publicRuntimeConfig.API_BASE;
+export const IMG_HOST = API_BASE + '/';
+export const LOGIN_API = API_BASE + '/api/rest-auth/login/';
+export const LOGOUT_API = API_BASE + '/api/rest-auth/logout/';
+export const SIGN_UP_API = API_BASE + '/api/rest-auth/registration/';
+export const CONFIRM_TOKEN_API = API_BASE + '/api/accounts-rest/registration/account-confirm-email/';
+export const PASSWORD_RESET_API = API_BASE + '/api/reset_password/';
+export const PASSWORD_RESET_CONFIRM_API = API_BASE + '/api/reset_password/confirm/';
+export const USERS_LIST_API = API_BASE + '/api/users/';
+export const USER_DETAIL_FROM_TOKEN_API = API_BASE + '/api/users/me/';
+export const FILES_LIST_API = API_BASE + '/api/files/';

@@ -9,6 +9,8 @@ import * as yup from "yup";
 import {isEmpty} from "../../../lib/utils";
 import {IMG_HOST} from "../../../constants";
 import PasswordStrengthMeter from "./PasswordStrengthMeter";
+import PackmanSpinner from "../Spinner/PackmanSpinner";
+import Alert from "../Notifications/Alert";
 
 const Form = (props) => {
 
@@ -31,6 +33,8 @@ const Form = (props) => {
 
     let [formDataState, setFormDataState] = useState(setInitialFormDataState());
     let [showChangeImageCover, setShowChangeImageCover] = useState(false);
+    let [loading, setLoading] = useState(props.loading ? props.loading : false);
+    let [formError, setFormError] = useState(props.formError);
     let imageElementRef = useRef();
 
     const formConfig = {
@@ -50,6 +54,14 @@ const Form = (props) => {
         }
     }, [props.resetForm]);
 
+    useEffect( () => {
+        setLoading(props.loading);
+    }, [props.loading]);
+
+    useEffect( () => {
+        setFormError(props.formError);
+    }, [props.formError]);
+
     let updateFormDataState = (accessor, value) => {
         let updatedElement = {};
         updatedElement[accessor] = value;
@@ -67,12 +79,23 @@ const Form = (props) => {
     };
 
     const onSubmit = async data => {
-        console.log(data);
-        props.onSubmitCallback(data);
-        // TODO connect to the server
+        setLoading(true);
+        let result = await props.onSubmitCallback(data);
+        if(result){
+            await setLoading(false);
+        }
     };
 
     const renderFormElements = () => {
+        if(loading){
+            return <PackmanSpinner/>
+        }
+        if(!isEmpty(formError)){
+            return <Alert
+                title="Something went wrong"
+                content={formError.message}
+                closeCallback={() => setFormError(false)} />
+        }
         return props.formData.elements.map(element => {
             if (!element.editable) {
                 return;
@@ -247,6 +270,8 @@ Form.propTypes = {
     onSubmitCallback: PropTypes.func,
     onSubmitSuccessCallback: PropTypes.func,
     onSubmitFailCallback: PropTypes.func,
+    loading: PropTypes.bool,
+    formError: PropTypes.object,
 };
 
 export default Form

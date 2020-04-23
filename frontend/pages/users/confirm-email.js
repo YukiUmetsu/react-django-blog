@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { confirmEmailFetch } from "../../lib/auth";
+import { confirmEmailFetch } from "../../lib/auth/auth";
 import Router, { useRouter } from 'next/router'
 import {isEmpty} from "../../lib/utils";
 

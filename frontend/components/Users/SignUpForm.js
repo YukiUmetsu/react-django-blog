@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import {EMAIL_VALIDATION_RULE, PASSWORD_VALIDATION_RULE} from "../../constants";
 import OutsideComponentAlerter from "../../hoc/Aux/OutsideComponentAlerter";
 import CSRFTokenInput from "../UI/Form/CSRFTokenInput";
-import {signUpFetch} from "../../lib/auth";
+import {signUpFetch} from "../../lib/auth/auth";
 import Router from "next/router";
 import PropTypes from 'prop-types';
 

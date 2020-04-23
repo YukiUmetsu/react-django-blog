@@ -6,11 +6,112 @@ import Aux from "../../../hoc/Aux/Aux";
 import Modal from "../../UI/Modal/Modal";
 import Form from "../../UI/Form/Form";
 import {FORM_DATA} from "../../../constants/FormDataConst";
+import {isEmpty} from "../../../lib/utils";
+import cloneDeep from 'lodash/cloneDeep';
+import {FILES_LIST_API, SWR_PATCH_FETCH, SWR_POST_FETCH, SWR_POST_FILE_FETCH, USERS_LIST_API} from "../../../constants";
+import useSWR from "swr";
+import * as moment from 'moment';
 
 const AddNewUser = (props) => {
 
     let [isNewUserModalOpen, setIsNewUserModalOpen] = useState(false);
-    // TODO user data submission.
+    let [newUserData, setNewUserData] = useState(null);
+    let [profileImg, setprofileImg] = useState(null);
+    let [profileImgCreated, setProfileImgCreated] = useState(false);
+    let [dataUpdateError, setDataUpdateError] = useState(null);
+    let [formLoading, setFormLoading] = useState(false);
+
+    let submitHandler = async (data) => {
+        await setFormLoading(true);
+        await setprofileImg(data.profile_img[0]);
+        await setNewUserData({...data, profile_img: null});
+    };
+
+    let createErrorObj = (message = '') => {
+        return {error: {message: message}}
+    };
+
+    const { data: user } = useSWR(
+        newUserData ? [USERS_LIST_API, newUserData]: null,
+        SWR_POST_FETCH,
+        {
+            errorRetryCount: 1,
+            onSuccess: async (user) => {
+                if(!user.hasOwnProperty('id')){
+                    setDataUpdateError(createErrorObj("Server connection error. Unable to create a user."));
+                    clearNewUserFormStatesExceptError();
+                }
+            },
+            onError: (error) => {
+                console.log(error);
+                setDataUpdateError(error);
+                clearNewUserFormStatesExceptError();
+            }
+        });
+
+    const { data: fileObj } = useSWR((!isEmpty(user) && !isEmpty(profileImg)) ? [FILES_LIST_API, user] : null,
+        () => SWR_POST_FILE_FETCH(
+            FILES_LIST_API,
+            "image",
+            `${user.first_name}-${user.last_name}-${moment().format('YYYY-MM-DD-HH-mm')}`,
+            user.id,
+            profileImg),
+        {
+            errorRetryCount: 1,
+            onSuccess: (fileObj) => {
+                if(!fileObj.hasOwnProperty('id')){
+                    setDataUpdateError(createErrorObj("Server connection error. Unable to create a user icon."));
+                    clearNewUserFormStatesExceptError();
+                } else {
+                    setProfileImgCreated(true);
+                }
+            },
+            onError: (error) => {
+                console.log(error);
+                setDataUpdateError(error);
+                clearNewUserFormStatesExceptError();
+            }
+        }
+    );
+
+    const { data: editedUser } = useSWR((!isEmpty(user) && !isEmpty(fileObj) && profileImgCreated) ? [USERS_LIST_API+user.id+'/', fileObj.id]: null,
+        () => SWR_PATCH_FETCH(USERS_LIST_API+user.id+'/', {profile_img: fileObj.id}),
+        {
+            errorRetryCount: 1,
+            onSuccess: (editedUser) => {
+                if(!editedUser.hasOwnProperty('id')){
+                    setDataUpdateError(createErrorObj("Server connection error. Unable to set the Icon image to the new user."))
+                    clearNewUserFormStatesExceptError();
+                } else {
+                    clearNewUserFormStates();
+                    setIsNewUserModalOpen(false);
+                }
+            },
+            onError: (error) => {
+                console.log(error);
+                setDataUpdateError(error);
+                clearNewUserFormStatesExceptError();
+            }
+        }
+    );
+
+    const clearNewUserFormStates = () => {
+        setFormLoading(false);
+        setDataUpdateError(null);
+        setprofileImg(null);
+        setNewUserData(null);
+        setProfileImgCreated(false);
+        setNewUserData(null);
+    };
+
+    const clearNewUserFormStatesExceptError = () => {
+        setFormLoading(false);
+        setDataUpdateError(null);
+        setprofileImg(null);
+        setNewUserData(null);
+        setProfileImgCreated(false);
+        setNewUserData(null);
+    };
 
     return (
         <Aux>
@@ -21,7 +122,9 @@ const AddNewUser = (props) => {
                 <Form
                     form_id_prefix="New_User"
                     formData={FORM_DATA.NEW_USER_FORM}
-                    onSubmitCallback={() => {console.log("submitted!")}}
+                    onSubmitCallback={submitHandler}
+                    loading={formLoading}
+                    formError={dataUpdateError}
                 />
             </Modal>
         </Aux>

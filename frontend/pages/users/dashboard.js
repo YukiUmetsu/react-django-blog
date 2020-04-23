@@ -1,5 +1,5 @@
 import React from 'react';
-import {withAuthSync} from "../../lib/auth";
+import {withAuthSync} from "../../lib/auth/auth";
 
 const UsersDashboard = (props) => {
     return (

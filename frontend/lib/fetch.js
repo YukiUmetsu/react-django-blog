@@ -26,6 +26,7 @@ export default class Fetcher {
         onFailCallback = null,
         headers = null,
         successStatuses = [200, 201],
+        hasFile = false
     ) {
         this.url = url;
         this.method = method;
@@ -38,6 +39,7 @@ export default class Fetcher {
         this.onSuccessCallback = onSuccessCallback;
         this.onFailCallback = onFailCallback;
         this.results = [];
+        this.hasFile = hasFile;
 
         if(headers){
             this.headers = headers;
@@ -47,6 +49,10 @@ export default class Fetcher {
                 'Content-Type': 'application/json',
             };
         }
+        if(hasFile) {
+            delete this.headers['Content-Type'];
+            delete this.headers['Accept'];
+        }
         if(credentialsInclude){
             this.headers['credentials'] = "include";
         }
@@ -54,6 +60,14 @@ export default class Fetcher {
             this.data = data;
         }
     }
+
+    setHasFile = (value = false) => {
+        this.hasFile = value;
+        if(value){
+            delete this.headers['Accept'];
+            delete this.headers['Content-Type'];
+        }
+    };
 
     start = async () => {
         if (this.cookie.csrftoken !== 'undefined') {
@@ -79,12 +93,21 @@ export default class Fetcher {
                 .catch(error => error)
         } catch (error) {
             (this.onFailCallback) ? this.onFailCallback(error) : null;
-            return {result: false, data: error}
+            return {result: false, error: error}
         }
     };
 
     post = async () => {
         try {
+            if(this.hasFile){
+                return fetch(this.url, {
+                    method: this.method,
+                    body: this.data
+                })
+                    .then(res => res.json())
+                    .catch(error => error)
+            }
+
             return fetch(this.url, {
                 method: this.method,
                 headers: this.headers,
@@ -95,7 +118,7 @@ export default class Fetcher {
 
         } catch (error) {
             this.onFailCallback(error);
-            return {result: false, data: error}
+            return {result: false, error: error}
         }
     }
 }

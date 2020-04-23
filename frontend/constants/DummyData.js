@@ -1,4 +1,4 @@
-const IMG_HOST = 'http://localhost:8000/';
+import {IMG_HOST} from "./API";
 
 export const DUMMY_TABLE_ACTIONS = [
     {

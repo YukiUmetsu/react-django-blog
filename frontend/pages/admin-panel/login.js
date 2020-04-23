@@ -4,6 +4,8 @@ import Link from "next/link";
 import Alert from "../../components/UI/Notifications/Alert";
 import { useRouter } from 'next/router'
 import AdminLoginForm from "../../components/AdminPanel/Users/AdminLoginForm";
+import getConfig from "next/config";
+import {generateRandomStr} from "../../lib/crypto";
 
 const AdminLogin = (props) => {
     const router = useRouter()
@@ -74,6 +76,7 @@ const AdminLogin = (props) => {
                             onServerError={() => setHasServerError(true)}
                             maxLoginFailure={10}
                             onMaxLoginFailureCallback={() => setOverMaxLoginFailure(true)}
+                            angoKey={props.angoKey}
                         />
                     </div>
 
@@ -87,5 +90,11 @@ const AdminLogin = (props) => {
         </div>
     );
 };
+
+export async function getServerSideProps(ctx) {
+    const { serverRuntimeConfig } = getConfig();
+    const angoKey = serverRuntimeConfig.ANGOU_KEY + generateRandomStr();
+    return { props: { angoKey: angoKey } }
+}
 
 export default AdminLogin

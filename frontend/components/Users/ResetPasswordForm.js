@@ -4,7 +4,7 @@ import OutsideComponentAlerter from "../../hoc/Aux/OutsideComponentAlerter";
 import {EMAIL_VALIDATION_RULE, PASSWORD_VALIDATION_RULE} from "../../constants";
 import { useForm } from 'react-hook-form'
 import Router, {useRouter} from "next/router";
-import {resetPasswordConfirmFetch} from "../../lib/auth";
+import {resetPasswordConfirmFetch} from "../../lib/auth/auth";
 
 const ResetPasswordForm = (props) => {
     const router = useRouter();

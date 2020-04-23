@@ -2,6 +2,7 @@ import React from 'react';
 import AdminPanelLayout from "../../components/UI/Admin/AdminPanelLayout";
 import Table from "../../components/UI/Table/Table";
 import {DUMMY_ADMIN_USER_FOR_HEADER, DUMMY_TABLE} from "../../constants";
+import {withAdminAuth} from "../../lib/auth/adminAuth";
 
 const AdminPanel = (props) => {
 
@@ -15,4 +16,4 @@ const AdminPanel = (props) => {
     );
 };
 
-export default AdminPanel
+export default withAdminAuth(AdminPanel)

@@ -3,9 +3,9 @@ import { useForm } from 'react-hook-form'
 import OutsideComponentAlerter from "../../../hoc/Aux/OutsideComponentAlerter";
 import {EMAIL_VALIDATION_RULE, PASSWORD_VALIDATION_RULE} from "../../../constants";
 import CSRFTokenInput from "../../UI/Form/CSRFTokenInput";
-import {AdminLoginFetch, loginFetch} from "../../../lib/auth";
 import cookie from 'js-cookie'
 import PropTypes from 'prop-types';
+import {AdminLoginFetch} from "../../../lib/auth/adminAuth";
 
 
 const AdminLoginForm = (props) => {
@@ -25,7 +25,7 @@ const AdminLoginForm = (props) => {
             await props.onMaxLoginFailureCallback();
             return;
         }
-        let responseData = await AdminLoginFetch(data);
+        let responseData = await AdminLoginFetch(data, props.angoKey);
         if (!responseData.response.ok) {
            props.onServerError();
            cookie.set('login_fail', current_login_fail+1, { expires: 1 });

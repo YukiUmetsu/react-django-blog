@@ -40,7 +40,7 @@ const Paginator = (props) => {
 
     useEffect(() => {
         setTotalData(getPreSortData());
-    },[preSortData, props.originalData]);
+    },[preSortData]);
 
     let setDataFromTotalData = () => {
         if(isEmpty(totalData)){
@@ -292,7 +292,7 @@ Paginator.defaultProps = {
 };
 
 Paginator.propTypes = {
-    originalData: PropTypes.array,
+    // originalData: PropTypes.array,
     preSortData: PropTypes.array,
     columns: PropTypes.array,
     //-------------optional↓---------------//

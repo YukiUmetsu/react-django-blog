@@ -1,19 +1,26 @@
 import React, {createContext, useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import cloneDeep from 'lodash/cloneDeep';
-import matchSorter from 'match-sorter'
-import Moment from 'moment';
-import {extendMoment} from 'moment-range';
-import {isEmpty} from "../../../lib/utils";
+import {dClone, getObjsToAdd, isEmpty, removeDuplicatesById} from "../../../lib/utils";
 import OutsideComponentAlerter from "../../../hoc/Aux/OutsideComponentAlerter";
+import Alert from "../Notifications/Alert";
+import {SWR_FETCH, USERS_LIST_API} from "../../../constants";
+import useSWR from "swr";
+import {performDateRangeSearch, performTextSearch, performYesNoSearch} from "../../../lib/dataSearch";
 
-const moment = extendMoment(Moment);
 
 export const SearchCallbackContext = createContext({updateSearchState: ()=>{}});
 
 const DataSearcher = (props) => {
 
-    const [data, setData] = useState(props.originalData);
+    let localStorageData = [];
+    if (typeof window !== 'undefined') {
+        localStorageData = JSON.parse(localStorage.getItem(props.dataNameKey));
+    }
+    let [hasError, setHasError] = useState(false);
+    let [data, setData] = useState(localStorageData);
+    let [nextFetchUrl, setNextFetchUrl] = useState(USERS_LIST_API);
+
     const [searchKeys, setSearchKeys] = useState(props.searchKeys);
     const [clearSortState, setClearSortState] = useState(false);
 
@@ -37,8 +44,55 @@ const DataSearcher = (props) => {
     }, [searchState, searchKeys]);
 
     useEffect(() => {
-        setData(props.originalData);
-    }, [props.originalData]);
+        return () => {
+            localStorage.removeItem(props.dataNameKey);
+        }
+    }, []);
+
+    /***
+     * this function removes data duplicates by Id and concatenate new data to existing data
+     * @param dataItems
+     * @returns {Promise<[]>}
+     */
+    const getNewData = async (dataItems = []) => {
+        if(isEmpty(dataItems)){
+            return;
+        }
+        let itemsToAdd = [];
+        let newData;
+
+        if(isEmpty(data)){
+            newData = dataItems;
+        } else {
+            newData = await dClone(data);
+            newData = await newData.concat(dataItems);
+            let userCurrentIds = data.map(item => item.id);
+            itemsToAdd = getObjsToAdd(dataItems, userCurrentIds);
+            if(!isEmpty(itemsToAdd)){
+                newData = newData.concat(itemsToAdd);
+            }
+        }
+        // remove duplicates
+        newData = removeDuplicatesById(newData);
+        if(typeof window !== 'undefined'){
+            await localStorage.setItem(props.dataNameKey, JSON.stringify(newData));
+        }
+        return newData;
+    };
+
+    const {error, serverData} = useSWR(
+        nextFetchUrl,
+        SWR_FETCH,
+        {
+            onSuccess: async (serverData) => {
+                let newData = await getNewData(serverData.results);
+                await setData(newData);
+                await setNextFetchUrl(serverData.next);
+            },
+            onError: () => { setHasError(true)},
+        }
+    );
+
 
     let isSearchStateEmpty = (givenState= {}) => {
         let keys = Object.keys(givenState);
@@ -66,12 +120,12 @@ const DataSearcher = (props) => {
             return;
         }
         if(isSearchStateEmpty(searchState)){
-            setData(props.originalData);
+            setData(JSON.parse(localStorage.getItem(props.dataNameKey)));
             return;
         }
         let newData = [];
         if(onOriginal){
-            newData = cloneDeep(props.originalData);
+            newData = cloneDeep(JSON.parse(localStorage.getItem(props.dataNameKey)));
         } else {
             newData = cloneDeep(data);
         }
@@ -99,27 +153,6 @@ const DataSearcher = (props) => {
         }
     };
 
-    let performTextSearch = (givenData, key, value, searchType = 'match') => {
-        if(searchType === 'equal'){
-            return matchSorter(givenData, value, {keys: [key], threshold: matchSorter.rankings.CONTAINS});
-        }
-        return matchSorter(givenData, value, {keys: [key]})
-    };
-
-    let performDateRangeSearch = (givenData, key, [dateStart, dateEnd]) => {
-        const range = moment.range(dateStart, dateEnd);
-        return givenData.filter(item => {
-            let target = moment(item[key]);
-            return target.within(range);
-        });
-    };
-
-    let performYesNoSearch = (givenData, key, value) => {
-        return givenData.filter(item => {
-            return item[key] === value;
-        });
-    };
-
     const getClearSortState = () => {
         return clearSortState;
     };
@@ -136,6 +169,12 @@ const DataSearcher = (props) => {
         return data;
     };
 
+    let renderAlert = () => {
+        if(hasError){
+            return <Alert title="Something went wrong" content="Failed to load user data" />;
+        }
+    };
+
     return (
         <OutsideComponentAlerter callback={performSearch}>
             <SearchCallbackContext.Provider value={{
@@ -145,6 +184,7 @@ const DataSearcher = (props) => {
                 updateSearchState: updateSearchState,
                 preSortData: data,
             }} >
+                {renderAlert()}
                 {props.children}
             </SearchCallbackContext.Provider>
         </OutsideComponentAlerter>
@@ -152,12 +192,12 @@ const DataSearcher = (props) => {
 };
 
 DataSearcher.defaultProps = {
-    originalData: [],
     searchKeys: [{key:"", type:""}],
 };
 
 DataSearcher.propTypes = {
-    originalData: PropTypes.array,
+    dataNameKey: PropTypes.string,
+    dataListFetchURL: PropTypes.string,
     searchKeys: PropTypes.array,
 };
 export default DataSearcher

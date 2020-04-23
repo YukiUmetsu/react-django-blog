@@ -1,4 +1,4 @@
-import React, {createContext, useEffect, useState} from 'react';
+import React, {createContext, useContext, useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import TableCSS from '../Table.module.css';
 import SelectableTableRow from "./SelectableTableRow";
@@ -7,19 +7,23 @@ import Modal from "../../Modal/Modal";
 import Form from "../../Form/Form";
 import {FORM_DATA} from "../../../../constants/FormDataConst";
 import AlertModal from "../../Modal/AlertModal";
-import {isEmpty} from "../../../../lib/utils";
+import {getTableColumnInfo, isEmpty} from "../../../../lib/utils";
 import OutsideComponentAlerter from "../../../../hoc/Aux/OutsideComponentAlerter";
 import PackmanSpinner from "../../Spinner/PackmanSpinner";
+import {SearchCallbackContext} from "../../Filters/DataSearcher";
+import AlertModalTable from "../../Modal/AlertModalTable";
 
 export const DataMutationContext = createContext({});
 
 const SelectableTable = (props) => {
 
+    const {updateDeletionStates: updateDeletionStates} = useContext(SearchCallbackContext);
     let [ selectedItems, setSelectedItems ] = useState(new Set());
     let [ data, setData ] = useState(props.data);
     let [ checkboxAllOn, setCheckboxAllOnOffStatus] = useState(false);
     let [ editModalState, setEditModalState ] = useState({isOpen: false, rowObj: {}});
     let [ deleteModalState, setDeleteModalState ] = useState({isOpen: false, rowObj: {}});
+    let [ bunchDeleteModalOpen, setBunchDeleteModalOpen ] = useState(false);
     let [ resetEditForm, setResetEditForm ] = useState(false);
 
     useEffect(()=> {
@@ -100,7 +104,7 @@ const SelectableTable = (props) => {
                     rowObj={rowObj}
                     key={rowObj.id}
                     isActionsRequired={props.isActionsRequired}
-                    columnData={getColumnData()}
+                    columnData={getTableColumnInfo(props.columns)}
                     onInputChanged={(e)=>{inputChangedHandler(e)}}
                     isRowSelected={selectedItems.has(parseInt(rowObj.id))}
                 />);
@@ -158,37 +162,16 @@ const SelectableTable = (props) => {
             [selectedActionItem, ...rest] = props.actionData.filter(item => {
                 return item.value === selectedAction;
             });
-            await selectedActionItem.callback(selectedItems);
-            setSelectedItems([]);
+            if(selectedActionItem.value === 'delete'){
+                setBunchDeleteModalOpen(true);
+            }
         }
     };
 
-    let getColumnData = () => {
-        let newColumnData = {
-            imageColumns: [],
-            booleanColumns: [],
-            dateColumns: [],
-            increaseColumns: [],
-            decreaseColumns: [],
-        };
-        props.columns.map((column,index) => {
-            if (column.type === 'image') {
-                newColumnData.imageColumns.push(index);
-            } else if(column.type === 'boolean'){
-                newColumnData.booleanColumns.push(index);
-            } else if(column.type === 'date'){
-                newColumnData.dateColumns.push(index);
-            } else if(column.type === 'increase'){
-                newColumnData.increaseColumns.push(index);
-            } else if(column.type === 'decrease'){
-                newColumnData.decreaseColumns.push(index);
-            }
-        });
-        newColumnData.columns = props.columns;
-        return newColumnData;
-    };
-
-    let renderOnDeleteMessage = (rowObj) => {
+    let renderOnDeleteMessage = (rowObjs) => {
+        if(isEmpty(rowObjs)){
+            return;
+        }
         let shownColumns = props.columns.map(column => {
             if(!column.showOnDelete){
                 return;
@@ -196,32 +179,48 @@ const SelectableTable = (props) => {
             return ({label: column.label, accessor: column.accessor, type: column.type});
         }).filter(x => x!== undefined);
 
-        let headerRows = shownColumns.map(column => {
-            return (<th className="px-4 py-2" key={column.label}>{column.label}</th>);
+        let labels = shownColumns.map(col => col.label);
+
+        let tableBodyData = [];
+
+        if(!Array.isArray(rowObjs)){
+            rowObjs = [rowObjs];
+        }
+
+        tableBodyData = rowObjs.map(rowObj => {
+            return shownColumns.map(column => {
+                let content = rowObj[column.accessor];
+                if(column.type === "boolean"){
+                    content = isEmpty(rowObj[column.accessor]) ? "No" : "Yes";
+                }
+                return {accessor: column.accessor, content: content};
+            });
         });
 
-        let bodyRows = shownColumns.map(column => {
-            let content = rowObj[column.accessor];
-            if(column.type === "boolean"){
-                content = isEmpty(rowObj[column.accessor]) ? "No" : "Yes";
-            }
-            return <td className="px-4 py-2" key={column.accessor}>{content}</td>
-        });
+        return <AlertModalTable labels={labels} data={tableBodyData} />;
+    };
 
-        return (
-            <table className="table-auto">
-                <thead>
-                <tr>
-                    {headerRows}
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    {bodyRows}
-                </tr>
-                </tbody>
-            </table>
-        );
+    const handleDataItemDeleted = (ids) => {
+        updateDeleteModalState({}, false);
+        if(!Array.isArray(ids)){
+            ids = [ids];
+        }
+        updateDeletionStates(0, ids);
+    };
+
+    const getSelectedItemDetailData = (ids) => {
+        if(ids instanceof Set){
+            ids = Array.from(ids);
+        }
+
+        return data.filter(item => {
+            return ids.includes(item.id);
+        });
+    };
+
+    const handleBunchDeleteConfirmed = () => {
+        handleDataItemDeleted(Array.from(selectedItems));
+        setSelectedItems(new Set());
     };
 
     return (
@@ -255,8 +254,19 @@ const SelectableTable = (props) => {
                     modalOpen={deleteModalState.isOpen}
                     onCloseCallback={() => updateDeleteModalState({}, false)}
                     title="Are you sure to delete?"
-                    onConfirmedCallback={() => {updateDeleteModalState({}, false); console.log("confirmed!!"); }}>
+                    onConfirmedCallback={(id) => handleDataItemDeleted(id)}
+                    associatedObjId={parseInt(deleteModalState.rowObj.id)}>
                     {renderOnDeleteMessage(deleteModalState.rowObj)}
+                </AlertModal>
+            </OutsideComponentAlerter>
+
+            <OutsideComponentAlerter callback={() => setBunchDeleteModalOpen(false)}>
+                <AlertModal
+                    modalOpen={bunchDeleteModalOpen}
+                    onCloseCallback={() => setBunchDeleteModalOpen(false)}
+                    title="Are you sure to delete?"
+                    onConfirmedCallback={() => handleBunchDeleteConfirmed()}>
+                    {renderOnDeleteMessage(getSelectedItemDetailData(selectedItems))}
                 </AlertModal>
             </OutsideComponentAlerter>
 

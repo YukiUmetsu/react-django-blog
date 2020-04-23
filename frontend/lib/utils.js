@@ -41,6 +41,53 @@ export const formatDate = (dateObj, formatStr='MMMM Do YYYY') => {
     return moment(dateObj).format(formatStr);
 };
 
+export const getLocalStorageItem = (key) => {
+    return JSON.parse(localStorage.getItem(key));
+};
+
+export const setLocalStorageItem = (key, data) => {
+    localStorage.setItem(key, JSON.stringify(data));
+};
+
+export const removeFromLocalStorage = (key, idsToDelete = []) => {
+    let localStorageData = getLocalStorageItem(key);
+    let newLocalData = localStorageData.filter((item) => {
+        return !idsToDelete.includes(item.id);
+    });
+    setLocalStorageItem(key, newLocalData);
+};
+
+export const removeFromData = (idsToDelete, data) => {
+    return data.filter(item => {
+        return !idsToDelete.includes(item.id);
+    });
+};
+
+export const getTableColumnInfo = columns => {
+    let newColumnData = {
+        imageColumns: [],
+        booleanColumns: [],
+        dateColumns: [],
+        increaseColumns: [],
+        decreaseColumns: [],
+    };
+    columns.map((column,index) => {
+        if (column.type === 'image') {
+            newColumnData.imageColumns.push(index);
+        } else if(column.type === 'boolean'){
+            newColumnData.booleanColumns.push(index);
+        } else if(column.type === 'date'){
+            newColumnData.dateColumns.push(index);
+        } else if(column.type === 'increase'){
+            newColumnData.increaseColumns.push(index);
+        } else if(column.type === 'decrease'){
+            newColumnData.decreaseColumns.push(index);
+        }
+    });
+    newColumnData.columns = columns;
+    return newColumnData;
+};
+
 export const removeFromArray = (array=[], value) => {
     let index = array.indexOf(value);
     if (index >= 0) {

@@ -52,7 +52,6 @@ const SelectableTableRow = (props) => {
     };
 
     let renderActions = () => {
-        // TODO action clicked!
         if(props.isActionsRequired) {
             return (
                 <td className="whitespace-no-wrap">

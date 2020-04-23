@@ -31,7 +31,7 @@ const AlertModal = (props) => {
     };
 
     let confirmedHandler = async () => {
-        await props.onConfirmedCallback();
+        await props.onConfirmedCallback(props.associatedObjId);
         await setOpacity(0);  // opacity 100 => 0
         await setTimeout(() => setModalOpen(false),550);  // => display:none
     };
@@ -47,9 +47,9 @@ const AlertModal = (props) => {
                     onClick={() => closeModalHandler()}> </div>
                 <div
                     id="modal-content-box"
-                    className={`rounded-md relative bg-white w-11/12 md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto rounded shadow-lg overflow-y-auto ${props.contentBoxClassNames}`}>
+                    className={`rounded-md relative bg-white w-11/12 md:w-11/12 lg:w-1/2 xl:w-1/2 mx-auto rounded shadow-lg overflow-y-auto ${props.contentBoxClassNames}`}>
 
-                    <div role="alert">
+                    <div role="alert" className="inline-block min-w-full">
                         <div className="bg-red-500 text-white font-bold rounded-t px-4 py-2">
                             {props.title}
                         </div>
@@ -83,6 +83,7 @@ AlertModal.defaultProps = {
     onCloseCallback: () => {},
     onOpenCallback: () => {},
     onConfirmedCallback: () => {},
+    associatedObjId: null,
 };
 
 AlertModal.propTypes = {
@@ -94,5 +95,6 @@ AlertModal.propTypes = {
     onCloseCallback: PropTypes.func,
     onOpenCallback: PropTypes.func,
     onConfirmedCallback: PropTypes.func,
+    associatedObjId: PropTypes.any,
 };
 export default AlertModal

@@ -1,10 +1,17 @@
 import React, {createContext, useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import cloneDeep from 'lodash/cloneDeep';
-import {dClone, getObjsToAdd, isEmpty, removeDuplicatesById} from "../../../lib/utils";
+import {
+    dClone,
+    getLocalStorageItem,
+    getObjsToAdd,
+    isEmpty,
+    removeDuplicatesById, removeFromData, removeFromLocalStorage,
+    setLocalStorageItem
+} from "../../../lib/utils";
 import OutsideComponentAlerter from "../../../hoc/Aux/OutsideComponentAlerter";
 import Alert from "../Notifications/Alert";
-import {SWR_FETCH, USERS_LIST_API} from "../../../constants";
+import {SWR_DELETE_FETCH, SWR_FETCH, USERS_LIST_API} from "../../../constants";
 import useSWR from "swr";
 import {performDateRangeSearch, performTextSearch, performYesNoSearch} from "../../../lib/dataSearch";
 
@@ -15,14 +22,29 @@ const DataSearcher = (props) => {
 
     let localStorageData = [];
     if (typeof window !== 'undefined') {
-        localStorageData = JSON.parse(localStorage.getItem(props.dataNameKey));
+        localStorageData = getLocalStorageItem(props.dataNameKey);
     }
-    let [hasError, setHasError] = useState(false);
     let [data, setData] = useState(localStorageData);
-    let [nextFetchUrl, setNextFetchUrl] = useState(USERS_LIST_API);
+    let [nextDataFetchUrl, setNextDataFetchUrl] = useState(USERS_LIST_API);
+    let [searchKeys, setSearchKeys] = useState(props.searchKeys);
+    let [clearSortState, setClearSortState] = useState(false);
 
-    const [searchKeys, setSearchKeys] = useState(props.searchKeys);
-    const [clearSortState, setClearSortState] = useState(false);
+    /***
+     * data edit and delete from action buttons
+     */
+    let [dataIdsToBeDeleted, setDataIdsToBeDeleted] = useState([]);
+    let [deleteCurrentIndex, setDeleteCurrentIndex] = useState(null);
+    let [editCurrentIndex, setEditCurrentIndex] = useState(null);
+    let [dataItemsToBeEdited, setDataItemsToBeEdited] = useState([]);
+
+    let initialAlertProps = {
+        title:"Something went wrong",
+        content:"Failed to load user data",
+        hideAfterSeconds: 3,
+        showAlert: false,
+    };
+    let [alertProps, setAlertProps] = useState(initialAlertProps);
+
 
     let createInitialSearchState = () => {
         let srchState = {};
@@ -32,12 +54,6 @@ const DataSearcher = (props) => {
         return srchState;
     };
     const [searchState, setSearchState] = useState(createInitialSearchState());
-
-    const updateSearchState = (newValue, searchKey) => {
-        let newSearchState = Object.assign({}, searchState);
-        newSearchState[searchKey] = newValue;
-        setSearchState(newSearchState);
-    };
 
     useEffect(() => {
         performSearch();
@@ -75,23 +91,69 @@ const DataSearcher = (props) => {
         // remove duplicates
         newData = removeDuplicatesById(newData);
         if(typeof window !== 'undefined'){
-            await localStorage.setItem(props.dataNameKey, JSON.stringify(newData));
+            await setLocalStorageItem(props.dataNameKey, newData);
         }
         return newData;
     };
 
+    /***
+     * connect to server to fetch data
+     */
     const {error, serverData} = useSWR(
-        nextFetchUrl,
+        nextDataFetchUrl,
         SWR_FETCH,
         {
             onSuccess: async (serverData) => {
                 let newData = await getNewData(serverData.results);
                 await setData(newData);
-                await setNextFetchUrl(serverData.next);
+                await setNextDataFetchUrl(serverData.next);
             },
-            onError: () => { setHasError(true)},
+            onError: () => showDefaultServerErrorAlert(),
         }
     );
+
+    /***
+     * connect server to delete a user
+     */
+    useSWR(
+        (typeof deleteCurrentIndex === 'number' && !isEmpty(dataIdsToBeDeleted)) ?
+            [props.dataListFetchURL + dataIdsToBeDeleted[deleteCurrentIndex] + "/", deleteCurrentIndex]
+            : null,
+        SWR_DELETE_FETCH,
+        {
+            onSuccess: async () => {
+                if(deleteCurrentIndex === dataIdsToBeDeleted.length-1){
+                    await showAlertAfterDeletion();
+                    await setDeleteCurrentIndex(null);
+                    await setDataIdsToBeDeleted(null);
+                } else {
+                    await setDeleteCurrentIndex(deleteCurrentIndex+1);
+                }
+            },
+            onError: () => showDefaultServerErrorAlert(),
+        }
+    );
+
+    let showAlertAfterDeletion = () => {
+        setAlertProps({
+            bgColor: 'teal',
+            textColor: 'teal',
+            exitColor: 'teal',
+            showAlert: true,
+            hideAfterSeconds: 3,
+            title: 'Deletion',
+            content: 'Data was successfully deleted',
+            hideCallback: () => { setAlertProps(initialAlertProps);}
+        });
+    };
+
+    let showDefaultServerErrorAlert = () => {
+        setAlertProps({
+            ...initialAlertProps,
+            showAlert: true,
+            hideCallback: () => { setAlertProps(initialAlertProps);}
+        });
+    };
 
 
     let isSearchStateEmpty = (givenState= {}) => {
@@ -120,12 +182,12 @@ const DataSearcher = (props) => {
             return;
         }
         if(isSearchStateEmpty(searchState)){
-            setData(JSON.parse(localStorage.getItem(props.dataNameKey)));
+            setData(getLocalStorageItem(props.dataNameKey));
             return;
         }
         let newData = [];
         if(onOriginal){
-            newData = cloneDeep(JSON.parse(localStorage.getItem(props.dataNameKey)));
+            newData = cloneDeep(getLocalStorageItem(props.dataNameKey));
         } else {
             newData = cloneDeep(data);
         }
@@ -165,13 +227,33 @@ const DataSearcher = (props) => {
         return setClearSortState(!clearSortState);
     };
 
+    const updateNextFetchURL = (nextURL = null) => {
+        if(nextURL === true){
+            setNextDataFetchUrl(props.dataListFetchURL);
+        } else if(nextURL != null){
+            setNextDataFetchUrl(nextURL);
+        }
+    };
+
     const getPreSortData = () => {
         return data;
     };
 
-    let renderAlert = () => {
-        if(hasError){
-            return <Alert title="Something went wrong" content="Failed to load user data" />;
+    const updateSearchState = (newValue, searchKey) => {
+        let newSearchState = Object.assign({}, searchState);
+        newSearchState[searchKey] = newValue;
+        setSearchState(newSearchState);
+    };
+
+    let updateDeletionStates = (index = null, ids = []) => {
+        if(typeof index === 'number'){
+            setDeleteCurrentIndex(index);
+        }
+        if(!isEmpty(ids)){
+            setDataIdsToBeDeleted(ids);
+            removeFromLocalStorage(props.dataNameKey, ids);
+            let newData = removeFromData(ids, data);
+            setData(newData);
         }
     };
 
@@ -182,9 +264,11 @@ const DataSearcher = (props) => {
                 updateClearSortState: updateClearSortState,
                 getPreSortData: getPreSortData,
                 updateSearchState: updateSearchState,
+                updateNextFetchURL: updateNextFetchURL,
+                updateDeletionStates: updateDeletionStates,
                 preSortData: data,
             }} >
-                {renderAlert()}
+                <Alert {...alertProps} />
                 {props.children}
             </SearchCallbackContext.Provider>
         </OutsideComponentAlerter>

@@ -22,14 +22,6 @@ const AdminPanelUsersTable = (props) => {
             label: 'delete users',
             value: 'delete',
         },
-        {
-            label: 'change to staff',
-            value: 'staff',
-        },
-        {
-            label: 'change to super admin',
-            value: 'superuser',
-        },
     ];
 
     return (

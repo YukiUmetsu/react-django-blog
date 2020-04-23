@@ -11,12 +11,12 @@ const ItemActions = (props) => {
     let [showEditTooltip, setShowEditTooltip] = useState(false);
     let [showDeleteTooltip, setShowDeleteTooltip] = useState(false);
 
-    // show modals
-    let [showEditModal, setShowEditModal] = useState(false);
-
     let editClickedHandler = () => {
-        setShowEditModal(!showEditModal);
         props.onEditClicked();
+    };
+
+    let deleteClickedHandler = () => {
+        props.onDeleteClicked();
     };
 
     return (
@@ -43,7 +43,7 @@ const ItemActions = (props) => {
 
             <a
                 className="bg-red-700 cursor-pointer rounded p-1 mx-1 text-white relative"
-                onClick={() => props.onDeleteClicked()}
+                onClick={() => deleteClickedHandler()}
                 onMouseEnter={() => setShowDeleteTooltip(true)}
                 onMouseLeave={() => setShowDeleteTooltip(false)}
             >

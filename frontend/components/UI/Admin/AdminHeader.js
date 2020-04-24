@@ -4,7 +4,7 @@ import AdminHeaderCSS from './AdminHeader.module.css';
 import Link from "next/link";
 import {LOGOUT_URL} from "../../../constants/URLs";
 
-const AdminHeader = (props) => {
+const AdminHeader = React.memo((props) => {
     let [ isProfileDropdownOpen, setIsSetProfileDropdownOpen ] = useState(false);
 
     let fullName = props.first_name + " " + props.last_name;
@@ -40,7 +40,7 @@ const AdminHeader = (props) => {
             </div>
         </header>
     );
-};
+});
 
 AdminHeader.propTypes = {
     first_name: PropTypes.string,

@@ -2,7 +2,7 @@ import React from 'react';
 import Link from "next/link";
 import PropTypes from 'prop-types';
 
-const AdminSideBarSubItem = (props) => {
+const AdminSideBarSubItem = React.memo((props) => {
     return (
         <li className="border-t border-light-border w-full h-full pl-5 pr-1 py-3">
             <Link href={props.link}>
@@ -12,7 +12,7 @@ const AdminSideBarSubItem = (props) => {
             </Link>
         </li>
     );
-};
+});
 
 AdminSideBarSubItem.propTypes = {
     link: PropTypes.string,

@@ -8,7 +8,7 @@ import OutsideComponentAlerter from "../../../../hoc/Aux/OutsideComponentAlerter
 import Aux from "../../../../hoc/Aux/Aux";
 import PropTypes from 'prop-types';
 
-const AdminSideBarItem = (props) => {
+const AdminSideBarItem = React.memo((props) => {
 
     let [ isSubBarItemOpen, setIsSubBarItemOpen ] = useState(false);
 
@@ -69,7 +69,7 @@ const AdminSideBarItem = (props) => {
             </li>
         </OutsideComponentAlerter>
     );
-};
+});
 
 AdminSideBarItem.propTypes = {
     link: PropTypes.string,

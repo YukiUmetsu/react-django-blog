@@ -4,7 +4,7 @@ import TableRowItem from "../TableRowItem";
 import ItemActions from "../ItemActions/ItemActions";
 import {DataMutationContext} from "./SelectableTable";
 
-const SelectableTableRow = (props) => {
+const SelectableTableRow = React.memo((props) => {
 
     let {updateEditModalState: updateEditModalState, updateDeleteModalState: updateDeleteModalState} = useContext(DataMutationContext);
     let [ isInputSelected, setIsInputSelected ] = useState(false);
@@ -86,7 +86,7 @@ const SelectableTableRow = (props) => {
             {renderActions()}
         </tr>
     );
-};
+});
 
 SelectableTableRow.propTypes = {
     rowObj: PropTypes.object,

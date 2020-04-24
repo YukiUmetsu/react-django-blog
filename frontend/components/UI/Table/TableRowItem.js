@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {faCheck, faTimes} from "@fortawesome/free-solid-svg-icons";
 import {formatDate} from "../../../lib/utils";
 
-const TableRowItem = (props) => {
+const TableRowItem = React.memo((props) => {
 
     let renderItem = () => {
         if(props.increase){
@@ -29,7 +29,7 @@ const TableRowItem = (props) => {
     };
 
     return renderItem();
-};
+});
 
 TableRowItem.defaultProps = {
     increase: false,

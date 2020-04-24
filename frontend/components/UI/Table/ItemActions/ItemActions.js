@@ -5,7 +5,7 @@ import Aux from "../../../../hoc/Aux/Aux";
 import PropTypes from 'prop-types';
 import styles from "./ItemActions.module.css";
 
-const ItemActions = (props) => {
+const ItemActions = React.memo((props) => {
 
     let [showDetailTooltip, setShowDetailTooltip] = useState(false);
     let [showEditTooltip, setShowEditTooltip] = useState(false);
@@ -53,7 +53,8 @@ const ItemActions = (props) => {
         </Aux>
 
     );
-};
+});
+
 ItemActions.defaultProps = {
     showViewButton: false,
     onViewClicked: () => {},

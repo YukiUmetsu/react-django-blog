@@ -85,7 +85,7 @@ const UserDataCenter = (props) => {
             onSuccess: async (user) => {
                 if(!user.hasOwnProperty('id')){
                     createAlertProps("Server connection error. ","Unable to create a user.");
-                    clearNewUserFormStatesExceptError();
+                    clearNewUserFormStates(true);
                 } else if(isEmpty(profileImg)){
                     setDataManipulationComplete(true);
                     createSuccessfulAlertProps("User creation", " User was successfully created!");
@@ -94,7 +94,7 @@ const UserDataCenter = (props) => {
             onError: (error) => {
                 console.log(error);
                 createAlertProps("Server connection error", error.message);
-                clearNewUserFormStatesExceptError();
+                clearNewUserFormStates(true);
             }
         });
 
@@ -110,7 +110,7 @@ const UserDataCenter = (props) => {
             onSuccess: (fileObj) => {
                 if(!fileObj.hasOwnProperty('id')){
                     createAlertProps("Server connection error. ","Unable to create a user icon.");
-                    clearNewUserFormStatesExceptError();
+                    clearNewUserFormStates(true);
                 } else {
                     setProfileImgCreated(true);
                 }
@@ -118,7 +118,7 @@ const UserDataCenter = (props) => {
             onError: (error) => {
                 console.log(error);
                 createAlertProps("Server connection error", error.message);
-                clearNewUserFormStatesExceptError();
+                clearNewUserFormStates(true);
             }
         }
     );
@@ -133,7 +133,7 @@ const UserDataCenter = (props) => {
             onSuccess: (editedUser) => {
                 if(!editedUser.hasOwnProperty('id')){
                     createAlertProps("Server connection error. ","Unable to set the Icon image to the new user.");
-                    clearNewUserFormStatesExceptError();
+                    clearNewUserFormStates(true);
                 } else {
                     clearNewUserFormStates();
                     setDataManipulationComplete(true);
@@ -142,7 +142,7 @@ const UserDataCenter = (props) => {
             },
             onError: (error) => {
                 createAlertProps("Server connection error", error.message);
-                clearNewUserFormStatesExceptError();
+                clearNewUserFormStates(true);
             }
         }
     );
@@ -165,7 +165,7 @@ const UserDataCenter = (props) => {
             onSuccess: (fileObj) => {
                 if(!fileObj.hasOwnProperty('id')){
                     createAlertProps("Server connection error. ","Unable to edit a user icon.");
-                    clearNewUserFormStatesExceptError();
+                    clearEditUserFormStates(true);
                 } else {
                     setProfileImgCreated(true);
                 }
@@ -173,7 +173,7 @@ const UserDataCenter = (props) => {
             onError: (error) => {
                 console.log(error);
                 createAlertProps("Server connection error", error.message);
-                clearNewUserFormStatesExceptError();
+                clearEditUserFormStates(true);
             }
         }
     );
@@ -188,7 +188,7 @@ const UserDataCenter = (props) => {
             onSuccess: (editedUser) => {
                 if(!editedUser.hasOwnProperty('id')){
                     createAlertProps("Server connection error. ","Unable to set the new icon image to the user.");
-                    clearNewUserFormStatesExceptError();
+                    clearEditUserFormStates(true);
                 } else {
                     clearNewUserFormStates();
                     setDataManipulationComplete(true);
@@ -197,7 +197,7 @@ const UserDataCenter = (props) => {
             },
             onError: (error) => {
                 createAlertProps("Server connection error", error.message);
-                clearNewUserFormStatesExceptError();
+                clearEditUserFormStates(true);
             }
         }
     );
@@ -215,10 +215,10 @@ const UserDataCenter = (props) => {
             onSuccess: (editedUser) => {
                 if(!editedUser.hasOwnProperty('id')){
                     createAlertProps("Server connection error. ","Unable to set the new icon image to the user.");
-                    clearNewUserFormStatesExceptError();
+                    clearEditUserFormStates(true);
                 } else {
                     replaceDataItemWithNewOne(editedUser);
-                    clearNewUserFormStates();
+                    clearEditUserFormStates();
                     setDataManipulationComplete(true);
                     setAlertProps(
                         {...NOTIFICATION_AFTER_DATA_EDIT,
@@ -227,7 +227,7 @@ const UserDataCenter = (props) => {
             },
             onError: (error) => {
                 createAlertProps("Server connection error", error.message);
-                clearNewUserFormStatesExceptError();
+                clearEditUserFormStates(true);
             }
         }
     );
@@ -322,17 +322,17 @@ const UserDataCenter = (props) => {
         });
     };
 
-    const clearNewUserFormStates = () => {
+    const clearNewUserFormStates = (skipAlertProps = false) => {
         setAlertProps(initialAlertProps);
         setprofileImg(null);
         setNewUserFormData(null);
         setProfileImgCreated(false);
     };
 
-    const clearNewUserFormStatesExceptError = () => {
+    const clearEditUserFormStates = (skipAlertProps = false) => {
         setAlertProps(initialAlertProps);
         setprofileImg(null);
-        setNewUserFormData(null);
+        setEditUserFormData(null);
         setProfileImgCreated(false);
     };
 

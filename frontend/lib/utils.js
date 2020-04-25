@@ -137,6 +137,15 @@ export const getObjsToAdd = (newData, totalIdPool) => {
     return objsToAdd;
 };
 
+export const replaceDataItem = (dataItem, data) => {
+    return dClone(data).map(item => {
+        if(item.id === dataItem.id){
+            return dataItem;
+        }
+        return item;
+    });
+};
+
 export const removeDuplicatesById = (data = []) => {
     let ids = [];
     let newData = [];

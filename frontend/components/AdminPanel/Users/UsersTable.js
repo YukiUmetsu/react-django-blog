@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
 import Aux from '../../../hoc/Aux/Aux';
 import SelectableTable from "../../UI/Table/SelectableTable/SelectableTable";
@@ -6,8 +6,17 @@ import {ADMIN_USER_TABLE_COLUMNS, USERS_LIST_API} from "../../../constants";
 import Paginator from "../../UI/Pagination/Paginator";
 import DataSearcher from "../../UI/Filters/DataSearcher";
 import {isEmpty} from "../../../lib/utils";
+import {FORM_DATA} from "../../../constants/FormDataConst";
+import {UserDataCenterContext} from "./UserDataCenter";
+import Alert from "../../UI/Notifications/Alert";
 
 const AdminPanelUsersTable = (props) => {
+
+    const {
+        updateEditUserFormData: updateEditUserFormData,
+        alertProps: alertProps,
+        dataManipulationComplete: dataManipulationComplete,
+    } = useContext(UserDataCenterContext);
 
     let isActionRequired = true;
     let columnData = ADMIN_USER_TABLE_COLUMNS;
@@ -24,19 +33,31 @@ const AdminPanelUsersTable = (props) => {
         },
     ];
 
+    let onEditObjFormSubmitted = async (formData) => {
+        if(formData.profile_img.length < 1){
+            delete await formData.profile_img;
+        }
+        await updateEditUserFormData(formData);
+    };
+
     return (
         <Aux>
+            <Alert {...alertProps} />
             <DataSearcher
                 searchKeys={createSearchKeys(columnData)}
                 dataListFetchURL={USERS_LIST_API}
-                dataNameKey="users">
+                dataCenterContext={UserDataCenterContext}>
                 <Paginator
                     isActionRequired={isActionRequired}
                     columns={columnData}>
                     <SelectableTable
                         isActionsRequired={isActionRequired}
                         columns={columnData}
-                        actionData={bunchActionData}/>
+                        actionData={bunchActionData}
+                        editObjFormData={FORM_DATA.EDIT_USER_FORM}
+                        onEditObjFormSubmitted={(formData) => onEditObjFormSubmitted(formData)}
+                        dataCenterContext={UserDataCenterContext}
+                    />
                 </Paginator>
             </DataSearcher>
         </Aux>

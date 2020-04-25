@@ -4,6 +4,7 @@ import {DUMMY_ADMIN_USER_FOR_HEADER} from "../../../constants";
 import AdminPanelUsersTable from "../../../components/AdminPanel/Users/UsersTable";
 import AddNewUser from "../../../components/AdminPanel/Users/AddNewUser";
 import {withAdminAuth} from "../../../lib/auth/adminAuth";
+import UserDataCenter from "../../../components/AdminPanel/Users/UserDataCenter";
 
 const AdminPanelUsers = (props) => {
 
@@ -14,7 +15,9 @@ const AdminPanelUsers = (props) => {
                 <AddNewUser additionalBtnClassNames="float-right"/>
             </div>
             <div className="float-none w-full py-5"> </div>
-            <AdminPanelUsersTable/>
+            <UserDataCenter>
+                <AdminPanelUsersTable/>
+            </UserDataCenter>
         </AdminPanelLayout>
     );
 };

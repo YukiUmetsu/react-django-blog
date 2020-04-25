@@ -62,6 +62,12 @@ const Form = (props) => {
         setFormError(props.formError);
     }, [props.formError]);
 
+    useEffect(() => {
+        if(props.dataManipulationComplete){
+            setLoading(false);
+        }
+    }, [props.dataManipulationComplete]);
+
     let updateFormDataState = (accessor, value) => {
         let updatedElement = {};
         updatedElement[accessor] = value;
@@ -80,10 +86,17 @@ const Form = (props) => {
 
     const onSubmit = async data => {
         setLoading(true);
-        let result = await props.onSubmitCallback(data);
-        if(result){
-            await setLoading(false);
+        if(!isEmpty(props.object)){
+            // this is editing form since object exist. remove unchanged values.
+            let objKeys = Object.keys(props.object);
+            for (let i = 0; i < objKeys.length; i++) {
+                let objKey = objKeys[i];
+                if(data[objKey] === props.object[objKey]){
+                    delete data[objKey];
+                }
+            }
         }
+        await props.onSubmitCallback(data);
     };
 
     const renderFormElements = () => {
@@ -102,7 +115,7 @@ const Form = (props) => {
             }
             let initialValue = isEmpty(props.object) ? "" : props.object[element.accessor];
             let error = (errors[element.accessor]) ? errors[element.accessor] : null;
-            if (['text', 'password'].includes(element.type)) {
+            if (['text', 'password', 'hidden'].includes(element.type)) {
                 return renderTextInput(element.accessor, element.label, element.type, initialValue, element.formLength, error)
             }
             if (element.type === 'boolean') {
@@ -122,13 +135,30 @@ const Form = (props) => {
 
     const renderTextInput = (id, label, type, value, length, error=null) => {
         let inputValue = (formDataState[id]) ? formDataState[id] : "";
+        let inputClass = 'appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white';
+        if(type === 'hidden'){
+            inputClass='invisible';
+            return (
+                <input
+                    readOnly
+                    className={inputClass}
+                    id={`${props.form_id_prefix}_form_${id}`}
+                    name={id}
+                    key={id}
+                    type={type}
+                    value={inputValue}
+                    ref={register}
+                    placeholder={label}
+                />
+            );
+        }
         return (
             <div key={id} className={`w-full md:w-${length} px-3 mb-6 md:mb-0`}>
                 <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor={id}>
                     {label}
                 </label>
                 <input
-                    className="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+                    className={inputClass}
                     id={`${props.form_id_prefix}_form_${id}`}
                     name={id}
                     type={type}
@@ -272,6 +302,7 @@ Form.propTypes = {
     onSubmitFailCallback: PropTypes.func,
     loading: PropTypes.bool,
     formError: PropTypes.object,
+    dataManipulationComplete: PropTypes.bool,
 };
 
 export default Form

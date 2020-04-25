@@ -5,19 +5,20 @@ import SelectableTableRow from "./SelectableTableRow";
 import SelectableTableHeader from "./SelectableTableHeader";
 import Modal from "../../Modal/Modal";
 import Form from "../../Form/Form";
-import {FORM_DATA} from "../../../../constants/FormDataConst";
 import AlertModal from "../../Modal/AlertModal";
 import {getTableColumnInfo, isEmpty} from "../../../../lib/utils";
 import OutsideComponentAlerter from "../../../../hoc/Aux/OutsideComponentAlerter";
 import PackmanSpinner from "../../Spinner/PackmanSpinner";
-import {SearchCallbackContext} from "../../Filters/DataSearcher";
 import AlertModalTable from "../../Modal/AlertModalTable";
 
 export const DataMutationContext = createContext({});
 
 const SelectableTable = (props) => {
 
-    const {updateDeletionStates: updateDeletionStates} = useContext(SearchCallbackContext);
+    const {
+        dataManipulationComplete: dataManipulationComplete,
+        updateDeletionStates: updateDeletionStates
+    } = useContext(props.dataCenterContext);
     let [ selectedItems, setSelectedItems ] = useState(new Set());
     let [ data, setData ] = useState(props.data);
     let [ checkboxAllOn, setCheckboxAllOnOffStatus] = useState(false);
@@ -33,6 +34,13 @@ const SelectableTable = (props) => {
     useEffect(() => {
         setCheckboxAllOnOffStatus(isAllSelected());
     }, [data]);
+
+    useEffect( () => {
+        if(dataManipulationComplete){
+            setEditModalState(false);
+            setDeleteModalState(false);
+        }
+    },[dataManipulationComplete]);
 
     let isAllSelected = () => {
         let isAllSelected = true;
@@ -242,9 +250,11 @@ const SelectableTable = (props) => {
                     onOpenCallback={() => setResetEditForm(false)}>
                     <Form
                         object={editModalState.rowObj}
-                        formData={FORM_DATA.USER_DISPLAY}
-                        onSubmitCallback={() => {console.log("submitted!")}}
+                        formData={props.editObjFormData}
+                        form_id_prefix="edit"
+                        onSubmitCallback={(data) => props.onEditObjFormSubmitted(data)}
                         resetForm={resetEditForm}
+                        dataManipulationComplete={dataManipulationComplete}
                     />
                 </Modal>
             </OutsideComponentAlerter>
@@ -286,6 +296,9 @@ SelectableTable.propTyles = {
     actionData: PropTypes.array,
     updateObjApiUrl: PropTypes.string,
     deleteObjApiUrl: PropTypes.string,
+    editObjFormData: PropTypes.object,
+    onEditObjFormSubmitted: PropTypes.func,
+    dataCenterContext: PropTypes.any
 };
 
 export default SelectableTable

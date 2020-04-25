@@ -35,6 +35,9 @@ export const FORM_DATA = {
     USER_DISPLAY: {
         elements: ADMIN_USER_TABLE_COLUMNS,
         validationSchema: {
+            profile_img: mixed()
+                .test('profile img file type', 'invalid file type',value => checkIfFilesAreCorrectType(value))
+                .test('profile img file size',`file is too large (max is ${ICON_FILE_SIZE} MB)`, value => checkIfFilesAreTooBig(value)),
             first_name: string().required(),
             last_name: string().required(),
             email: string().email().required(),
@@ -108,5 +111,26 @@ export const FORM_DATA = {
             is_staff: boolean().required(),
             is_superuser: boolean().required(),
         },
-    }
+    },
+    EDIT_USER_FORM: {
+        elements: [...ADMIN_USER_TABLE_COLUMNS, {
+            label: 'id',
+            accessor: 'id',
+            type: 'hidden',
+            editable: true,
+            showOnDelete: false,
+            formLength: 'full',
+        }],
+        validationSchema: {
+            id: mixed().required(),
+            profile_img: mixed()
+                .test('profile img file type', 'invalid file type',value => checkIfFilesAreCorrectType(value))
+                .test('profile img file size',`file is too large (max is ${ICON_FILE_SIZE} MB)`, value => checkIfFilesAreTooBig(value)),
+            first_name: string().required(),
+            last_name: string().required(),
+            email: string().email().required(),
+            is_staff: boolean().required(),
+            is_superuser: boolean().required(),
+        },
+    },
 };

@@ -123,8 +123,9 @@ export const ADMIN_USER_TABLE_COLUMNS = [
         label: 'Icon',
         accessor: 'profile_img',
         type: 'image',
-        editable: false,
+        editable: true,
         showOnDelete: false,
+        formLength: 'full',
     },
     {
         label: 'First Name',
@@ -212,5 +213,6 @@ export const ANGO_SESSION_NAME = 'angoukagi';
 export const USER_ID_SESSION_NAME = 'daredesuka';
 
 export * from './SWR';
-export * from "./DummyData";
-export * from "./API";
+export * from './DummyData';
+export * from './API';
+export * from './NotificationConst'

@@ -86,6 +86,9 @@ const UserDataCenter = (props) => {
                 if(!user.hasOwnProperty('id')){
                     createAlertProps("Server connection error. ","Unable to create a user.");
                     clearNewUserFormStatesExceptError();
+                } else if(isEmpty(profileImg)){
+                    setDataManipulationComplete(true);
+                    createSuccessfulAlertProps("User creation", " User was successfully created!");
                 }
             },
             onError: (error) => {
@@ -133,6 +136,8 @@ const UserDataCenter = (props) => {
                     clearNewUserFormStatesExceptError();
                 } else {
                     clearNewUserFormStates();
+                    setDataManipulationComplete(true);
+                    createSuccessfulAlertProps("User creation", " User was successfully created!")
                 }
             },
             onError: (error) => {
@@ -186,6 +191,8 @@ const UserDataCenter = (props) => {
                     clearNewUserFormStatesExceptError();
                 } else {
                     clearNewUserFormStates();
+                    setDataManipulationComplete(true);
+                    createSuccessfulAlertProps("User Edit", " Successfully edited the user.")
                 }
             },
             onError: (error) => {
@@ -293,6 +300,19 @@ const UserDataCenter = (props) => {
         });
     };
 
+    let createSuccessfulAlertProps = (title, content) => {
+        setAlertProps({
+            bgColor: 'teal',
+            textColor: 'teal',
+            exitColor: 'teal',
+            showAlert: true,
+            hideAfterSeconds: 3,
+            title: title,
+            content: content,
+            hideCallback: () => resetAlertProps()
+        });
+    };
+
     let createAlertProps = (title = '', message = '') => {
         setAlertProps({
             title: title,
@@ -351,8 +371,16 @@ const UserDataCenter = (props) => {
         }
     };
 
+    const updateProfileImg = (profileImg) => {
+        if(isEmpty(profileImg)){
+           return;
+        }
+        setprofileImg(profileImg);
+    };
+
     const resetAlertProps = () => {
         setAlertProps(initialAlertProps);
+        setDataManipulationComplete(false);
     };
 
     const replaceDataItemWithNewOne = dataItem => {
@@ -368,6 +396,7 @@ const UserDataCenter = (props) => {
             updateNewUserFormData: updateNewUserFormData,
             updateEditUserFormData: updateEditUserFormData,
             updateDeletionStates: updateDeletionStates,
+            updateProfileImg: updateProfileImg,
             resetAlertProps: resetAlertProps,
             dataManipulationComplete: dataManipulationComplete,
         }}>

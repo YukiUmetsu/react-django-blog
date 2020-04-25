@@ -1,130 +1,83 @@
-import React, {useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {faPlus} from "@fortawesome/free-solid-svg-icons";
 import Aux from "../../../hoc/Aux/Aux";
 import Modal from "../../UI/Modal/Modal";
 import Form from "../../UI/Form/Form";
-import {FORM_DATA} from "../../../constants/FormDataConst";
-import {isEmpty} from "../../../lib/utils";
-import cloneDeep from 'lodash/cloneDeep';
-import {FILES_LIST_API, SWR_PATCH_FETCH, SWR_POST_FETCH, SWR_POST_FILE_FETCH, USERS_LIST_API} from "../../../constants";
-import useSWR from "swr";
-import * as moment from 'moment';
+import {isEmpty, removeFromMutableObject} from "../../../lib/utils";
 
 const AddNewUser = (props) => {
 
+    const {
+        updateNewUserFormData: updateNewUserFormData,
+        updateProfileImg: updateProfileImg,
+        dataManipulationComplete: dataManipulationComplete,
+    } = useContext(props.dataCenterContext);
     let [isNewUserModalOpen, setIsNewUserModalOpen] = useState(false);
-    let [newUserData, setNewUserData] = useState(null);
-    let [profileImg, setprofileImg] = useState(null);
-    let [profileImgCreated, setProfileImgCreated] = useState(false);
     let [dataUpdateError, setDataUpdateError] = useState(null);
     let [formLoading, setFormLoading] = useState(false);
+    let [fileFields, setFileFields] = useState([]);
+
+    const fileFieldsTypes = ['image', 'file'];
 
     let submitHandler = async (data) => {
         await setFormLoading(true);
-        await setprofileImg(data.profile_img[0]);
-        await setNewUserData({...data, profile_img: null});
-    };
 
-    let createErrorObj = (message = '') => {
-        return {error: {message: message}}
-    };
-
-    const { data: user } = useSWR(
-        newUserData ? [USERS_LIST_API, newUserData]: null,
-        SWR_POST_FETCH,
-        {
-            errorRetryCount: 1,
-            onSuccess: async (user) => {
-                if(!user.hasOwnProperty('id')){
-                    setDataUpdateError(createErrorObj("Server connection error. Unable to create a user."));
-                    clearNewUserFormStatesExceptError();
-                }
-            },
-            onError: (error) => {
-                console.log(error);
-                setDataUpdateError(error);
-                clearNewUserFormStatesExceptError();
-            }
-        });
-
-    const { data: fileObj } = useSWR((!isEmpty(user) && !isEmpty(profileImg)) ? [FILES_LIST_API, user] : null,
-        () => SWR_POST_FILE_FETCH(
-            FILES_LIST_API,
-            "image",
-            `${user.first_name}-${user.last_name}-${moment().format('YYYY-MM-DD-HH-mm')}`,
-            user.id,
-            profileImg),
-        {
-            errorRetryCount: 1,
-            onSuccess: (fileObj) => {
-                if(!fileObj.hasOwnProperty('id')){
-                    setDataUpdateError(createErrorObj("Server connection error. Unable to create a user icon."));
-                    clearNewUserFormStatesExceptError();
-                } else {
-                    setProfileImgCreated(true);
-                }
-            },
-            onError: (error) => {
-                console.log(error);
-                setDataUpdateError(error);
-                clearNewUserFormStatesExceptError();
-            }
+        if(isEmpty(fileFields)){
+            // no image field exist
+            await updateNewUserFormData(data);
+            return;
         }
-    );
 
-    const { data: editedUser } = useSWR((!isEmpty(user) && !isEmpty(fileObj) && profileImgCreated) ? [USERS_LIST_API+user.id+'/', fileObj.id]: null,
-        () => SWR_PATCH_FETCH(USERS_LIST_API+user.id+'/', {profile_img: fileObj.id}),
-        {
-            errorRetryCount: 1,
-            onSuccess: (editedUser) => {
-                if(!editedUser.hasOwnProperty('id')){
-                    setDataUpdateError(createErrorObj("Server connection error. Unable to set the Icon image to the new user."))
-                    clearNewUserFormStatesExceptError();
-                } else {
-                    clearNewUserFormStates();
-                    setIsNewUserModalOpen(false);
-                }
-            },
-            onError: (error) => {
-                console.log(error);
-                setDataUpdateError(error);
-                clearNewUserFormStatesExceptError();
-            }
+        // support just one file per obj creation for now.
+        if(data[fileFields[0]].length > 0){
+            await updateProfileImg(data[fileFields[0]][0]);
+            await removeFromMutableObject(data, fileFields[0]);
+            await updateNewUserFormData(data);
+
+        } else {
+            // file was not submitted.
+            await removeFromMutableObject(data, fileFields[0]);
+            await updateNewUserFormData(data);
         }
-    );
-
-    const clearNewUserFormStates = () => {
-        setFormLoading(false);
-        setDataUpdateError(null);
-        setprofileImg(null);
-        setNewUserData(null);
-        setProfileImgCreated(false);
-        setNewUserData(null);
     };
 
-    const clearNewUserFormStatesExceptError = () => {
-        setFormLoading(false);
-        setDataUpdateError(null);
-        setprofileImg(null);
-        setNewUserData(null);
-        setProfileImgCreated(false);
-        setNewUserData(null);
+    useEffect(() => {
+        if(dataManipulationComplete){
+            setFormLoading(false);
+            setIsNewUserModalOpen(false);
+        }
+    }, [dataManipulationComplete]);
+
+    useEffect(() => {
+        updateFileFields();
+    }, [props.formData]);
+
+    let updateFileFields = () => {
+        let formFileFields = props.formData.elements.map(element => {
+            if(fileFieldsTypes.includes(element.type)){
+                return element.accessor;
+            }
+        }).filter(x => !isEmpty(x));
+        if(!isEmpty(formFileFields)){
+            setFileFields(formFileFields);
+        }
     };
 
     return (
         <Aux>
             <button className={`${props.btnClassNames} ${props.additionalBtnClassNames}`} onClick={()=>setIsNewUserModalOpen(true)}>
-                <FontAwesomeIcon icon={faPlus} className="pr-1"/>  Add New User
+                <FontAwesomeIcon icon={faPlus} className="pr-1"/>  {props.btnTitle}
             </button>
             <Modal modalOpen={isNewUserModalOpen} onCloseCallback={() => setIsNewUserModalOpen(false)}>
                 <Form
-                    form_id_prefix="New_User"
-                    formData={FORM_DATA.NEW_USER_FORM}
+                    form_id_prefix={props.form_id_prefix}
+                    formData={props.formData}
                     onSubmitCallback={submitHandler}
                     loading={formLoading}
                     formError={dataUpdateError}
+                    object={null}
                 />
             </Modal>
         </Aux>
@@ -134,11 +87,15 @@ const AddNewUser = (props) => {
 AddNewUser.defaultProps = {
     btnClassNames: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded",
     additionalBtnClassNames: "",
+    form_id_prefix: "new_"
 };
 
 AddNewUser.propTypes = {
+    btnTitle: PropTypes.string,
     btnClassNames: PropTypes.string,
     additionalBtnClassNames: PropTypes.string,
+    form_id_prefix: PropTypes.string,
+    formData: PropTypes.any
 };
 
 export default AddNewUser

@@ -265,7 +265,7 @@ const SelectableTable = (props) => {
                     onCloseCallback={() => updateDeleteModalState({}, false)}
                     title="Are you sure to delete?"
                     onConfirmedCallback={(id) => handleDataItemDeleted(id)}
-                    associatedObjId={parseInt(deleteModalState.rowObj.id)}>
+                    associatedObjId={(deleteModalState.rowObj) ? parseInt(deleteModalState.rowObj.id): null}>
                     {renderOnDeleteMessage(deleteModalState.rowObj)}
                 </AlertModal>
             </OutsideComponentAlerter>

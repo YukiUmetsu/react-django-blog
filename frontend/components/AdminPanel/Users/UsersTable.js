@@ -9,6 +9,8 @@ import {isEmpty} from "../../../lib/utils";
 import {FORM_DATA} from "../../../constants/FormDataConst";
 import {UserDataCenterContext} from "./UserDataCenter";
 import Alert from "../../UI/Notifications/Alert";
+import AddNewUser from "./AddNewUser";
+import AdminPanelLayout from "../../UI/Admin/AdminPanelLayout";
 
 const AdminPanelUsersTable = (props) => {
 
@@ -43,6 +45,18 @@ const AdminPanelUsersTable = (props) => {
     return (
         <Aux>
             <Alert {...alertProps} />
+
+            <div className="px-6 py-2 mb-3 float-none">
+                <div className="float-left font-bold text-xl">Users</div>
+                <AddNewUser
+                    additionalBtnClassNames="float-right"
+                    dataCenterContext={UserDataCenterContext}
+                    btnTitle="Add New User"
+                    formData={FORM_DATA.NEW_USER_FORM}
+                />
+            </div>
+            <div className="float-none w-full py-5"> </div>
+
             <DataSearcher
                 searchKeys={createSearchKeys(columnData)}
                 dataListFetchURL={USERS_LIST_API}

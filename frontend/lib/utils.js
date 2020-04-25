@@ -96,6 +96,15 @@ export const removeFromArray = (array=[], value) => {
     return array;
 };
 
+export const removeFromMutableObject = (object, givenKey) => {
+    let keys = Object.keys(object);
+    keys.forEach((key, index, arr) => {
+        if(key === givenKey){
+            delete object[key];
+        }
+    });
+};
+
 export const createSortOrderMap = () => {
     let map = {};
     map[SORT_ORDER.NONE] = SORT_ORDER.ASC;

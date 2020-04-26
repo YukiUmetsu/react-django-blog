@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from rest_framework import serializers
 from allauth.account import app_settings as allauth_settings
 from allauth.utils import email_address_exists
@@ -6,10 +8,57 @@ from allauth.account.utils import setup_user_email
 from allauth.account.models import EmailAddress
 from users.models import CustomUser
 from django.utils.translation import gettext as _
+from files.serializers import FilesSerializer
+from files.models import Files
+from django.core.exceptions import ObjectDoesNotExist
+
+
+class ModifiedRelatedField(serializers.RelatedField):
+    def get_choices(self, cutoff=None):
+        queryset = self.get_queryset()
+        if queryset is None:
+            # Ensure that field.choices returns something sensible
+            # even when accessed with a read-only field.
+            return {}
+
+        if cutoff is not None:
+            queryset = queryset[:cutoff]
+
+        return OrderedDict([
+            (
+                item.pk,
+                self.display_value(item)
+            )
+            for item in queryset
+        ])
+
+
+class ProfileImageField(ModifiedRelatedField):
+
+    def to_representation(self, value):
+        return FilesSerializer(value).data
+
+    def to_internal_value(self, value):
+        try:
+            try:
+                return Files.objects.get(id=value)
+            except KeyError:
+                raise serializers.ValidationError(
+                    'id is a required field.'
+                )
+            except ValueError:
+                raise serializers.ValidationError(
+                    'id must be an integer.'
+                )
+        except ObjectDoesNotExist:
+            raise serializers.ValidationError(
+                'Obj does not exist.'
+            )
 
 
 class UserSerializer(serializers.ModelSerializer):
     # this serializer is used when accessing user data from admin panel.
+    profile_img = ProfileImageField(queryset=Files.objects.all(), required=False)
 
     class Meta:
         model = CustomUser

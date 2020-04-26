@@ -78,6 +78,14 @@ class TestPublicUsersAPI:
         response = self.client.post(USERS_API_URL, user_payload)
         assert response.status_code in [status.HTTP_403_FORBIDDEN, status.HTTP_401_UNAUTHORIZED]
 
+    def test_outsider_cannot_delete_user(self, users):
+        detail_view_url = get_user_detail_url(users['normal'][0].id)
+        response = self.client.delete(detail_view_url)
+        assert response.status_code in [status.HTTP_403_FORBIDDEN, status.HTTP_401_UNAUTHORIZED]
+        query_obj = get_user_model().objects.filter(id=users['normal'][0].id)
+        assert len(query_obj) == 1
+
+
 
 @pytest.mark.django_db
 class TestPrivateUsersAPI:
@@ -173,6 +181,14 @@ class TestPrivateUsersAPI:
         new_first_name = 'new_first_name!'
         response = self.client.patch(get_user_detail_url(users['superuser'][0].id), {'first_name': new_first_name})
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_staff_user_can_delete_normal_user(self, users):
+        self.client.force_authenticate(users['staff'][0])
+        detail_view_url = get_user_detail_url(users['normal'][1].id)
+        response = self.client.delete(detail_view_url)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        query_obj = get_user_model().objects.filter(id=users['normal'][1].id)
+        assert len(query_obj) == 0
 
     def test_superuser_can_create_staff_user(self, users, staff_user_payload):
         self.client.force_authenticate(users['superuser'][0])

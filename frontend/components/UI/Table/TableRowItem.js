@@ -4,7 +4,8 @@ import NumberIncreaseDisplay from "../Statistics/NumberDisplay/NumberIncreaseDis
 import NumberDecreaseDisplay from "../Statistics/NumberDisplay/NumberDecreaseDisplay";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {faCheck, faTimes} from "@fortawesome/free-solid-svg-icons";
-import {formatDate} from "../../../lib/utils";
+import {formatDate, isEmpty} from "../../../lib/utils";
+import {API_BASE} from "../../../constants";
 
 const TableRowItem = React.memo((props) => {
 
@@ -14,12 +15,22 @@ const TableRowItem = React.memo((props) => {
         } else if (props.decrease){
             return <td><NumberDecreaseDisplay content={props.content}/></td>
         } else if(props.isImage){
-            return <td><img className="h-11 w-10 rounded-full" src={props.content} alt="" /></td>
+            if(props.content === null){
+                return <td> </td>
+            }
+            if(typeof props.content === 'string'){
+                return <td><img className="h-11 w-10 rounded-full" src={props.content} alt="" /></td>
+            } else if(!isEmpty(props.content.file)){
+                return <td><img className="h-11 w-10 rounded-full" src={API_BASE+props.content.file} alt={props.content.desc} /></td>
+            }
+
         } else if(props.isBoolean){
             return (
                 <td>
                     {props.content === true ?
-                        <FontAwesomeIcon id={`${props.columnAccessor}-${props.rowObjId}`} icon={faCheck} className="text-teal-700"/>: " "}
+                        <FontAwesomeIcon id={`${props.columnAccessor}-${props.rowObjId}`} icon={faCheck} className="text-teal-700"/>:
+                        <FontAwesomeIcon id={`${props.columnAccessor}-${props.rowObjId}`} icon={faTimes} className="text-grey-400"/>
+                    }
                 </td>
             );
         } else if(props.isDate){

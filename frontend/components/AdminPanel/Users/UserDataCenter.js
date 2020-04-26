@@ -9,6 +9,7 @@ import {
 } from "../../../constants";
 import useSWR from "swr";
 import {
+    addDataItem,
     dClone,
     getObjsToAdd,
     isEmpty,
@@ -135,6 +136,7 @@ const UserDataCenter = (props) => {
                     createAlertProps("Server connection error. ","Unable to set the Icon image to the new user.");
                     clearNewUserFormStates(true);
                 } else {
+                    setData(addDataItem(editedUser, data));
                     clearNewUserFormStates();
                     setDataManipulationComplete(true);
                     createSuccessfulAlertProps("User creation", " User was successfully created!")
@@ -190,6 +192,7 @@ const UserDataCenter = (props) => {
                     createAlertProps("Server connection error. ","Unable to set the new icon image to the user.");
                     clearEditUserFormStates(true);
                 } else {
+                    replaceDataItemWithNewOne(editedUser);
                     clearEditUserFormStates();
                     setDataManipulationComplete(true);
                     createSuccessfulAlertProps("User Edit", " Successfully edited the user.")

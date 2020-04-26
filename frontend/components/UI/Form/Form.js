@@ -7,7 +7,7 @@ import {faAngleDown, faCamera} from "@fortawesome/free-solid-svg-icons";
 import Toggle from "./Toggle";
 import * as yup from "yup";
 import {isEmpty} from "../../../lib/utils";
-import {IMG_HOST} from "../../../constants";
+import {API_BASE, IMG_HOST} from "../../../constants";
 import PasswordStrengthMeter from "./PasswordStrengthMeter";
 import PackmanSpinner from "../Spinner/PackmanSpinner";
 import Alert from "../Notifications/Alert";
@@ -228,7 +228,13 @@ const Form = (props) => {
     };
 
     let renderImageIcon = (id, label, value, multiple=false, accept="image/*", length, error = null) => {
-        let source = isEmpty(value) ? `${IMG_HOST}media/uploads/2020/04/05/default-person.png` : value;
+        let source =`${IMG_HOST}media/uploads/2020/04/05/default-person.png`;
+        if(!isEmpty(value) && typeof value.file === 'string'){
+            source = API_BASE + value.file;
+        }
+        if(!isEmpty(value) && typeof value.desc === 'string' && value.desc !== ''){
+            label = value.desc;
+        }
         let displayId = `${props.form_id_prefix}_form_${id}`;
 
         return (

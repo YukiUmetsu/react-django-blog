@@ -101,6 +101,7 @@ export default class Fetcher {
         try {
             if(this.hasFile){
                 return fetch(this.url, {
+                    headers: this.headers,
                     method: this.method,
                     body: this.data
                 })

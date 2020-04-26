@@ -85,6 +85,7 @@ const UserDataCenter = (props) => {
             errorRetryCount: 1,
             onSuccess: async (user) => {
                 if(!user.hasOwnProperty('id')){
+                    setDataManipulationComplete(true);
                     createAlertProps("Server connection error. ","Unable to create a user.");
                     clearNewUserFormStates(true);
                 } else if(isEmpty(profileImg)){
@@ -94,6 +95,7 @@ const UserDataCenter = (props) => {
             },
             onError: (error) => {
                 console.log(error);
+                setDataManipulationComplete(true);
                 createAlertProps("Server connection error", error.message);
                 clearNewUserFormStates(true);
             }
@@ -110,7 +112,12 @@ const UserDataCenter = (props) => {
             errorRetryCount: 1,
             onSuccess: (fileObj) => {
                 if(!fileObj.hasOwnProperty('id')){
-                    createAlertProps("Server connection error. ","Unable to create a user icon.");
+                    let message = 'Unable to create a user icon.';
+                    if(fileObj.hasOwnProperty('detail')){
+                        message = fileObj.detail;
+                    }
+                    createAlertProps("Server error. ", message);
+                    setDataManipulationComplete(true);
                     clearNewUserFormStates(true);
                 } else {
                     setProfileImgCreated(true);
@@ -166,7 +173,12 @@ const UserDataCenter = (props) => {
             errorRetryCount: 1,
             onSuccess: (fileObj) => {
                 if(!fileObj.hasOwnProperty('id')){
-                    createAlertProps("Server connection error. ","Unable to edit a user icon.");
+                    let message = 'Unable to edit a user icon.';
+                    if(fileObj.hasOwnProperty('detail')){
+                        message = fileObj.detail;
+                    }
+                    createAlertProps("Server error. ", message);
+                    setDataManipulationComplete(true);
                     clearEditUserFormStates(true);
                 } else {
                     setProfileImgCreated(true);
@@ -312,7 +324,8 @@ const UserDataCenter = (props) => {
             hideAfterSeconds: 3,
             title: title,
             content: content,
-            hideCallback: () => resetAlertProps()
+            hideCallback: () => resetAlertProps(),
+            closeCallback: () => resetAlertProps()
         });
     };
 
@@ -321,21 +334,27 @@ const UserDataCenter = (props) => {
             title: title,
             content: message,
             showAlert: true,
-            hideCallback: () => { setAlertProps(initialAlertProps);}
+            hideAfterSeconds: 3,
+            hideCallback: () => resetAlertProps(),
+            closeCallback: () => resetAlertProps()
         });
     };
 
     const clearNewUserFormStates = (skipAlertProps = false) => {
-        setAlertProps(initialAlertProps);
+        if(!skipAlertProps){
+            setAlertProps(initialAlertProps);
+        }
         setprofileImg(null);
         setNewUserFormData(null);
         setProfileImgCreated(false);
     };
 
     const clearEditUserFormStates = (skipAlertProps = false) => {
+        if(!skipAlertProps){
+            setAlertProps(initialAlertProps);
+        }
         setEditUserFormData(null);
         setProfileImgCreated(false);
-        setAlertProps(initialAlertProps);
         setprofileImg(null);
     };
 

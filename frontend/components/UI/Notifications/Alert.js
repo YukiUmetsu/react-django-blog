@@ -36,28 +36,29 @@ const Alert = (props) => {
                     </svg>
                 </span>
         </div>
-    );;
+    );
 };
 
 Alert.defaultProps = {
-  bgColor: "red",
-  textColor: "red",
-  exitColor: "red",
-  showAlert: true,
-  hideAfterSeconds: 0,
-  hideCallback: () => {},
+    bgColor: "red",
+    textColor: "red",
+    exitColor: "red",
+    showAlert: true,
+    hideAfterSeconds: 0,
+    hideCallback: () => {},
+    closeCallback: () => {},
 };
 
 Alert.propTypes = {
-  bgColor: PropTypes.string,
-  textColor: PropTypes.string,
-  exitColor: PropTypes.string,
-  title: PropTypes.string,
-  content: PropTypes.string,
-  closeCallback: PropTypes.func,
-  showAlert: PropTypes.bool,
-  hideAfterSeconds: PropTypes.number,
-  hideCallback: PropTypes.func,
+    bgColor: PropTypes.string,
+    textColor: PropTypes.string,
+    exitColor: PropTypes.string,
+    title: PropTypes.string,
+    content: PropTypes.string,
+    closeCallback: PropTypes.func,
+    showAlert: PropTypes.bool,
+    hideAfterSeconds: PropTypes.number,
+    hideCallback: PropTypes.func,
 };
 
 export default Alert

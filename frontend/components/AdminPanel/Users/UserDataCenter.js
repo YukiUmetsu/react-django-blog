@@ -179,10 +179,10 @@ const UserDataCenter = (props) => {
     );
 
     useSWR(
-        (!isEmpty(editedFileObj) && profileImgCreated) ?
-            [USERS_LIST_API+editUserFormData.id+'/', fileObj.id]
+        (!isEmpty(editedFileObj) &&  !isEmpty(editUserFormData) && profileImgCreated) ?
+            [USERS_LIST_API+editUserFormData.id+'/', editedFileObj.id]
             : null,
-        () => SWR_PATCH_FETCH(USERS_LIST_API+editUserFormData.id+'/', {...editedFileObj, ...{profile_img: editedFileObj.id}}),
+        () => SWR_PATCH_FETCH(USERS_LIST_API+editUserFormData.id+'/', {...editUserFormData, ...{profile_img: editedFileObj.id}}),
         {
             errorRetryCount: 1,
             onSuccess: (editedUser) => {
@@ -190,7 +190,7 @@ const UserDataCenter = (props) => {
                     createAlertProps("Server connection error. ","Unable to set the new icon image to the user.");
                     clearEditUserFormStates(true);
                 } else {
-                    clearNewUserFormStates();
+                    clearEditUserFormStates();
                     setDataManipulationComplete(true);
                     createSuccessfulAlertProps("User Edit", " Successfully edited the user.")
                 }
@@ -206,7 +206,7 @@ const UserDataCenter = (props) => {
      * Editing a user without profile_img
      */
     useSWR(
-        !isEmpty(editUserFormData) ?
+        (!isEmpty(editUserFormData) && !profileImgCreated && isEmpty(profileImg)) ?
             [USERS_LIST_API+editUserFormData.id+'/', editUserFormData]
             : null,
         () => SWR_PATCH_FETCH(USERS_LIST_API+editUserFormData.id+'/', editUserFormData),
@@ -330,10 +330,10 @@ const UserDataCenter = (props) => {
     };
 
     const clearEditUserFormStates = (skipAlertProps = false) => {
-        setAlertProps(initialAlertProps);
-        setprofileImg(null);
         setEditUserFormData(null);
         setProfileImgCreated(false);
+        setAlertProps(initialAlertProps);
+        setprofileImg(null);
     };
 
 
@@ -354,10 +354,11 @@ const UserDataCenter = (props) => {
         }
         if(data.hasOwnProperty('profile_img')){
             await setprofileImg(data.profile_img[0]);
-            await setEditUserFormData({...data, profile_img: null});
-            return;
+            delete data.profile_img;
+            await setEditUserFormData(data);
+        } else {
+            await setEditUserFormData(data);
         }
-        await setEditUserFormData(data);
     };
 
     const updateDeletionStates = (index = null, ids = []) => {

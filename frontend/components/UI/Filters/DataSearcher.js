@@ -58,7 +58,9 @@ const DataSearcher = (props) => {
     };
 
     let performSearch = (searchCount = 0, onOriginal = true) => {
-        if(searchCount > 1){
+        let originalEmpty = onOriginal && isEmpty(originalData);
+        let searchCountReachedMax = searchCount > 1;
+        if(originalEmpty || searchCountReachedMax){
             return;
         }
         let newData = [];
@@ -67,7 +69,6 @@ const DataSearcher = (props) => {
         } else {
             newData = cloneDeep(data);
         }
-
         for (let i = 0; i < searchKeys.length; i++) {
             let key = searchKeys[i].key;
             let type = searchKeys[i].type;

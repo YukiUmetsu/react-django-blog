@@ -4,17 +4,15 @@ import nextCookie from 'next-cookies'
 import cookie from 'js-cookie'
 import fetch from 'isomorphic-unfetch'
 import {
-    ANGO_SESSION_NAME,
-    CONFIRM_TOKEN_API, IS_STAFF_SESSION_NAME,
+    CONFIRM_TOKEN_API,
     LOGIN_API,
     LOGOUT_API,
     PASSWORD_RESET_API,
     PASSWORD_RESET_CONFIRM_API,
-    SIGN_UP_API, USER_DETAIL_FROM_TOKEN_API, USER_ID_SESSION_NAME
+    SIGN_UP_API,
 } from "../../constants";
 import {isEmpty} from "../utils";
-import {ADMIN_LOGIN_URL, LOGIN_URL} from "../../constants/URLs";
-import {code} from "../crypto";
+import {LOGIN_URL} from "../../constants/URLs";
 
 const defaultHeader = {
     'Accept': 'application/json',
@@ -58,12 +56,6 @@ export const logout = async () => {
     cookie.remove('token');
     // to support logging out from all windows
     window.localStorage.setItem('logout', Date.now());
-
-    let is_staff = sessionStorage.getItem(IS_STAFF_SESSION_NAME) === '1';
-    if(is_staff){
-        sessionStorage.clear();
-        return Router.push(ADMIN_LOGIN_URL);
-    }
     Router.push(LOGIN_URL)
 };
 

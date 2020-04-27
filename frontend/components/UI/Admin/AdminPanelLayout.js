@@ -11,7 +11,7 @@ const AdminPanelLayout = (props) => {
     return (
         <div className="mx-auto bg-grey-400">
             <div className="min-h-screen flex flex-col">
-                <AdminHeader {...props.user} onMenuIconClicked={() => setIsSideBarVisible(!isSideBarVisible)}/>
+                <AdminHeader onMenuIconClicked={() => setIsSideBarVisible(!isSideBarVisible)}/>
                 <div className="flex flex-1">
                     {isSideBarVisible?<AdminSideBar/>: ""}
 

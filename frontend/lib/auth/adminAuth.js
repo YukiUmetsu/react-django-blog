@@ -1,11 +1,11 @@
-import { useEffect } from 'react'
+import {createContext, useEffect, useState} from 'react'
 import Router from 'next/router'
 import nextCookie from 'next-cookies'
 import cookie from 'js-cookie'
 import fetch from 'isomorphic-unfetch'
 import {
-    ANGO_SESSION_NAME, IS_STAFF_SESSION_NAME, IS_SUPERUSER_SESSION_NAME,
-    USER_DETAIL_FROM_TOKEN_API, USER_ID_SESSION_NAME
+    LOGOUT_API,
+    USER_DETAIL_FROM_TOKEN_API
 } from "../../constants";
 import {isEmpty} from "../utils";
 import {ADMIN_DASHBOARD_URL, ADMIN_LOGIN_URL, LOGIN_URL} from "../../constants/URLs";
@@ -33,14 +33,31 @@ export const adminAuth = ctx => {
     return token
 };
 
+export const AdminAuthContext = createContext(null);
 export const withAdminAuth = WrappedComponent => {
     const Wrapper = props => {
+
+        let [loggedInUser, setLoggedInUser] = useState(null);
+
         const syncLogout = event => {
             if (event.key === 'logout') {
                 console.log('logged out from storage!');
                 Router.push(ADMIN_LOGIN_URL)
             }
         };
+
+        const getLoggedInUser = async () => {
+            const token = await cookie.get('token');
+            const newLoggedInUser = await fetchLoggedInUser(token);
+            setLoggedInUser(newLoggedInUser);
+        };
+
+        useEffect(() => {
+            if(loggedInUser === null){
+                getLoggedInUser();
+            }
+            return () => setLoggedInUser(null);
+        }, []);
 
         useEffect(() => {
             window.addEventListener('storage', syncLogout);
@@ -51,17 +68,20 @@ export const withAdminAuth = WrappedComponent => {
             }
         }, []);
 
-        return <WrappedComponent {...props} />
+        return (
+            <AdminAuthContext.Provider value={{loggedInUser: loggedInUser}}>
+                <WrappedComponent {...props} />
+            </AdminAuthContext.Provider>
+        );
     };
 
     Wrapper.getInitialProps = async ctx => {
-        const token = adminAuth(ctx);
-
+        const token = await adminAuth(ctx);
         const componentProps =
             WrappedComponent.getInitialProps &&
             (await WrappedComponent.getInitialProps(ctx));
 
-        return { ...componentProps, token }
+        return { ...componentProps, token}
     };
 
     return Wrapper
@@ -89,7 +109,7 @@ export const AdminLoginFetch = async (data, angoKey) => {
         });
         if (response.status === 200) {
             const userData = await response.json();
-            adminLogin(userData.is_staff, userData.is_superuser, angoKey, userData);
+            adminLogin(userData.is_staff);
             return {userData: userData, response: response};
         } else {
             let error = new Error(response.statusText);
@@ -102,17 +122,54 @@ export const AdminLoginFetch = async (data, angoKey) => {
     }
 };
 
-let adminLogin = (is_staff, is_superuser, angoKey, userData) => {
+let adminLogin = (is_staff) => {
     if(!is_staff){
         return Router.push(ADMIN_LOGIN_URL);
-    }
-    sessionStorage.setItem(ANGO_SESSION_NAME, angoKey);
-    sessionStorage.setItem(USER_ID_SESSION_NAME, code(`${userData.id}`, angoKey));
-    sessionStorage.setItem(IS_STAFF_SESSION_NAME, '1');
-    if(is_superuser){
-        sessionStorage.setItem(IS_SUPERUSER_SESSION_NAME, '1');
     }
     Router.push(ADMIN_DASHBOARD_URL) ;
 };
 
+let fetchLoggedInUser = async (token) => {
+    let csrf_token = cookie.get('csrf_token');
+    const headers = defaultHeader;
+    if(!isEmpty(csrf_token)){
+        headers['X-CSRFToken'] = csrf_token;
+    }
+    headers['Authorization'] = `Token ${token}`;
+
+    try {
+        const response = await fetch(USER_DETAIL_FROM_TOKEN_API, {
+            headers: headers,
+        });
+        if (response.status === 200) {
+            return await response.json();
+        } else {
+            let error = new Error(response.statusText);
+            error.response = response;
+            throw error
+        }
+
+    } catch (error) {
+        return error;
+    }
+};
+
+export const adminLogout = async () => {
+    const headers = defaultHeader;
+    const token = cookie.get('token');
+    const csrf_token = cookie.get('csrf_token');
+    if (csrf_token!== 'undefined') {
+        headers['X-CSRFToken'] = csrf_token
+    }
+    const response = await fetch(LOGOUT_API, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({token: token}),
+    });
+
+    cookie.remove('token');
+    // to support logging out from all windows
+    window.localStorage.setItem('logout', Date.now());
+    Router.push(ADMIN_LOGIN_URL)
+};
 

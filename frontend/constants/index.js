@@ -6,6 +6,7 @@ import {
     faTachometerAlt, faUser
 } from "@fortawesome/free-solid-svg-icons";
 import {faWpforms} from "@fortawesome/free-brands-svg-icons";
+import {IMG_HOST} from "./API";
 
 export const ICON_FILE_SIZE = 50;
 export const ICON_SUPPORTED_FORMATS = ['image/jpg', 'image/jpeg', 'image/gif', 'image/png'];
@@ -211,6 +212,7 @@ export const IS_STAFF_SESSION_NAME = "stf";
 export const IS_SUPERUSER_SESSION_NAME = "stfspad";
 export const ANGO_SESSION_NAME = 'angoukagi';
 export const USER_ID_SESSION_NAME = 'daredesuka';
+export const DEFAULT_PERSON_PHOTO = `${IMG_HOST}media/uploads/2020/04/05/default-person.png`;
 
 export * from './SWR';
 export * from './DummyData';

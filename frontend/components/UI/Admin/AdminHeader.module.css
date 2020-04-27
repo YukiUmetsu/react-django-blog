@@ -1,5 +1,6 @@
 .bg-nav {
     background-color: #3F495E;
+    min-height: 3rem;
 }
 .bg-nav-item {
     background-color: #626b7a;

@@ -21,7 +21,9 @@ const SelectableTableHeader = (props) => {
 
 
     let renderHeader = (headerItems) => {
-        return headerItems.map(item => {
+        return headerItems.filter(item => {
+            return !item.hideOnDisplay;
+        }).map(item => {
             let isSortableColumn = sortableColumns.includes(item.accessor);
             return (
                 <SelectableHeaderItem
@@ -34,7 +36,9 @@ const SelectableTableHeader = (props) => {
     };
 
     let renderSearches = (headerItems) => {
-        return headerItems.map(item => {
+        return headerItems.filter(item => {
+            return !item.hideOnDisplay;
+        }).map(item => {
             let isSortableColumn = sortableColumns.includes(item.accessor);
             return (
                 <SelectableTableHeaderSearchesItem

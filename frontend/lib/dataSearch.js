@@ -10,6 +10,13 @@ export const performTextSearch = (givenData, key, value, searchType = 'match') =
     return matchSorter(givenData, value, {keys: [key]})
 };
 
+export const textSearchNested = (givenData, key, value, field, searchType = 'match') => {
+    if(searchType === 'equal'){
+        return matchSorter(givenData, value, {keys: [item => item[key][field]], threshold: matchSorter.rankings.CONTAINS});
+    }
+    return matchSorter(givenData, value, {keys: [item => item[key][field]]})
+};
+
 export const performDateRangeSearch = (givenData, key, [dateStart, dateEnd]) => {
     const range = moment.range(
         moment(dateStart).startOf('day'),

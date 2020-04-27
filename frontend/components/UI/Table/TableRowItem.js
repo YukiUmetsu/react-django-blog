@@ -9,34 +9,66 @@ import {API_BASE} from "../../../constants";
 
 const TableRowItem = React.memo((props) => {
 
+    const columnAccessor = props.column.accessor;
+    const content = props.rowObj[columnAccessor];
+    const rowObjId = props.rowObj.id;
+
+    const renderTextContent = () => {
+        if(isEmpty(props.column)){
+            return (<td> </td>);
+        }
+        let isNested = props.column.nested;
+        let isMultiple = props.column.multiple;
+        if(!isNested && !isMultiple){
+            return <td>{content}</td>
+        } else if(isNested && !isMultiple){
+            return <td>{content[props.column.displayField]}</td>
+        }  else if(!isNested && isMultiple){
+            return (
+                <td>
+                    {content.map(item => ` ${item},`).splice(0,-1)}
+                </td>);
+        } else {
+            return (
+                <td>
+                    {content.map(item => {
+                        return (
+                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">
+                                #{item[props.column.displayField]}
+                            </span>);
+                    })}
+                </td>);
+        }
+    };
+
     let renderItem = () => {
         if(props.increase){
-            return <td><NumberIncreaseDisplay content={props.content}/></td>
+            return <td><NumberIncreaseDisplay content={content}/></td>
         } else if (props.decrease){
-            return <td><NumberDecreaseDisplay content={props.content}/></td>
+            return <td><NumberDecreaseDisplay content={content}/></td>
         } else if(props.isImage){
-            if(props.content === null){
+            if(content === null){
                 return <td> </td>
             }
-            if(typeof props.content === 'string'){
-                return <td><img className="h-11 w-10 rounded-full" src={props.content} alt="" /></td>
-            } else if(!isEmpty(props.content.file)){
-                return <td><img className="h-11 w-10 rounded-full" src={API_BASE+props.content.file} alt={props.content.desc} /></td>
+            if(typeof content === 'string'){
+                return <td><img className="h-11 w-10 rounded-full" src={content} alt="" /></td>
+            } else if(!isEmpty(content.file)){
+                return <td><img className="h-11 w-10 rounded-full" src={API_BASE+content.file} alt={content.desc} /></td>
             }
 
         } else if(props.isBoolean){
             return (
                 <td>
-                    {props.content === true ?
-                        <FontAwesomeIcon id={`${props.columnAccessor}-${props.rowObjId}`} icon={faCheck} className="text-teal-700"/>:
-                        <FontAwesomeIcon id={`${props.columnAccessor}-${props.rowObjId}`} icon={faTimes} className="text-grey-400"/>
+                    {content === true ?
+                        <FontAwesomeIcon id={`${columnAccessor}-${rowObjId}`} icon={faCheck} className="text-teal-700"/>:
+                        <FontAwesomeIcon id={`${columnAccessor}-${rowObjId}`} icon={faTimes} className="text-grey-400"/>
                     }
                 </td>
             );
         } else if(props.isDate){
-            return <td>{formatDate(props.content)}</td>
+            return <td>{formatDate(content)}</td>
         }
-        return <td>{props.content}</td>
+        return renderTextContent();
     };
 
     return renderItem();
@@ -49,8 +81,6 @@ TableRowItem.defaultProps = {
     isImage: false,
     isDate: false,
     isBoolean: false,
-    columnAccessor: "",
-    rowObjId: 0,
 };
 
 TableRowItem.propTypes = {
@@ -60,8 +90,8 @@ TableRowItem.propTypes = {
     isImage: PropTypes.bool,
     isDate: PropTypes.bool,
     isBoolean: PropTypes.bool,
-    columnAccessor: PropTypes.string,
-    rowObjId: PropTypes.number,
+    column: PropTypes.any,
+    rowObj: PropTypes.object,
 };
 
 export default TableRowItem

@@ -19,18 +19,19 @@ const SelectableTableRow = React.memo((props) => {
     },[props.rowObj]);
 
     let renderItems = (rowObj) => {
-        return props.columnData.columns.map((column, index) => {
+        return props.columnData.columns.filter(column => {
+            return !column.hideOnDisplay;
+        }).map((column, index) => {
            return (
                <TableRowItem
-                   content={rowObj[column.accessor]}
                    key={"column"+index+"-"+rowObj.id}
                    isImage={isImageColumn(index)}
                    isBoolean={isBooleanColumn(index)}
                    isDate={isDateColumn(index)}
                    increase={isIncreaseColumn(index)}
                    decrease={isDecreaseColumn(index)}
-                   columnAccessor={column.accessor}
-                   rowObjId={rowObj.id}
+                   rowObj={rowObj}
+                   column={column}
                />);
         })
     };

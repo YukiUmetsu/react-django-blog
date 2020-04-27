@@ -37,8 +37,8 @@ const SelectableTable = (props) => {
 
     useEffect( () => {
         if(dataManipulationComplete){
-            setEditModalState(false);
-            setDeleteModalState(false);
+            setEditModalState({isOpen: false, rowObj: {}});
+            setDeleteModalState({isOpen: false, rowObj: {}});
         }
     },[dataManipulationComplete]);
 
@@ -106,13 +106,14 @@ const SelectableTable = (props) => {
         if(!Array.isArray(data)){
             return;
         }
+        let tableColumnData = getTableColumnInfo(props.columns);
         return data.map(rowObj => {
             return (
                 <SelectableTableRow
                     rowObj={rowObj}
                     key={rowObj.id}
                     isActionsRequired={props.isActionsRequired}
-                    columnData={getTableColumnInfo(props.columns)}
+                    columnData={tableColumnData}
                     onInputChanged={(e)=>{inputChangedHandler(e)}}
                     isRowSelected={selectedItems.has(parseInt(rowObj.id))}
                 />);

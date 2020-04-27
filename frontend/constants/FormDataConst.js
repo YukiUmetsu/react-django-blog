@@ -1,6 +1,6 @@
-import {string, boolean, mixed} from "yup";
+import {string, boolean, mixed, number} from "yup";
 import zxcvbn from 'zxcvbn';
-import {ADMIN_USER_TABLE_COLUMNS, ICON_FILE_SIZE, ICON_SUPPORTED_FORMATS} from "./index";
+import {ADMIN_POST_TABLE_COLUMNS, ADMIN_USER_TABLE_COLUMNS, ICON_FILE_SIZE, ICON_SUPPORTED_FORMATS} from "./index";
 
 export const checkIfFilesAreTooBig = (files) => {
     let valid = true;
@@ -132,5 +132,21 @@ export const FORM_DATA = {
             is_staff: boolean().required(),
             is_superuser: boolean().required(),
         },
+    },
+};
+
+export const POSTS_FORM_DATA = {
+    elements: ADMIN_POST_TABLE_COLUMNS,
+    validationSchema: {
+        id: mixed().required(),
+        main_img: mixed()
+            .test('profile img file type', 'invalid file type',value => checkIfFilesAreCorrectType(value))
+            .test('profile img file size',`file is too large (max is ${ICON_FILE_SIZE} MB)`, value => checkIfFilesAreTooBig(value)),
+        category: string().required(),
+        tags: string(),
+        post_state: number(),
+        meta_desc: string(),
+        youtube_url: string(),
+        user: number(),
     },
 };

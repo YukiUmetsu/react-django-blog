@@ -12,3 +12,6 @@ export const PASSWORD_RESET_CONFIRM_API = API_BASE + '/api/reset_password/confir
 export const USERS_LIST_API = API_BASE + '/api/users/';
 export const USER_DETAIL_FROM_TOKEN_API = API_BASE + '/api/users/me/';
 export const FILES_LIST_API = API_BASE + '/api/files/';
+export const POSTS_LIST_API = API_BASE + '/api/posts/';
+export const CATEGORIES_LIST_API = API_BASE + '/api/categories/';
+export const POST_STATES_LIST_API = API_BASE + '/api/post_states/';

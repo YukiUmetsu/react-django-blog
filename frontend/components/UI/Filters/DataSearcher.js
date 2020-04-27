@@ -5,7 +5,7 @@ import {
     isEmpty,
 } from "../../../lib/utils";
 import OutsideComponentAlerter from "../../../hoc/Aux/OutsideComponentAlerter";
-import {performDateRangeSearch, performTextSearch, performYesNoSearch} from "../../../lib/dataSearch";
+import {performDateRangeSearch, performTextSearch, performYesNoSearch, textSearchNested} from "../../../lib/dataSearch";
 
 
 export const SearchCallbackContext = createContext({updateSearchState: ()=>{}});
@@ -77,8 +77,11 @@ const DataSearcher = (props) => {
             if(stateValue === null){
                 continue;
             }
-            if(type === 'text' && !isEmpty(stateValue)){
+            let isNested = searchKeys[i].nested;
+            if(type === 'text' && !isEmpty(stateValue) && !isNested){
                 newData = performTextSearch(newData, key, stateValue, searchType);
+            } else if(type === 'text' && !isEmpty(stateValue) && isNested){
+                newData = textSearchNested(newData, key, stateValue, searchKeys[i].displayField, searchType);
             } else if(type === 'boolean'){
                 newData = performYesNoSearch(newData, key, stateValue === 'true')
             } else if(type === 'date' && !isEmpty(stateValue[0]) && !isEmpty(stateValue[1])){

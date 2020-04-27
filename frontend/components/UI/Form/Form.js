@@ -198,13 +198,13 @@ const Form = (props) => {
     const renderSelectOptions = (id, label, value, options=[], length, error=null) => {
 
         let renderOptions = (options) => {
-            return options.map(option => {
-                return (<option>{option}</option>);
+            return options.map((option, index) => {
+                return (<option key={index}>{option}</option>);
             });
         };
 
         return (
-            <div className={`w-full md:w-${length} px-3 mb-6 md:mb-0`}>
+            <div className={`w-full md:w-${length} px-3 mb-6 md:mb-0`} key={`${props.form_id_prefix}_form_div_${id}`}>
                 <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                        htmlFor={id}>
                     {label}
@@ -212,7 +212,7 @@ const Form = (props) => {
                 <div className="relative">
                     <select
                         className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                        id={id}>
+                        id={`${props.form_id_prefix}_form_${id}`}>
                         {renderOptions(options)}
                         ref={register}
                         onChange={(e)=> updateFormDataState(id, e.target.value)}

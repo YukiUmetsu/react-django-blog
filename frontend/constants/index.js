@@ -129,65 +129,6 @@ export const SORT_ORDER = {
     DESC: "DESC",
 };
 
-export const ADMIN_USER_TABLE_COLUMNS = [
-    {
-        label: 'Icon',
-        accessor: 'profile_img',
-        type: 'image',
-        editable: true,
-        showOnDelete: false,
-        formLength: 'full',
-    },
-    {
-        label: 'First Name',
-        accessor: 'first_name',
-        type: 'text',
-        editable: true,
-        formLength: '1/2',
-        showOnDelete: true,
-    },
-    {
-        label: 'Last Name',
-        accessor: 'last_name',
-        type: 'text',
-        editable: true,
-        formLength: '1/2',
-        showOnDelete: true,
-    },
-    {
-        label: 'Email',
-        accessor: 'email',
-        type: 'text',
-        searchType: 'equal',
-        editable: true,
-        formLength: 'full',
-        showOnDelete: true,
-    },
-    {
-        label: "staff",
-        accessor: "is_staff",
-        type: 'boolean',
-        editable: true,
-        formLength: 'full',
-        showOnDelete: true,
-    },
-    {
-        label: "super admin",
-        accessor: "is_superuser",
-        type: 'boolean',
-        editable: true,
-        formLength: 'full',
-        showOnDelete: false,
-    },
-    {
-        label: 'Registered at',
-        accessor: 'created_at',
-        type: 'date',
-        editable: false,
-        showOnDelete: false,
-    }
-];
-
 export const SELECTABLE_TABLE_CONSTS = {
     HEADER_SORT_NORMAL: 0,
     HEADER_SORT_ASC: 1,
@@ -228,3 +169,4 @@ export * from './SWR';
 export * from './DummyData';
 export * from './API';
 export * from './NotificationConst'
+export * from './TableColumns';

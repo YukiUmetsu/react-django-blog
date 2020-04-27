@@ -38,6 +38,9 @@ export const isEmpty = (target) => {
 };
 
 export const formatDate = (dateObj, formatStr='MMMM Do YYYY') => {
+    if(typeof dateObj === 'string'){
+        dateObj = new Date(dateObj);
+    }
     return moment(dateObj).format(formatStr);
 };
 
@@ -71,7 +74,9 @@ export const getTableColumnInfo = columns => {
         increaseColumns: [],
         decreaseColumns: [],
     };
-    columns.map((column,index) => {
+    columns.filter(item => {
+        return !item.hideOnDisplay;
+    }).map((column,index) => {
         if (column.type === 'image') {
             newColumnData.imageColumns.push(index);
         } else if(column.type === 'boolean'){

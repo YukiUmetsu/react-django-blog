@@ -4,12 +4,10 @@ import nextCookie from 'next-cookies'
 import cookie from 'js-cookie'
 import fetch from 'isomorphic-unfetch'
 import {
-    LOGOUT_API,
     USER_DETAIL_FROM_TOKEN_API
 } from "../../constants";
 import {isEmpty} from "../utils";
-import {ADMIN_DASHBOARD_URL, ADMIN_LOGIN_URL, LOGIN_URL} from "../../constants/URLs";
-import {code} from "../crypto";
+import {ADMIN_DASHBOARD_URL, ADMIN_LOGIN_URL} from "../../constants/URLs";
 import {loginFetch} from "./auth";
 
 const defaultHeader = {
@@ -153,23 +151,3 @@ let fetchLoggedInUser = async (token) => {
         return error;
     }
 };
-
-export const adminLogout = async () => {
-    const headers = defaultHeader;
-    const token = cookie.get('token');
-    const csrf_token = cookie.get('csrf_token');
-    if (csrf_token!== 'undefined') {
-        headers['X-CSRFToken'] = csrf_token
-    }
-    const response = await fetch(LOGOUT_API, {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify({token: token}),
-    });
-
-    cookie.remove('token');
-    // to support logging out from all windows
-    window.localStorage.setItem('logout', Date.now());
-    Router.push(ADMIN_LOGIN_URL)
-};
-

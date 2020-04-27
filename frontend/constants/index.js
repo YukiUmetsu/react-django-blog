@@ -46,8 +46,18 @@ export const ADMIN_SIDE_BAR_ITEMS = [
     {
         title: 'Posts',
         icon: faNewspaper,
-        link: '/admin-panel/posts',
-        subItems: [],
+        subItems: [
+            {
+                title: 'Post list',
+                icon: faNewspaper,
+                link: '/admin-panel/posts',
+            },
+            {
+                title: 'Create a new post',
+                icon: faNewspaper,
+                link: '/admin-panel/posts/new',
+            }
+        ],
     },
     {
         title: 'Comments',

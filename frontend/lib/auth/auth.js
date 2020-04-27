@@ -6,7 +6,6 @@ import fetch from 'isomorphic-unfetch'
 import {
     CONFIRM_TOKEN_API,
     LOGIN_API,
-    LOGOUT_API,
     PASSWORD_RESET_API,
     PASSWORD_RESET_CONFIRM_API,
     SIGN_UP_API,
@@ -38,25 +37,6 @@ export const auth = ctx => {
     }
 
     return token
-};
-
-export const logout = async () => {
-    const headers = defaultHeader;
-    const token = cookie.get('token');
-    const csrf_token = cookie.get('csrf_token');
-    if (csrf_token!== 'undefined') {
-        headers['X-CSRFToken'] = csrf_token
-    }
-    const response = await fetch(LOGOUT_API, {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify({token: token}),
-    });
-
-    cookie.remove('token');
-    // to support logging out from all windows
-    window.localStorage.setItem('logout', Date.now());
-    Router.push(LOGIN_URL)
 };
 
 export const withAuthSync = WrappedComponent => {

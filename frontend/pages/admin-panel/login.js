@@ -6,9 +6,10 @@ import { useRouter } from 'next/router'
 import AdminLoginForm from "../../components/AdminPanel/Users/AdminLoginForm";
 import getConfig from "next/config";
 import {generateRandomStr} from "../../lib/crypto";
+import PackmanSpinner from "../../components/UI/Spinner/PackmanSpinner";
 
 const AdminLogin = (props) => {
-    const router = useRouter()
+    const router = useRouter();
     const [ hasServerError, setHasServerError ] = useState(false);
     const [ overMaxLoginFailure, setOverMaxLoginFailure ] = useState(false);
     const [ createdSuccess, setCreatedSuccess ] = useState(false);
@@ -72,12 +73,15 @@ const AdminLogin = (props) => {
                 <div className="container max-w-sm mx-auto flex-1 flex flex-col items-center justify-center px-2">
                     <div className="bg-white px-6 py-8 rounded shadow-md text-black w-full">
                         <h1 className="mb-8 text-3xl text-center">Login</h1>
-                        <AdminLoginForm
+                        { props.isPageLoading ?
+                            <PackmanSpinner/>:
+                            <AdminLoginForm
                             onServerError={() => setHasServerError(true)}
                             maxLoginFailure={10}
                             onMaxLoginFailureCallback={() => setOverMaxLoginFailure(true)}
                             angoKey={props.angoKey}
-                        />
+                            />
+                        }
                     </div>
 
                     <div className="text-grey-dark mt-6">

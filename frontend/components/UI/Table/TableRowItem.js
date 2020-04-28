@@ -4,7 +4,7 @@ import NumberIncreaseDisplay from "../Statistics/NumberDisplay/NumberIncreaseDis
 import NumberDecreaseDisplay from "../Statistics/NumberDisplay/NumberDecreaseDisplay";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {faCheck, faTimes} from "@fortawesome/free-solid-svg-icons";
-import {formatDate, isEmpty} from "../../../lib/utils";
+import {formatDate, getDisplayContentFromObj, isEmpty} from "../../../lib/utils";
 import {API_BASE} from "../../../constants";
 
 const TableRowItem = React.memo((props) => {
@@ -14,30 +14,23 @@ const TableRowItem = React.memo((props) => {
     const rowObjId = props.rowObj.id;
 
     const renderTextContent = () => {
-        if(isEmpty(props.column)){
-            return (<td> </td>);
-        }
-        let isNested = props.column.nested;
-        let isMultiple = props.column.multiple;
-        if(!isNested && !isMultiple){
+        let content = getDisplayContentFromObj(props.column, props.rowObj);
+        if(typeof content === 'string'){
             return <td>{content}</td>
-        } else if(isNested && !isMultiple){
-            return <td>{content[props.column.displayField]}</td>
-        }  else if(!isNested && isMultiple){
+        }
+        if(props.column.isTag === true){
             return (
                 <td>
-                    {content.map(item => ` ${item},`).splice(0,-1)}
-                </td>);
-        } else {
-            return (
-                <td>
-                    {content.map(item => {
+                    {content.map((item, index) => {
                         return (
-                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">
-                                #{item[props.column.displayField]}
+                            <span key={`${index}-${item}`} className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">
+                                #{item}
                             </span>);
                     })}
                 </td>);
+        }
+        if(Array.isArray(content)){
+            return (<td>{content.join(', ')}</td>);
         }
     };
 

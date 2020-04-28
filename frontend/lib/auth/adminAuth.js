@@ -85,7 +85,7 @@ export const withAdminAuth = WrappedComponent => {
     return Wrapper
 };
 
-export const AdminLoginFetch = async (data, angoKey) => {
+export const AdminLoginFetch = async (data) => {
     let loginRespond = await loginFetch(data, true);
     let wasLoginSuccess = !isEmpty(loginRespond.token);
     if(!wasLoginSuccess){

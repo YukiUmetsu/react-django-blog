@@ -6,10 +6,11 @@ import SelectableTableHeader from "./SelectableTableHeader";
 import Modal from "../../Modal/Modal";
 import Form from "../../Form/Form";
 import AlertModal from "../../Modal/AlertModal";
-import {getTableColumnInfo, isEmpty} from "../../../../lib/utils";
+import {getDisplayContentFromObj, getTableColumnInfo, isEmpty} from "../../../../lib/utils";
 import OutsideComponentAlerter from "../../../../hoc/Aux/OutsideComponentAlerter";
 import PackmanSpinner from "../../Spinner/PackmanSpinner";
 import AlertModalTable from "../../Modal/AlertModalTable";
+import { convertArrayToObject } from '../../../../lib/utils';
 
 export const DataMutationContext = createContext({});
 
@@ -179,13 +180,13 @@ const SelectableTable = (props) => {
 
     let renderOnDeleteMessage = (rowObjs) => {
         if(isEmpty(rowObjs)){
-            return;
+            return '';
         }
         let shownColumns = props.columns.map(column => {
             if(!column.showOnDelete){
                 return;
             }
-            return ({label: column.label, accessor: column.accessor, type: column.type});
+            return column;
         }).filter(x => x!== undefined);
 
         let labels = shownColumns.map(col => col.label);
@@ -198,15 +199,12 @@ const SelectableTable = (props) => {
 
         tableBodyData = rowObjs.map(rowObj => {
             return shownColumns.map(column => {
-                let content = rowObj[column.accessor];
-                if(column.type === "boolean"){
-                    content = isEmpty(rowObj[column.accessor]) ? "No" : "Yes";
-                }
+                let content = getDisplayContentFromObj(column, rowObj);
                 return {accessor: column.accessor, content: content};
             });
         });
 
-        return <AlertModalTable labels={labels} data={tableBodyData} />;
+        return <AlertModalTable labels={labels} data={tableBodyData} columns={convertArrayToObject(shownColumns, 'accessor')}/>;
     };
 
     const handleDataItemDeleted = (ids) => {

@@ -129,6 +129,7 @@ export const ADMIN_POST_TABLE_COLUMNS = [
         multiple: true,
         nested: true,
         displayField: 'name',
+        isTag: true,
     },
     {
         label: 'likes',
@@ -180,5 +181,7 @@ export const ADMIN_POST_TABLE_COLUMNS = [
         editable: true,
         showOnDelete: true,
         hideOnDisplay: false,
+        nested: true,
+        displayField: 'first_name'
     },
 ];

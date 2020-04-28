@@ -16,10 +16,9 @@ const AlertModalTable = (props) => {
     };
 
     let renderRow = (row, index) => {
-
         let renderInsideTr = () => {
             return row.map(column => {
-                return renderColumns(column);
+                return renderColumns(column, props.columns[column.accessor]);
             })
         };
 
@@ -30,7 +29,21 @@ const AlertModalTable = (props) => {
         );
     };
 
-    let renderColumns = (column) => {
+    let renderColumns = (column, columnInfo) => {
+        if(columnInfo.isTag){
+            return (
+                <td>
+                    {column.content.map((item, index) => {
+                        return (
+                            <span key={`${index}-${item}`} className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">
+                                #{item}
+                            </span>);
+                    })}
+                </td>);
+        }
+        if(Array.isArray(column.content)){
+            return (<td className="px-4 py-2" key={column.accessor}>{column.content.join(' ')}</td>);
+        }
         return (<td className="px-4 py-2" key={column.accessor}>{column.content}</td>);
     };
 
@@ -51,6 +64,7 @@ const AlertModalTable = (props) => {
 AlertModalTable.propTypes = {
     labels: PropTypes.array,
     data: PropTypes.array,
+    columns: PropTypes.array,
 };
 
 export default AlertModalTable

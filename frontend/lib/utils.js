@@ -1,5 +1,6 @@
 import moment from 'moment'
 import {SORT_ORDER} from "../constants";
+import React from "react";
 
 export const isEmpty = (target) => {
     let objType = typeof target;
@@ -177,6 +178,46 @@ export const removeDuplicatesById = (data = []) => {
         }
     }
     return newData;
+};
+
+export const getDisplayContentFromObj = (column, rowObj) => {
+    const columnAccessor = column.accessor;
+    const content = rowObj[columnAccessor];
+
+    if(isEmpty(column) || isEmpty(content)){
+        return '';
+    }
+    if(column.type === "boolean"){
+        return isEmpty(rowObj[column.accessor]) ? "No" : "Yes";
+    }
+
+    let isNested = column.nested;
+    let isMultiple = column.multiple;
+    if(!isNested && !isMultiple){
+        return content
+    } else if(isNested && !isMultiple){
+        if(content.hasOwnProperty('first_name')){
+            return `${content.first_name} ${content.last_name}`;
+        }
+        return content[column.displayField];
+
+    }  else if(!isNested && isMultiple){
+        return content;
+    } else {
+        return content.map((item, index) => {
+                    return item[column.displayField];
+                });
+    }
+};
+
+export const convertArrayToObject = (array, key) => {
+    const initialValue = {};
+    return array.reduce((obj, item) => {
+        return {
+            ...obj,
+            [item[key]]: item,
+        };
+    }, initialValue);
 };
 
 /***

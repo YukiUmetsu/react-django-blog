@@ -3,13 +3,12 @@ from rest_framework import status
 from test_utils.users_fixtures import users
 from test_utils.categories_fixtures import category_payload, category_obj
 from test_utils.post_states_fixtures import all_states
-from test_utils.posts_fixtures import post_min_payload, post_payload, post_obj
+from test_utils.posts_fixtures import post_min_payload, post_payload, post_obj, img_obj
 from test_utils.tags_fixtures import tag_payload, staff_tag_obj0
 from rest_framework.test import APIClient
 from posts.models import Posts
 
 pytestmark = pytest.mark.django_db
-
 
 @pytest.mark.django_db
 class TestPublicPostsAPI:

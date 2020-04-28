@@ -1,15 +1,33 @@
+import os
+import pytest
 import random
 import string
-import pytest
 from posts.models import Posts
 from test_utils.users_fixtures import users
 from test_utils.categories_fixtures import category_payload, category_obj
 from test_utils.tags_fixtures import staff_tag_obj0
 from test_utils.post_states_fixtures import all_states
+from rest_framework.test import APIClient
+from files.models import Files
+
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+IMG_DIR = BASE_DIR + '/files/tests/'
+
+
+@pytest.mark.django_db
+@pytest.fixture
+def img_obj(users):
+    with open(IMG_DIR + '1pixel.png', 'rb') as img:
+        file_payload = {'type': 'image', 'desc': random_string(50), 'user': users['staff'][0].id, 'file': img}
+        client = APIClient()
+        client.force_authenticate(users['staff'][0])
+        client.post("/api/files/", file_payload)
+    yield Files.objects.filter(user=users['staff'][0].id)[0]
 
 
 @pytest.fixture
-def post_min_payload(category_obj, users, all_states):
+def post_min_payload(category_obj, users, all_states, img_obj):
     content = random_string(25) + get_lorem()
     yield {
         'title': random_string(25),
@@ -19,21 +37,23 @@ def post_min_payload(category_obj, users, all_states):
         'category': category_obj,
         'user': users['staff'][0],
         'post_state': all_states[0],
+        'main_img': img_obj
     }
 
 
 @pytest.fixture
-def post_payload(users, category_obj, all_states, staff_tag_obj0):
+def post_payload(users, category_obj, all_states, staff_tag_obj0, img_obj):
     content = random_string(25) + get_lorem()
     yield {
         'title': random_string(25),
-        'content': content,
         'meta_desc': random_string(50),
         'youtube_url': 'https://www.youtube.com/watch?v=PesqzWG0BVs',
         'category': category_obj.id,
         'user': users['staff'][0].id,
         'post_state': all_states[0].id,
-        'tags': staff_tag_obj0.id
+        'tags': staff_tag_obj0.id,
+        'main_img': img_obj.id,
+        'content': content,
     }
 
 

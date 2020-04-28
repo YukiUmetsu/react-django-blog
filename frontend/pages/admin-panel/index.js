@@ -15,9 +15,8 @@ const AdminPanel = (props) => {
         return (
             <Aux>
                 <div className="px-6 py-2 border-b border-light-grey">
-                    <div className="font-bold text-xl">Trending Categories</div>
+                    <div className="font-bold text-xl">Admin Panel</div>
                 </div>
-                <Table {...DUMMY_TABLE} />
             </Aux>
         );
     };

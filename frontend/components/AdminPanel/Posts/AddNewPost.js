@@ -3,11 +3,15 @@ import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Aux from "../../../hoc/Aux/Aux";
 import Modal from "../../UI/Modal/Modal";
-import Form from "../../UI/Form/Form";
 import {isEmpty, removeFromMutableObject} from "../../../lib/utils";
 import {faPlus} from "@fortawesome/free-solid-svg-icons/faPlus";
+import dynamic from "next/dynamic";
+const DynamicForm = dynamic(
+    () => import('../../UI/Form/Form'),
+    { ssr: false }
+);
 
-const AddNewPost = (props) => {
+const AddNewPost = React.memo((props) => {
 
     const {
         updateNewObjFormData: updateNewObjFormData,
@@ -71,7 +75,7 @@ const AddNewPost = (props) => {
                 <FontAwesomeIcon icon={faPlus} className="pr-1"/>  {props.btnTitle}
             </button>
             <Modal modalOpen={isNewObjModalOpen} onCloseCallback={() => setIsNewObjModalOpen(false)}>
-                <Form
+                <DynamicForm
                     form_id_prefix={props.form_id_prefix}
                     formData={props.formData}
                     onSubmitCallback={submitHandler}
@@ -82,7 +86,7 @@ const AddNewPost = (props) => {
             </Modal>
         </Aux>
     );
-};
+});
 
 AddNewPost.defaultProps = {
     btnClassNames: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded",

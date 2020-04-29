@@ -1,16 +1,29 @@
 import React, {createContext, useContext, useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
+import dynamic from 'next/dynamic'
 import TableCSS from '../Table.module.css';
 import SelectableTableRow from "./SelectableTableRow";
 import SelectableTableHeader from "./SelectableTableHeader";
-import Modal from "../../Modal/Modal";
-import Form from "../../Form/Form";
-import AlertModal from "../../Modal/AlertModal";
 import {getDisplayContentFromObj, getTableColumnInfo, isEmpty} from "../../../../lib/utils";
 import OutsideComponentAlerter from "../../../../hoc/Aux/OutsideComponentAlerter";
 import PackmanSpinner from "../../Spinner/PackmanSpinner";
 import AlertModalTable from "../../Modal/AlertModalTable";
 import { convertArrayToObject } from '../../../../lib/utils';
+
+const DynamicForm = dynamic(
+    () => import('../../Form/Form'),
+    { ssr: false }
+);
+
+const DynamicModal = dynamic(
+    () => import('../../Modal/Modal'),
+    { ssr: false }
+);
+
+const DynamicAlertModal = dynamic(
+    () => import('../../Modal/AlertModal'),
+    { ssr: false }
+);
 
 export const DataMutationContext = createContext({});
 
@@ -243,11 +256,11 @@ const SelectableTable = (props) => {
             </div>
 
             <OutsideComponentAlerter callback={() => updateEditModalState({}, false)}>
-                <Modal
+                <DynamicModal
                     onCloseCallback={() => {updateEditModalState(editModalState.rowObj); setResetEditForm(true);}}
                     modalOpen={editModalState.isOpen}
                     onOpenCallback={() => setResetEditForm(false)}>
-                    <Form
+                    <DynamicForm
                         object={editModalState.rowObj}
                         formData={props.editObjFormData}
                         form_id_prefix="edit"
@@ -255,28 +268,28 @@ const SelectableTable = (props) => {
                         resetForm={resetEditForm}
                         dataManipulationComplete={dataManipulationComplete}
                     />
-                </Modal>
+                </DynamicModal>
             </OutsideComponentAlerter>
 
             <OutsideComponentAlerter callback={() => updateDeleteModalState({}, false)}>
-                <AlertModal
+                <DynamicAlertModal
                     modalOpen={deleteModalState.isOpen}
                     onCloseCallback={() => updateDeleteModalState({}, false)}
                     title="Are you sure to delete?"
                     onConfirmedCallback={(id) => handleDataItemDeleted(id)}
                     associatedObjId={(deleteModalState.rowObj) ? parseInt(deleteModalState.rowObj.id): null}>
                     {renderOnDeleteMessage(deleteModalState.rowObj)}
-                </AlertModal>
+                </DynamicAlertModal>
             </OutsideComponentAlerter>
 
             <OutsideComponentAlerter callback={() => setBunchDeleteModalOpen(false)}>
-                <AlertModal
+                <DynamicAlertModal
                     modalOpen={bunchDeleteModalOpen}
                     onCloseCallback={() => setBunchDeleteModalOpen(false)}
                     title="Are you sure to delete?"
                     onConfirmedCallback={() => handleBunchDeleteConfirmed()}>
                     {renderOnDeleteMessage(getSelectedItemDetailData(selectedItems))}
-                </AlertModal>
+                </DynamicAlertModal>
             </OutsideComponentAlerter>
 
         </DataMutationContext.Provider>

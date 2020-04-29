@@ -2,7 +2,10 @@ import React, {useEffect, useState} from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import PropTypes from 'prop-types';
 import zxcvbn from 'zxcvbn';
-import {faLaugh, faMeh, faSadTear, faSmile} from "@fortawesome/free-solid-svg-icons";
+import {faSadTear} from "@fortawesome/free-regular-svg-icons/faSadTear";
+import {faMeh} from "@fortawesome/free-regular-svg-icons/faMeh";
+import {faSmile} from "@fortawesome/free-regular-svg-icons/faSmile";
+import {faLaugh} from "@fortawesome/free-regular-svg-icons/faLaugh";
 
 const PasswordStrengthMeter = (props) => {
 

@@ -4,7 +4,7 @@ import AdminSideBarItem from "./AdminSideBarItem";
 import { useRouter } from 'next/router'
 import Aux from "../../../../hoc/Aux/Aux";
 
-const AdminSideBar = (props) => {
+const AdminSideBar = React.memo((props) => {
     const router = useRouter();
 
     let renderSideBarItems = (items) => {
@@ -26,6 +26,6 @@ const AdminSideBar = (props) => {
             </aside>
         </Aux>
     );
-};
+});
 
 export default AdminSideBar

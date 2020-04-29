@@ -4,7 +4,7 @@ import AdminSideBar from "./SideBar/AdminSideBar";
 import PropTypes from 'prop-types';
 import NavigationSelection from "./SideBar/NavigationSelection";
 
-const AdminPanelLayout = (props) => {
+const AdminPanelLayout = React.memo((props) => {
 
     let [ isSideBarVisible, setIsSideBarVisible ] = useState(true);
 
@@ -31,7 +31,7 @@ const AdminPanelLayout = (props) => {
             </div>
         </div>
     );
-};
+});
 
 AdminPanelLayout.propTypes = {
   user: PropTypes.object,

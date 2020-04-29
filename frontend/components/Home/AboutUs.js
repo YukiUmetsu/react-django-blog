@@ -1,7 +1,9 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {faChess, faNewspaper, faUserFriends} from "@fortawesome/free-solid-svg-icons";
-import {faYoutube} from "@fortawesome/free-brands-svg-icons";
+import {faNewspaper} from "@fortawesome/free-regular-svg-icons/faNewspaper";
+import {faYoutube} from "@fortawesome/free-brands-svg-icons/faYoutube";
+import {faChess} from "@fortawesome/free-solid-svg-icons/faChess";
+import {faUserFriends} from "@fortawesome/free-solid-svg-icons/faUserFriends";
 
 const AboutUs = (props) => {
     return (

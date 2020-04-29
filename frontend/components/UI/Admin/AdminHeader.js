@@ -5,10 +5,11 @@ import Link from "next/link";
 import {ADMIN_LOGOUT_URL} from "../../../constants/URLs";
 import {AdminAuthContext} from "../../../lib/auth/adminAuth";
 import {isEmpty} from "../../../lib/utils";
-import {API_BASE, DEFAULT_PERSON_PHOTO, IMG_HOST} from "../../../constants";
+import {API_BASE} from "../../../constants";
 import OutsideComponentAlerter from "../../../hoc/Aux/OutsideComponentAlerter";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {faUserCircle} from "@fortawesome/free-solid-svg-icons";
+import {faUserCircle} from "@fortawesome/free-regular-svg-icons/faUserCircle";
+
 
 const AdminHeader = React.memo((props) => {
     let { loggedInUser: loggedInUser} = useContext(AdminAuthContext);

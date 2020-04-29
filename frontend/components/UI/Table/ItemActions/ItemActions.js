@@ -1,9 +1,11 @@
 import React, {useState} from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {faEdit, faEye, faTrash} from "@fortawesome/free-solid-svg-icons";
 import Aux from "../../../../hoc/Aux/Aux";
 import PropTypes from 'prop-types';
 import styles from "./ItemActions.module.css";
+import {faEye} from "@fortawesome/free-regular-svg-icons/faEye";
+import {faEdit} from "@fortawesome/free-regular-svg-icons/faEdit";
+import {faTrash} from "@fortawesome/free-solid-svg-icons/faTrash";
 
 const ItemActions = React.memo((props) => {
 

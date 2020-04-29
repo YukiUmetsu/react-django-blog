@@ -1,9 +1,11 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useState} from 'react';
 import PropTypes from 'prop-types';
 import {SELECTABLE_TABLE_CONSTS} from "../../../../constants";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {faSort, faSortDown, faSortUp} from "@fortawesome/free-solid-svg-icons";
 import {SortCallbackContext} from "../../Pagination/Paginator";
+import {faSort} from "@fortawesome/free-solid-svg-icons/faSort";
+import {faSortDown} from "@fortawesome/free-solid-svg-icons/faSortDown";
+import {faSortUp} from "@fortawesome/free-solid-svg-icons/faSortUp";
 
 const CON = SELECTABLE_TABLE_CONSTS;
 

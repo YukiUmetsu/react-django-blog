@@ -1,7 +1,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import PropTypes from 'prop-types';
-import {faArrowDown} from "@fortawesome/free-solid-svg-icons";
+import {faArrowDown} from "@fortawesome/free-solid-svg-icons/faArrowDown";
 
 const NumberDecreaseDisplay = (props) => {
     return (

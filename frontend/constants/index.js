@@ -1,12 +1,15 @@
-import {
-    faAddressCard, faCog,
-    faComments, faFolderPlus, faImages,
-    faNewspaper,
-    faQuestionCircle, faShoppingBasket,
-    faTachometerAlt, faUser
-} from "@fortawesome/free-solid-svg-icons";
-import {faWpforms} from "@fortawesome/free-brands-svg-icons";
 import {IMG_HOST} from "./API";
+import {faTachometerAlt} from "@fortawesome/free-solid-svg-icons/faTachometerAlt";
+import {faNewspaper} from "@fortawesome/free-regular-svg-icons/faNewspaper";
+import {faComments} from "@fortawesome/free-regular-svg-icons/faComments";
+import {faAddressCard} from "@fortawesome/free-regular-svg-icons/faAddressCard";
+import {faQuestionCircle} from "@fortawesome/free-regular-svg-icons/faQuestionCircle";
+import {faUser} from "@fortawesome/free-regular-svg-icons/faUser";
+import {faWpforms} from "@fortawesome/free-brands-svg-icons/faWpforms";
+import {faImages} from "@fortawesome/free-regular-svg-icons/faImages";
+import {faFolderPlus} from "@fortawesome/free-solid-svg-icons/faFolderPlus";
+import {faCog} from "@fortawesome/free-solid-svg-icons/faCog";
+import {faShoppingBasket} from "@fortawesome/free-solid-svg-icons/faShoppingBasket";
 
 export const ICON_FILE_SIZE = 50;
 export const ICON_SUPPORTED_FORMATS = ['image/jpg', 'image/jpeg', 'image/gif', 'image/png'];

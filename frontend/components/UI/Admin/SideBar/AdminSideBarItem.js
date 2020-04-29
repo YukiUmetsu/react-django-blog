@@ -1,12 +1,13 @@
 import React, {useState} from 'react';
 import Link from "next/link";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faAngleDown, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {isEmpty} from "../../../../lib/utils";
 import AdminSideBarSubItem from "./AdminSideBarSubItem";
 import OutsideComponentAlerter from "../../../../hoc/Aux/OutsideComponentAlerter";
 import Aux from "../../../../hoc/Aux/Aux";
 import PropTypes from 'prop-types';
+import {faAngleDown} from "@fortawesome/free-solid-svg-icons/faAngleDown";
+import {faAngleRight} from "@fortawesome/free-solid-svg-icons/faAngleRight";
 
 const AdminSideBarItem = React.memo((props) => {
 

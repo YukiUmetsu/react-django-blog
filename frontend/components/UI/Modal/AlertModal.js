@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import Aux from "../../../hoc/Aux/Aux";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {faTimes} from "@fortawesome/free-solid-svg-icons";
+import {faTimes} from "@fortawesome/free-solid-svg-icons/faTimes";
 
 const AlertModal = (props) => {
 

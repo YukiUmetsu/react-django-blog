@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import './FlashCard.module.css';
 import {isEmpty} from "../../../lib/utils";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {faVolumeMute, faVolumeUp} from "@fortawesome/free-solid-svg-icons";
 import Audio from "../Audio/Audio";
 import PropTypes from 'prop-types';
+import {faVolumeMute} from "@fortawesome/free-solid-svg-icons/faVolumeMute";
+import {faVolumeUp} from "@fortawesome/free-solid-svg-icons/faVolumeUp";
 
 const FlashCardContentTemplate = (props) => {
 

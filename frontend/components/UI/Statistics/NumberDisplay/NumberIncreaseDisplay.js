@@ -1,7 +1,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {faArrowUp} from "@fortawesome/free-solid-svg-icons";
 import PropTypes from 'prop-types';
+import {faArrowUp} from "@fortawesome/free-solid-svg-icons/faArrowUp";
 
 const NumberIncreaseDisplay = (props) => {
     return (

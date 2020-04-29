@@ -1,9 +1,9 @@
 import React from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faAngleDown} from "@fortawesome/free-solid-svg-icons";
 import {isEmpty} from "../../../../lib/utils";
 import { useRouter } from 'next/router'
 import {ADMIN_SIDE_BAR_ITEMS} from "../../../../constants";
+import {faAngleDown} from "@fortawesome/free-solid-svg-icons/faAngleDown";
 
 const NavigationSelection = (props) => {
 

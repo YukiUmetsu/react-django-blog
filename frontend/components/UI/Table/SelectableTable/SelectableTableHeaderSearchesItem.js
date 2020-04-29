@@ -1,9 +1,14 @@
 import React, {useContext, useState} from 'react';
 import PropTypes from 'prop-types';
-import DateRangePicker from "../../Filters/DateRangePicker";
 import YesNoPicker from "../../Filters/YesNoPicker";
 import InputSearchItem from "../../Filters/InputSearchItem";
 import {SearchCallbackContext} from "../../Filters/DataSearcher";
+import dynamic from "next/dynamic";
+
+const DynamicDateRangePicker = dynamic(
+    () => import('../../Filters/DateRangePicker'),
+    { ssr: false }
+);
 
 const SelectableTableHeaderSearchesItem = (props) => {
 
@@ -15,7 +20,7 @@ const SelectableTableHeaderSearchesItem = (props) => {
         }
         if(props.type === 'date'){
             return (
-                <DateRangePicker
+                <DynamicDateRangePicker
                     onDateRangeChanged={updateSearchState}
                     onDateRangeChangedArguments={[props.accessor]}
                 />

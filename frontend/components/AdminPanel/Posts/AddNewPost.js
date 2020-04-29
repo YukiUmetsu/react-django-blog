@@ -1,11 +1,11 @@
 import React, {useContext, useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {faPlus} from "@fortawesome/free-solid-svg-icons";
 import Aux from "../../../hoc/Aux/Aux";
 import Modal from "../../UI/Modal/Modal";
 import Form from "../../UI/Form/Form";
 import {isEmpty, removeFromMutableObject} from "../../../lib/utils";
+import {faPlus} from "@fortawesome/free-solid-svg-icons/faPlus";
 
 const AddNewPost = (props) => {
 

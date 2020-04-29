@@ -1,20 +1,28 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form'
 import CSRFTokenInput from "./CSRFTokenInput";
 import PropTypes from 'prop-types';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faAngleDown, faCamera} from "@fortawesome/free-solid-svg-icons";
 import Toggle from "./Toggle";
 import * as yup from "yup";
 import {isEmpty} from "../../../lib/utils";
-import {API_BASE, DEFAULT_PERSON_PHOTO, IMG_HOST} from "../../../constants";
-import PasswordStrengthMeter from "./PasswordStrengthMeter";
+import {API_BASE, DEFAULT_PERSON_PHOTO} from "../../../constants";
 import PackmanSpinner from "../Spinner/PackmanSpinner";
 import Alert from "../Notifications/Alert";
+import {faCamera} from "@fortawesome/free-solid-svg-icons/faCamera";
+import dynamic from "next/dynamic";
+const DynamicTextInput = dynamic(
+    () => import('./FormTextInput'),
+    { ssr: false }
+);
+const DynamicSelect = dynamic(
+    () => import('./FormSelect'),
+    { ssr: false }
+);
 
 const Form = (props) => {
 
-    let setInitialFormDataState = () => {
+    let initialFormDataState = useMemo(() => {
         let initialState = {};
         for (let i = 0; i < props.formData.elements.length; i++) {
             let element = props.formData.elements[i];
@@ -29,9 +37,9 @@ const Form = (props) => {
             initialState[element.accessor] = givenValue;
         }
         return initialState;
-    };
+    }, [props.formData, props.object]);
 
-    let [formDataState, setFormDataState] = useState(setInitialFormDataState());
+    let [formDataState, setFormDataState] = useState(initialFormDataState);
     let [showChangeImageCover, setShowChangeImageCover] = useState(false);
     let [loading, setLoading] = useState(props.loading ? props.loading : false);
     let [formError, setFormError] = useState(props.formError);
@@ -45,7 +53,7 @@ const Form = (props) => {
     const { register, handleSubmit, reset, errors, triggerValidation } = useForm(formConfig);
 
     useEffect(() => {
-        setFormDataState(setInitialFormDataState());
+        setFormDataState(initialFormDataState);
     },[props.object]);
 
     useEffect(() => {
@@ -136,43 +144,22 @@ const Form = (props) => {
     const renderTextInput = (id, label, type, value, length, error=null) => {
         let inputValue = (formDataState[id]) ? formDataState[id] : "";
         let inputClass = 'appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white';
-        if(type === 'hidden'){
-            inputClass='invisible';
-            return (
-                <input
-                    readOnly
-                    className={inputClass}
-                    id={`${props.form_id_prefix}_form_${id}`}
-                    name={id}
-                    key={id}
-                    type={type}
-                    value={inputValue}
-                    ref={register}
-                    placeholder={label}
-                />
-            );
-        }
         return (
-            <div key={id} className={`w-full md:w-${length} px-3 mb-6 md:mb-0`}>
-                <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor={id}>
-                    {label}
-                </label>
-                <input
-                    className={inputClass}
-                    id={`${props.form_id_prefix}_form_${id}`}
-                    name={id}
-                    type={type}
-                    value={inputValue}
-                    ref={register}
-                    placeholder={label}
-                    onChange={(e)=> updateFormDataState(id, e.target.value)}
-                />
-                {error? <p className="text-red-500 text-xs italic">{error.message}</p> : ""}
-                <div className="mt-2 mb-4">
-                    {id === 'password' ? <PasswordStrengthMeter password={formDataState['password']}/> : ""}
-                </div>
-            </div>
-        );
+            <DynamicTextInput
+                key={id}
+                form_id_prefix={props.form_id_prefix}
+                inputClass={inputClass}
+                id={id}
+                inputValue={inputValue}
+                label={label}
+                type={type}
+                reference={register}
+                isHidden={type === 'hidden'}
+                length={length}
+                error={error}
+                updateFormDataState={updateFormDataState}
+                formDataState={formDataState}
+            />);
     };
 
     const renderToggle = (id, label, value, length, error=null) => {
@@ -196,35 +183,19 @@ const Form = (props) => {
     };
 
     const renderSelectOptions = (id, label, value, options=[], length, error=null) => {
-
-        let renderOptions = (options) => {
-            return options.map((option, index) => {
-                return (<option key={index}>{option}</option>);
-            });
-        };
-
         return (
-            <div className={`w-full md:w-${length} px-3 mb-6 md:mb-0`} key={`${props.form_id_prefix}_form_div_${id}`}>
-                <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                       htmlFor={id}>
-                    {label}
-                </label>
-                <div className="relative">
-                    <select
-                        className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                        id={`${props.form_id_prefix}_form_${id}`}>
-                        {renderOptions(options)}
-                        ref={register}
-                        onChange={(e)=> updateFormDataState(id, e.target.value)}
-                    </select>
-                    <div
-                        className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                        <FontAwesomeIcon icon={faAngleDown}/>
-                    </div>
-                </div>
-                {error? <p className="text-red-500 text-xs italic">{error.message}</p> : ""}
-            </div>
-        );
+            <DynamicSelect
+                key={id}
+                id={id}
+                label={label}
+                value={value}
+                options={options}
+                length={length}
+                error={error}
+                form_id_prefix={props.form_id_prefix}
+                updateFormDataState={updateFormDataState}
+                reference={register}
+            />);
     };
 
     let renderImageIcon = (id, label, value, multiple=false, accept="image/*", length, error = null) => {

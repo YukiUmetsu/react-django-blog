@@ -3,9 +3,11 @@ import PropTypes from 'prop-types';
 import NumberIncreaseDisplay from "../Statistics/NumberDisplay/NumberIncreaseDisplay";
 import NumberDecreaseDisplay from "../Statistics/NumberDisplay/NumberDecreaseDisplay";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {faCheck, faTimes} from "@fortawesome/free-solid-svg-icons";
+
 import {formatDate, getDisplayContentFromObj, isEmpty} from "../../../lib/utils";
 import {API_BASE} from "../../../constants";
+import {faCheck} from "@fortawesome/free-solid-svg-icons/faCheck";
+import {faTimes} from "@fortawesome/free-solid-svg-icons/faTimes";
 
 const TableRowItem = React.memo((props) => {
 

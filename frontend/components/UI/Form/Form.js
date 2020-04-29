@@ -2,14 +2,12 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form'
 import CSRFTokenInput from "./CSRFTokenInput";
 import PropTypes from 'prop-types';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import Toggle from "./Toggle";
-import * as yup from "yup";
+import {object as yupObj} from "yup";
 import {isEmpty} from "../../../lib/utils";
 import {API_BASE, DEFAULT_PERSON_PHOTO} from "../../../constants";
 import PackmanSpinner from "../Spinner/PackmanSpinner";
 import Alert from "../Notifications/Alert";
-import {faCamera} from "@fortawesome/free-solid-svg-icons/faCamera";
 import dynamic from "next/dynamic";
 const DynamicTextInput = dynamic(
     () => import('./FormTextInput'),
@@ -17,6 +15,10 @@ const DynamicTextInput = dynamic(
 );
 const DynamicSelect = dynamic(
     () => import('./FormSelect'),
+    { ssr: false }
+);
+const DynamicImageSelect = dynamic(
+    () => import('./FormImageSelect'),
     { ssr: false }
 );
 
@@ -40,17 +42,15 @@ const Form = (props) => {
     }, [props.formData, props.object]);
 
     let [formDataState, setFormDataState] = useState(initialFormDataState);
-    let [showChangeImageCover, setShowChangeImageCover] = useState(false);
     let [loading, setLoading] = useState(props.loading ? props.loading : false);
     let [formError, setFormError] = useState(props.formError);
-    let imageElementRef = useRef();
 
     const formConfig = {
         reValidateMode: 'onChange',
         submitFocusError: true,
-        validationSchema: yup.object().shape(props.formData.validationSchema),
+        validationSchema: yupObj().shape(props.formData.validationSchema),
     };
-    const { register, handleSubmit, reset, errors, triggerValidation } = useForm(formConfig);
+    const { register, handleSubmit, reset, errors } = useForm(formConfig);
 
     useEffect(() => {
         setFormDataState(initialFormDataState);
@@ -80,16 +80,6 @@ const Form = (props) => {
         let updatedElement = {};
         updatedElement[accessor] = value;
         setFormDataState({...formDataState, ...updatedElement});
-    };
-
-    let triggerAllValidation = async () => {
-        for (let i = 0; i < props.formData.elements.length; i++) {
-            let element = props.formData.elements[i];
-            if(!element.editable){
-                continue;
-            }
-            await triggerValidation(element.accessor);
-        }
     };
 
     const onSubmit = async data => {
@@ -209,51 +199,20 @@ const Form = (props) => {
         let displayId = `${props.form_id_prefix}_form_${id}`;
 
         return (
-            <div key={id} className={`rounded-lg p-6 w-${length}`}>
-                <div
-                    className="relative rounded-full h-20 w-20 md:w-24 md:h-24 rounded-full mx-auto bg-gray-400 overflow-hidden"
-                    onMouseEnter={() => setShowChangeImageCover(true)}
-                    onMouseLeave={() => setShowChangeImageCover(false)}
-                >
-                    <img
-                        ref={imageElementRef}
-                        className="bottom-0 h-20 w-20 md:w-24 md:h-24 rounded-full mx-auto"
-                        src={source} alt={label}
-                    />
-
-                    <div
-                        id="change-image-cover"
-                        className={`${showChangeImageCover? "": "hidden"} absolute w-full bottom-0 bg-black text-white opacity-75 text-center pt-2`}>
-                        <label htmlFor={displayId}>
-                        <p className="text-xs">change image</p>
-                        <FontAwesomeIcon icon={faCamera} className="text-white"/>
-
-                        <input
-                            id={displayId}
-                            name={id}
-                            type="file"
-                            onChange={(e) => imageChangedHandler(id, e)}
-                            className={`invisible h-full`}
-                            ref={register}
-                            multiple={multiple}
-                            accept={accept}
-                        />
-                        </label>
-                    </div>
-                </div>
-                {error? <p className="text-red-500 text-xs italic">{error.message}</p> : ""}
-            </div>
+            <DynamicImageSelect
+                key={displayId}
+                id={id}
+                displayId={displayId}
+                label={label}
+                multiple={multiple}
+                accept={accept}
+                length={length}
+                error={error}
+                imgSource={source}
+                reference={register}
+                updateFormDataState={updateFormDataState}
+            />
         );
-    };
-
-    let imageChangedHandler = (accessor, e) => {
-        const files = Array.from(e.target.files);
-        if(isEmpty(files[0])){
-            return;
-        }
-        let tempImageURL = URL.createObjectURL(files[0]);
-        imageElementRef.current.src = tempImageURL;
-        updateFormDataState(accessor, files[0]);
     };
 
     return (

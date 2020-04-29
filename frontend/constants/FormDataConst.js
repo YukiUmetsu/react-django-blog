@@ -113,14 +113,7 @@ export const FORM_DATA = {
         },
     },
     EDIT_USER_FORM: {
-        elements: [...ADMIN_USER_TABLE_COLUMNS, {
-            label: 'id',
-            accessor: 'id',
-            type: 'hidden',
-            editable: true,
-            showOnDelete: false,
-            formLength: 'full',
-        }],
+        elements: ADMIN_USER_TABLE_COLUMNS,
         validationSchema: {
             id: mixed().required(),
             profile_img: mixed()

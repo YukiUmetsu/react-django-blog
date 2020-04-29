@@ -14,10 +14,14 @@ const FormTextInput = React.memo((props) => {
                 key={props.id}
                 type={props.type}
                 value={props.inputValue}
-                ref={props.ref}
+                ref={props.reference}
                 placeholder={props.label}
             />
         );
+    };
+
+    let onInputChangeHandler = (e) => {
+        props.updateFormDataState(props.id, e.target.value);
     };
 
     let renderInput = () => {
@@ -34,7 +38,7 @@ const FormTextInput = React.memo((props) => {
                     value={props.inputValue}
                     ref={props.reference}
                     placeholder={props.label}
-                    onChange={(e)=> props.updateFormDataState(props.id, e.target.value)}
+                    onChange={(e)=> onInputChangeHandler(e)}
                 />
                 {props.error? <p className="text-red-500 text-xs italic">{props.error.message}</p> : ""}
                 <div className="mt-2 mb-4">

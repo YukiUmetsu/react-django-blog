@@ -1,5 +1,14 @@
 export const ADMIN_USER_TABLE_COLUMNS = [
     {
+        label: 'id',
+        accessor: 'id',
+        type: 'hidden',
+        editable: true,
+        showOnDelete: false,
+        formLength: 'full',
+        hideOnDisplay: true,
+    },
+    {
         label: 'Icon',
         accessor: 'profile_img',
         type: 'image',

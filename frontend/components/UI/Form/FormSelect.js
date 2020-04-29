@@ -2,15 +2,25 @@ import React from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import PropTypes from 'prop-types';
 import {faAngleDown} from "@fortawesome/free-solid-svg-icons/faAngleDown";
+import {isEmpty} from "../../../lib/utils";
 
 const FormSelect = React.memo((props) => {
 
     const selectClassName = "block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500";
 
     const renderOptions = (options) => {
-        return options.map((option, index) => {
-            return (<option key={index}>{option}</option>);
-        });
+        if(isEmpty(options)){
+            return null;
+        }
+        if(options[0].hasOwnProperty('value') && options[0].hasOwnProperty('displayOption')){
+            return options.map(option => {
+                return (<option key={option.value} value={option.value}>{option.displayOption}</option>);
+            });
+        } else {
+            return options.map((option, index) => {
+                return (<option key={index}>{option}</option>);
+            });
+        }
     };
 
     return (

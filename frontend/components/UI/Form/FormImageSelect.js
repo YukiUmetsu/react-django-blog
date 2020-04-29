@@ -20,8 +20,15 @@ const FormImageSelect = React.memo((props) => {
         }
     };
 
+    let renderLabel = () => {
+        if(props.displayImgLabel && props.label){
+            return <label className={`block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2`}>{props.label}</label>
+        }
+    };
+
     return (
         <div key={props.id} className={`rounded-lg p-6 w-${props.length}`}>
+            {renderLabel()}
             <div
                 className={props.outerDivClassName}
                 onMouseEnter={() => setShowChangeImageCover(true)}
@@ -37,9 +44,8 @@ const FormImageSelect = React.memo((props) => {
                     id="change-image-cover"
                     className={`${showChangeImageCover? "": "hidden"} ${props.hoverOverlayClassName}`}>
                     <label htmlFor={props.displayId}>
-                        <p className="text-xs">change image</p>
-                        <FontAwesomeIcon icon={faCamera} className="text-white"/>
-
+                        <p className={props.overlayPTextClassName}>change image</p>
+                        <p className={props.overlayPCameraIconClassName}><FontAwesomeIcon icon={faCamera} className="text-white" size={props.cameraIconSize}/></p>
                         <input
                             id={props.displayId}
                             name={props.id}
@@ -62,6 +68,10 @@ FormImageSelect.defaultProps = {
     outerDivClassName: 'relative rounded-full h-20 w-20 md:w-24 md:h-24 rounded-full mx-auto bg-gray-400 overflow-hidden',
     imgClassName: 'bottom-0 h-20 w-20 md:w-24 md:h-24 rounded-full mx-auto',
     hoverOverlayClassName: 'absolute w-full bottom-0 bg-black text-white opacity-75 text-center pt-2',
+    displayImgLabel: false,
+    cameraIconSize: '1x',
+    overlayPTextClassName: 'text-xs',
+    overlayPCameraIconClassName: '',
 };
 
 FormImageSelect.propTypes = {
@@ -78,6 +88,8 @@ FormImageSelect.propTypes = {
     outerDivClassName: PropTypes.string,
     imgClassName: PropTypes.string,
     hoverOverlayClassName: PropTypes.string,
+    displayImgLabel: PropTypes.bool,
+    cameraIconSize: PropTypes.string,
 };
 
 export default FormImageSelect

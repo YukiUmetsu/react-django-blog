@@ -132,6 +132,8 @@ export const POSTS_FORM_DATA = {
     elements: ADMIN_POST_TABLE_COLUMNS,
     validationSchema: {
         id: mixed().required(),
+        title: string().required(),
+        content: string().required(),
         main_img: mixed()
             .test('profile img file type', 'invalid file type',value => checkIfFilesAreCorrectType(value))
             .test('profile img file size',`file is too large (max is ${ICON_FILE_SIZE} MB)`, value => checkIfFilesAreTooBig(value)),

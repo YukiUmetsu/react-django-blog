@@ -10,7 +10,6 @@ import {FORM_DATA} from "../../../constants/FormDataConst";
 import {UserDataCenterContext} from "./UserDataCenter";
 import Alert from "../../UI/Notifications/Alert";
 import AddNewUser from "./AddNewUser";
-import AdminPanelLayout from "../../UI/Admin/AdminPanelLayout";
 
 const AdminPanelUsersTable = (props) => {
 

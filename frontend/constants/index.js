@@ -167,6 +167,7 @@ export const IS_SUPERUSER_SESSION_NAME = "stfspad";
 export const ANGO_SESSION_NAME = 'angoukagi';
 export const USER_ID_SESSION_NAME = 'daredesuka';
 export const DEFAULT_PERSON_PHOTO = `${IMG_HOST}media/uploads/2020/04/05/default-person.png`;
+export const DEFAULT_POST_MAIN_PHOTO = `${IMG_HOST}media/uploads/2020/04/05/fuji.jpg`;
 
 export * from './SWR';
 export * from './DummyData';

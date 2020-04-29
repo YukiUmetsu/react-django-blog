@@ -18,6 +18,7 @@ import {
     replaceDataItem,
 } from "../../../lib/utils";
 import * as moment from "moment";
+import PropTypes from 'prop-types';
 
 export const PostsDataCenterContext = createContext({});
 
@@ -29,17 +30,18 @@ const PostsDataCenter = (props) => {
     const objNameCp = 'Post';
     const imgFieldDisplayName = 'post main image';
     const imgFileNamePrefixField = 'title';
-    const listApi = POSTS_LIST_API;
+    const listApi = props.firstApiFetchURL ? props.firstApiFetchURL : POST_STATES_LIST_API;
 
     // loading objects
     let [nextDataFetchUrl, setNextDataFetchUrl] = useState(listApi);
-    let [data, setData] = useState([]);
+    let initialData = (props.mainDataRequired) ? [] : ['data not required'];
+    let [data, setData] = useState(initialData);
     let [categories, setCategories] = useState([]);
     let [users, setUsers] = useState([]);
     let [postStates, setPostStates] = useState([]);
 
-    let [dataLoadingDone, setDataLoadingDone] = useState(false);
-    let [usersLoadingDone, setUsersLoadingDone] = useState(false);
+    let [dataLoadingDone, setDataLoadingDone] = useState(!props.mainDataRequired);
+    let [usersLoadingDone, setUsersLoadingDone] = useState(!props.userDataRequired);
     let [categoriesLoadingDone, setCategoriesLoadingDone] = useState(false);
     let [postStatesLoadingDone, setPostStatesLoadingDone] = useState(false);
 
@@ -498,6 +500,18 @@ const PostsDataCenter = (props) => {
             {props.children}
         </PostsDataCenterContext.Provider>
     );
+};
+
+PostsDataCenter.defaultProps = {
+    mainDataRequired: true,
+    userDataRequired: true,
+    firstApiFetchURL: POSTS_LIST_API,
+};
+
+PostsDataCenter.propTypes = {
+    postDataRequired: PropTypes.bool,
+    userDataRequired: PropTypes.bool,
+    firstApiFetchURL: PropTypes.string,
 };
 
 export default PostsDataCenter

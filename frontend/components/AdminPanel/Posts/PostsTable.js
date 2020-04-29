@@ -9,7 +9,10 @@ import {isEmpty} from "../../../lib/utils";
 import {POSTS_FORM_DATA} from "../../../constants/FormDataConst";
 import Alert from "../../UI/Notifications/Alert";
 import {PostsDataCenterContext} from "./PostsDataCenter";
-import AddNewPost from "./AddNewPost";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faPenNib} from "@fortawesome/free-solid-svg-icons/faPenNib";
+import Link from "next/link";
+import {ADMIN_NEW_POST_URL} from "../../../constants/URLs";
 
 const AdminPanelPostsTable = (props) => {
 
@@ -63,12 +66,11 @@ const AdminPanelPostsTable = (props) => {
 
             <div className="px-6 py-2 mb-3 float-none">
                 <div className="float-left font-bold text-xl">{pageTitle}</div>
-                <AddNewPost
-                    additionalBtnClassNames="float-right"
-                    dataCenterContext={dataCenterContext}
-                    btnTitle="Add New User"
-                    formData={newObjectFormData}
-                />
+                <Link href={ADMIN_NEW_POST_URL}>
+                    <button className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded float-right`}>
+                        <FontAwesomeIcon icon={faPenNib} className="pr-1"/>  Write a post
+                    </button>
+                </Link>
             </div>
             <div className="float-none w-full py-5"> </div>
 

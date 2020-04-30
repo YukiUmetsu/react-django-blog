@@ -169,8 +169,6 @@ export const USER_ID_SESSION_NAME = 'daredesuka';
 export const DEFAULT_PERSON_PHOTO = `${IMG_HOST}media/uploads/2020/04/05/default-person.png`;
 export const DEFAULT_POST_MAIN_PHOTO = `${IMG_HOST}media/uploads/2020/04/05/fuji.jpg`;
 export const SANITIZE_HTML_OPTIONS = {
-    // allowedTags: false,
-    // allowedAttributes: false,
     allowedTags: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul', 'ol',
         'nl', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'hr', 'br', 'div',
         'table', 'thead', 'caption', 'tbody', 'tr', 'th', 'td', 'pre', 'span', 'u', 'img', 'del', 'sup', 'sub', 'table', 'tbody','tr', 'td'],

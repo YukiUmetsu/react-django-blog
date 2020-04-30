@@ -42,7 +42,7 @@ const Modal = (props) => {
                     onClick={() => closeModalHandler()}> </div>
                 <div
                     id="modal-content-box"
-                    className={`relative bg-white w-11/12 md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto rounded shadow-lg overflow-y-auto ${props.contentBoxClassNames}`}>
+                    className={`relative bg-white w-11/12 max-h-9/10 md:max-w-lg lg:max-w-xl xl:max-w-4/5 mx-auto rounded shadow-lg overflow-scroll ${props.contentBoxClassNames}`}>
                     {props.children}
 
                     <span className="absolute top-0 right-0 p-4 z-900" onClick={() => closeModalHandler()}>

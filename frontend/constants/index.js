@@ -168,6 +168,43 @@ export const ANGO_SESSION_NAME = 'angoukagi';
 export const USER_ID_SESSION_NAME = 'daredesuka';
 export const DEFAULT_PERSON_PHOTO = `${IMG_HOST}media/uploads/2020/04/05/default-person.png`;
 export const DEFAULT_POST_MAIN_PHOTO = `${IMG_HOST}media/uploads/2020/04/05/fuji.jpg`;
+export const SANITIZE_HTML_OPTIONS = {
+    // allowedTags: false,
+    // allowedAttributes: false,
+    allowedTags: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul', 'ol',
+        'nl', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'hr', 'br', 'div',
+        'table', 'thead', 'caption', 'tbody', 'tr', 'th', 'td', 'pre', 'span', 'u', 'img', 'del', 'sup', 'sub', 'table', 'tbody','tr', 'td'],
+    allowedAttributes: {
+        a: [ 'href', 'name', 'target' ],
+        img: [ 'src' ],
+        span: ['style', 'class'],
+        p: ['style', 'class'],
+        hr: ['class']
+    },
+    allowedSchemesByTag: {
+        a: ['https', 'http'],
+        img: [ 'data' ]
+    },
+    nonTextTags: ['script', 'textarea', 'noscript' ],
+    transformTags: {
+        'table': function(tagName, attribs) {
+            return {
+                tagName: tagName,
+                attribs: {
+                    class: 'table-auto'
+                }
+            };
+        },
+        'td': function (tagName, attribs) {
+            return {
+                tagName: tagName,
+                attribs: {
+                    class: 'border px-4 py-2',
+                }
+            }
+        },
+    }
+};
 
 export * from './SWR';
 export * from './DummyData';

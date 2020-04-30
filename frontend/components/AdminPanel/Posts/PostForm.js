@@ -8,9 +8,12 @@ import {isEmpty} from "../../../lib/utils";
 import PackmanSpinner from "../../UI/Spinner/PackmanSpinner";
 import Alert from "../../UI/Notifications/Alert";
 import Toggle from "../../UI/Form/Toggle";
-import {API_BASE, DEFAULT_PERSON_PHOTO, DEFAULT_POST_MAIN_PHOTO} from "../../../constants";
+import {API_BASE, DEFAULT_POST_MAIN_PHOTO, SANITIZE_HTML_OPTIONS} from "../../../constants";
 import dynamic from "next/dynamic";
-import BlogEditor from "../../UI/BlogEditer/BlogEditor";
+import parse, { domToReact } from 'html-react-parser';
+import sanitizeHtml from 'sanitize-html';
+import Aux from "../../../hoc/Aux/Aux";
+import Modal from "../../UI/Modal/Modal";
 
 const DynamicTextInput = dynamic(
     () => import('../../UI/Form/FormTextInput'),
@@ -24,6 +27,61 @@ const DynamicImageSelect = dynamic(
     () => import('../../UI/Form/FormImageSelect'),
     { ssr: false }
 );
+const BlogEditor = dynamic(
+    () => import('../../UI/BlogEditer/BlogEditor'),
+    { ssr: false }
+);
+
+const HTML_PARSE_OPTIONS = {
+    replace: ({attribs, name, children}) => {
+        if(name === 'table'){
+            return <table className="table-auto">{domToReact(children, HTML_PARSE_OPTIONS)}</table>
+        }
+        if(name === 'td'){
+            return <td className="border px-6 py-4">{domToReact(children, HTML_PARSE_OPTIONS)}</td>
+        }
+        if(name === 'ol'){
+            return <ol className="list-decimal">{domToReact(children, HTML_PARSE_OPTIONS)}</ol>
+        }
+        if(name === 'ul'){
+            return <ul className="list-disc">{domToReact(children, HTML_PARSE_OPTIONS)}</ul>
+        }
+        if(name === 'blockquote'){
+            return <blockquote className="flex flex-wrap flex-col bg-white text-indigo-700 border-l-8 italic border-gray-400 px-4 py-3">
+                {domToReact(children, HTML_PARSE_OPTIONS)}
+            </blockquote>
+        }
+        if(name === 'hr' && attribs.hasOwnProperty('class')){
+            if(attribs.class === '__se__solid'){
+                return <hr className="border-1 border-gray-600 border-solid"/>
+            }
+            if(attribs.class === '__se__dashed'){
+                return <hr className="border-1 border-gray-600 border-dashed"/>
+            }
+            if(attribs.class === '__se__dotted'){
+                return <hr className="border-1 border-gray-600 border-dotted"/>
+            }
+        }
+        if(name==='p' && attribs.hasOwnProperty('class') && attribs.class==='__se__p-bordered'){
+            return <p className="py-4 px-8 bg-white shadow-lg rounded-lg my-20 mt-2 text-gray-600">{domToReact(children, HTML_PARSE_OPTIONS)}</p>
+        }
+        if(name === 'h1'){
+           return <h1 className="font-black text-4xl">{domToReact(children, HTML_PARSE_OPTIONS)}</h1>
+        }
+        if(name === 'h2'){
+            return <h2 className="font-extrabold text-3xl">{domToReact(children, HTML_PARSE_OPTIONS)}</h2>
+        }
+        if(name === 'h3'){
+            return <h3 className="font-bold text-2xl">{domToReact(children, HTML_PARSE_OPTIONS)}</h3>
+        }
+        if(name === 'h4'){
+            return <h4 className="font-semibold text-xl">{domToReact(children, HTML_PARSE_OPTIONS)}</h4>
+        }
+        if(name === 'h5'){
+            return <h5 className="font-medium text-lg">{domToReact(children, HTML_PARSE_OPTIONS)}</h5>
+        }
+    }
+};
 
 const PostForm = React.memo((props) => {
 
@@ -51,6 +109,7 @@ const PostForm = React.memo((props) => {
     let [loading, setLoading] = useState(props.loading ? props.loading : false);
     let [formError, setFormError] = useState(props.formError);
     let [contentHtml, setContentHtml] = useState('');
+    let [previewModalOpen, setPreviewModalOpen] = useState(false);
 
     const excludedField = ['content'];
 
@@ -260,24 +319,43 @@ const PostForm = React.memo((props) => {
     };
 
     let editorOnChangeHandler = (content) => {
-        setContentHtml(content);
+        setContentHtml(sanitizeHtml(content, SANITIZE_HTML_OPTIONS));
+    };
+
+    let renderPostContentReview = () => {
+        if(typeof window !== 'undefined'){
+            return parse(contentHtml, HTML_PARSE_OPTIONS);
+        }
     };
 
     return (
-        <form className="w-full px-20 my-5" onSubmit={handleSubmit(onSubmit)}>
-            <div className="flex flex-wrap -mx-3 mb-6 text-center self-center">
-                {renderFormElements()}
-                <div className="w-full -mb-5 pb-0">
-                    {errors['content'] ? <p className="text-red-500 text-md italic text-center">*{errors['content']['message']}</p> : ""}
+        <Aux>
+            <form className="w-full px-20 my-5" onSubmit={handleSubmit(onSubmit)} suppressContentEditableWarning={true}>
+                <div className="flex flex-wrap -mx-3 mb-6 text-center self-center">
+                    {renderFormElements()}
+                    <div className="w-full -mb-5 pb-0">
+                        {errors['content'] ? <p className="text-red-500 text-md italic text-center">*{errors['content']['message']}</p> : ""}
+                    </div>
+                    <BlogEditor name='content' height={500} reference={register} onChangeCallback={(content) => editorOnChangeHandler(content)}/>
+                    <textarea readOnly name='content' ref={register} className={`hidden`} value={contentHtml}/>
                 </div>
-                <BlogEditor name='content' height={500} reference={register} onChangeCallback={(content) => editorOnChangeHandler(content)}/>
-                <textarea readOnly name='content' ref={register} className={`hidden`} value={contentHtml}/>
-            </div>
-            <CSRFTokenInput/>
-            <button type="submit" className="w-full text-center py-3 rounded bg-green-600 text-white hover:bg-green-900 focus:outline-none my-1">
-                Submit
-            </button>
-        </form>
+                <CSRFTokenInput/>
+                <button type="submit" className="w-1/2 text-center py-3 rounded bg-green-600 text-white hover:bg-green-900 focus:outline-none my-1">
+                    Submit
+                </button>
+                <button
+                    className="w-1/3 mx-5 text-center py-3 rounded bg-blue-500 hover:bg-blue-700 text-white focus:outline-none my-1"
+                    onClick={() => setPreviewModalOpen(true)}
+                >
+                    Preview
+                </button>
+            </form>
+            <Modal onCloseCallback={() => setPreviewModalOpen(false)} modalOpen={previewModalOpen} contentBoxClassNames="overflow-scroll">
+                <div className="mb-10 min-h-10 py-10 px-10" suppressContentEditableWarning={true}>
+                    {renderPostContentReview()}
+                </div>
+            </Modal>
+        </Aux>
     );
 });
 

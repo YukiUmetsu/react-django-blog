@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useContext, useEffect, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form'
 import CSRFTokenInput from "../../UI/Form/CSRFTokenInput";
 import PropTypes from 'prop-types';
@@ -10,10 +10,12 @@ import Alert from "../../UI/Notifications/Alert";
 import Toggle from "../../UI/Form/Toggle";
 import {API_BASE, DEFAULT_POST_MAIN_PHOTO, SANITIZE_HTML_OPTIONS} from "../../../constants";
 import dynamic from "next/dynamic";
-import parse, { domToReact } from 'html-react-parser';
+import parse, {domToReact} from 'html-react-parser';
 import sanitizeHtml from 'sanitize-html';
 import Aux from "../../../hoc/Aux/Aux";
 import Modal from "../../UI/Modal/Modal";
+import useInterval from "../../../lib/useInterval";
+import moment from "moment";
 
 const DynamicTextInput = dynamic(
     () => import('../../UI/Form/FormTextInput'),
@@ -110,6 +112,10 @@ const PostForm = React.memo((props) => {
     let [formError, setFormError] = useState(props.formError);
     let [contentHtml, setContentHtml] = useState('');
     let [previewModalOpen, setPreviewModalOpen] = useState(false);
+    let [isSaved, setIsSaved] = useState(false);
+    let [lastSavedAt, setLastSavedAt] = useState(null);
+
+    useInterval(() => savePost(), 1000*20);
 
     const excludedField = ['content'];
 
@@ -118,7 +124,7 @@ const PostForm = React.memo((props) => {
         submitFocusError: true,
         validationSchema: yupObj().shape(props.formData.validationSchema),
     };
-    const { register, handleSubmit, reset, errors } = useForm(formConfig);
+    const { register, handleSubmit, triggerValidation, reset, errors } = useForm(formConfig);
 
     useEffect(() => {
         setFormDataState(initialFormDataState);
@@ -143,6 +149,22 @@ const PostForm = React.memo((props) => {
             setLoading(false);
         }
     }, [props.dataManipulationComplete]);
+
+
+    let savePost = async () => {
+        let result = await triggerAllValidation();
+        if(!result || isSaved || !isEmpty(errors)){
+            return;
+        }
+        // TODO send data to the server!
+        await setSavedStates();
+    };
+
+    let setSavedStates = () => {
+        setLoading(false);
+        setIsSaved(true);
+        setLastSavedAt(moment().format('YYYY/MM/DD HH:mm'));
+    };
 
     let updateFormDataState = (accessor, value) => {
         let updatedElement = {};
@@ -185,7 +207,10 @@ const PostForm = React.memo((props) => {
                 }
             }
         }
-        await props.onSubmitCallback(data);
+        let result = await props.onSubmitCallback(data);
+        if(result){
+            setSavedStates();
+        }
     };
 
     const renderFormElements = () => {
@@ -318,14 +343,38 @@ const PostForm = React.memo((props) => {
         );
     };
 
+    let triggerAllValidation = async () => {
+        let formKeys = props.formData.elements.map(element => element.accessor);
+        let result = formKeys.map(async key => {
+            return await triggerValidation(key);
+        });
+        let allResult = await Promise.all(result);
+        let filteredResult = allResult.filter(x => x === false);
+        return filteredResult.length === 0;
+    };
+
     let editorOnChangeHandler = (content) => {
         setContentHtml(sanitizeHtml(content, SANITIZE_HTML_OPTIONS));
+        setIsSaved(false);
     };
 
     let renderPostContentReview = () => {
         if(typeof window !== 'undefined'){
             return parse(contentHtml, HTML_PARSE_OPTIONS);
         }
+    };
+
+    let renderSaveStatus = () => {
+        if(!isEmpty(errors)){
+            let errorKeys = Object.keys(errors);
+            return errorKeys.map((errKey) => {
+                return <p className="text-red-500 text-sm italic text-right">{errors[errKey].message}</p>
+            });
+        }
+        if(isSaved){
+            return <p className="text-gray-600 text-sm italic text-right">Saved at {lastSavedAt}</p>;
+        }
+        return <p className="text-gray-600 text-sm italic text-right">Not saved</p>;
     };
 
     return (
@@ -337,11 +386,14 @@ const PostForm = React.memo((props) => {
                         {errors['content'] ? <p className="text-red-500 text-md italic text-center">*{errors['content']['message']}</p> : ""}
                     </div>
                     <BlogEditor name='content' height={500} reference={register} onChangeCallback={(content) => editorOnChangeHandler(content)}/>
+                    <div className="mt-0 pt-0 mx-10 w-full align-right">
+                        {renderSaveStatus()}
+                    </div>
                     <textarea readOnly name='content' ref={register} className={`hidden`} value={contentHtml}/>
                 </div>
                 <CSRFTokenInput/>
-                <button type="submit" className="w-1/2 text-center py-3 rounded bg-green-600 text-white hover:bg-green-900 focus:outline-none my-1">
-                    Submit
+                <button type="submit" className="w-1/3 text-center py-3 rounded bg-green-600 text-white hover:bg-green-900 focus:outline-none my-1">
+                    Save
                 </button>
                 <button
                     className="w-1/3 mx-5 text-center py-3 rounded bg-blue-500 hover:bg-blue-700 text-white focus:outline-none my-1"

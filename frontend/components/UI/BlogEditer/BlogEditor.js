@@ -42,7 +42,7 @@ const BlogEditor = (props) => {
             <Head>
                 <link href="/css/suneditor.min.css" rel="stylesheet" />
             </Head>
-            <div className="mx-10 my-10 w-full">
+            <div className="mx-10 mt-10 mb-2 w-full">
                 <SunEditor
                     setOptions={editorOptions()}
                     showToolbar={true}

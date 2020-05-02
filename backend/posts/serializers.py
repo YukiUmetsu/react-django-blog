@@ -89,14 +89,23 @@ class TagsField(ModifiedRelatedField):
         return TagsSerializer(value).data
 
     def to_internal_value(self, value):
-        try:
+        if isinstance(value, dict) and len(value) > 0:
+            if not value.get('user', False):
+                raise serializers.ValidationError(
+                    'Invalid tag data.'
+                )
             try:
-                if isinstance(value, list):
-                    tag_list = []
-                    for element in value:
-                        tag_list.append(Tags.objects.get(id=element))
-                    return tag_list
-                return Tags.objects.get(id=value)
+                user = get_user_model().objects.get(id=value.get('user', ''))
+                value['user'] = user.id
+                serializer = TagsSerializer(data=value)
+                if serializer.is_valid(raise_exception=True):
+                    new_tag = serializer.save()
+                    print(new_tag)
+                    return new_tag
+                else:
+                    raise serializers.ValidationError(
+                        'Invalid tag data.'
+                    )
 
             except KeyError:
                 raise serializers.ValidationError(
@@ -106,11 +115,26 @@ class TagsField(ModifiedRelatedField):
                 raise serializers.ValidationError(
                     'id must be an integer.'
                 )
+            except ObjectDoesNotExist:
+                raise serializers.ValidationError(
+                    'User in tag does not exist.'
+                )
 
-        except ObjectDoesNotExist:
-            raise serializers.ValidationError(
-                'Obj does not exist.'
-            )
+        if isinstance(value, (str, int)):
+            try:
+                return Tags.objects.get(id=value)
+            except KeyError:
+                raise serializers.ValidationError(
+                    'id is a required field.'
+                )
+            except ValueError:
+                raise serializers.ValidationError(
+                    'id must be an integer.'
+                )
+            except ObjectDoesNotExist:
+                raise serializers.ValidationError(
+                    'Obj does not exist.'
+                )
 
 
 class PostStatesField(ModifiedRelatedField):
@@ -142,9 +166,15 @@ class UserField(ModifiedRelatedField):
         return UserSerializer(value).data
 
     def to_internal_value(self, value):
+        is_valid_type = isinstance(value, str) or isinstance(value, int)
+        if not is_valid_type:
+            raise serializers.ValidationError(
+                'id invalid type.'
+            )
+
         try:
             try:
-                return get_user_model().objects.get(id=value)
+                return get_user_model().objects.get(id=int(value))
             except KeyError:
                 raise serializers.ValidationError(
                     'id is a required field.'

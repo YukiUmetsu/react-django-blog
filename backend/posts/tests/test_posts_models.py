@@ -50,11 +50,13 @@ class TestPrivatePostsAPI:
     def test_staff_user_can_create_posts(self, users, post_payload):
         self.client.force_authenticate(users['staff'][0])
         response = self.client.post("/api/posts/", post_payload)
+        print(response.data)
         assert response.status_code == status.HTTP_201_CREATED
 
     def test_superuser_can_create_posts(self, users, post_payload):
         self.client.force_authenticate(users['superuser'][0])
         response = self.client.post("/api/posts/", post_payload)
+        print(response.data)
         assert response.status_code == status.HTTP_201_CREATED
 
     def test_normal_user_cannot_delete_posts(self, users, post_obj):

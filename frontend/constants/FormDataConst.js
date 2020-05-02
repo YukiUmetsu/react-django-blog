@@ -134,12 +134,12 @@ export const POSTS_FORM_DATA = {
         id: mixed().required(),
         title: string().required(),
         content: string().required(),
-        main_img: mixed()
+        main_img: mixed().required()
             .test('profile img file type', 'invalid file type',value => checkIfFilesAreCorrectType(value))
             .test('profile img file size',`file is too large (max is ${ICON_FILE_SIZE} MB)`, value => checkIfFilesAreTooBig(value)),
         category: string().required(),
         tags: string(),
-        post_state: number(),
+        post_state: mixed().required(),
         meta_desc: string(),
         youtube_url: string(),
         user: number(),

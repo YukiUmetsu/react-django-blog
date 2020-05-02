@@ -30,10 +30,9 @@ const PostsDataCenter = (props) => {
     const objNameCp = 'Post';
     const imgFieldDisplayName = 'post main image';
     const imgFileNamePrefixField = 'title';
-    const listApi = props.firstApiFetchURL ? props.firstApiFetchURL : POST_STATES_LIST_API;
 
     // loading objects
-    let [nextDataFetchUrl, setNextDataFetchUrl] = useState(listApi);
+    let [nextDataFetchUrl, setNextDataFetchUrl] = useState(props.firstApiFetchURL);
     let initialData = (props.mainDataRequired) ? [] : ['data not required'];
     let [data, setData] = useState(initialData);
     let [categories, setCategories] = useState([]);
@@ -146,11 +145,50 @@ const PostsDataCenter = (props) => {
 
 
     /**
-     * Creating a new object
+     * Creating a new object. Create imgField first.
      */
+    const { data: fileObj } = useSWR((!isEmpty(imgFieldObj)) ? [FILES_LIST_API, imgFieldObj.desc] : null,
+        () => SWR_POST_FILE_FETCH(
+            FILES_LIST_API,
+            "image",
+            `${imgFieldObj.desc}-${moment().format('YYYY-MM-DD-HH-mm')}`,
+            imgFieldObj.user,
+            imgFieldObj.file),
+        {
+            errorRetryCount: 1,
+            onSuccess: async (fileObj) => {
+                if(!fileObj.hasOwnProperty('id')){
+                    let message = `Unable to create a ${objNameSm} main image.`;
+                    if(fileObj.hasOwnProperty('detail')){
+                        message = fileObj.detail;
+                    }
+                    createAlertProps("Server error. ", message);
+                    setDataManipulationComplete(true);
+                    clearNewFormStates(true);
+                    return;
+                }
+
+                if(!isEmpty(newObjFormData)){
+                    let cloneNewObjFormData = dClone(newObjFormData);
+                    cloneNewObjFormData[imgFieldName] = fileObj.id;
+                    await setNewObjFormData(cloneNewObjFormData);
+                }
+                await setImgFieldObjCreated(true);
+            },
+            onError: (error) => {
+                console.log(error);
+                createAlertProps("Server connection error", error.message);
+                clearNewFormStates(true);
+            }
+        }
+    );
+
     const { data: createdObject } = useSWR(
-        newObjFormData ? [listApi, newObjFormData]: null,
-        SWR_POST_FETCH,
+        (newObjFormData && typeof newObjFormData[imgFieldName] !== 'object' && imgFieldObjCreated && fileObj)? [props.listApiUrl, newObjFormData['title']]: null,
+        () => SWR_POST_FETCH(
+            props.listApiUrl,
+            {...newObjFormData, tags: Object.values(newObjFormData.tags)}
+        ),
         {
             errorRetryCount: 1,
             onSuccess: async (createdObject) => {
@@ -171,60 +209,6 @@ const PostsDataCenter = (props) => {
             }
         });
 
-    const { data: fileObj } = useSWR((!isEmpty(createdObject) && !isEmpty(imgFieldObj)) ? [FILES_LIST_API, createdObject.id] : null,
-        () => SWR_POST_FILE_FETCH(
-            FILES_LIST_API,
-            "image",
-            `${createdObject[imgFileNamePrefixField]}-${moment().format('YYYY-MM-DD-HH-mm')}`,
-            createdObject.id,
-            imgFieldObj),
-        {
-            errorRetryCount: 1,
-            onSuccess: (fileObj) => {
-                if(!fileObj.hasOwnProperty('id')){
-                    let message = `Unable to create a ${objNameSm} main image.`;
-                    if(fileObj.hasOwnProperty('detail')){
-                        message = fileObj.detail;
-                    }
-                    createAlertProps("Server error. ", message);
-                    setDataManipulationComplete(true);
-                    clearNewFormStates(true);
-                } else {
-                    setImgFieldObjCreated(true);
-                }
-            },
-            onError: (error) => {
-                console.log(error);
-                createAlertProps("Server connection error", error.message);
-                clearNewFormStates(true);
-            }
-        }
-    );
-
-    useSWR(
-        (!isEmpty(createdObject) && !isEmpty(fileObj) && imgFieldObjCreated) ?
-            [listApi+createdObject.id+'/', fileObj.id]
-            : null,
-        () => SWR_PATCH_FETCH(listApi+createdObject.id+'/', {[imgFieldName]: fileObj.id}),
-        {
-            errorRetryCount: 1,
-            onSuccess: (editedObject) => {
-                if(!editedObject.hasOwnProperty('id')){
-                    createAlertProps("Server connection error. ",`Unable to set the ${imgFieldDisplayName} to the new ${objNameSm}.`);
-                    clearNewFormStates(true);
-                } else {
-                    setData(addDataItem(editedObject, data));
-                    clearNewFormStates();
-                    setDataManipulationComplete(true);
-                    createSuccessfulAlertProps(`${objNameCp} creation`, ` ${objNameCp} was successfully created!`)
-                }
-            },
-            onError: (error) => {
-                createAlertProps("Server connection error", error.message);
-                clearNewFormStates(true);
-            }
-        }
-    );
 
 
 
@@ -264,9 +248,9 @@ const PostsDataCenter = (props) => {
 
     useSWR(
         (!isEmpty(editedFileObj) &&  !isEmpty(editFormData) && imgFieldObjCreated) ?
-            [listApi+editFormData.id+'/', editedFileObj.id]
+            [props.listApiUrl+editFormData.id+'/', editedFileObj.id]
             : null,
-        () => SWR_PATCH_FETCH(listApi+editFormData.id+'/', {...editFormData, ...{[imgFieldName]: editedFileObj.id}}),
+        () => SWR_PATCH_FETCH(props.listApiUrl+editFormData.id+'/', {...editFormData, ...{[imgFieldName]: editedFileObj.id}}),
         {
             errorRetryCount: 1,
             onSuccess: (editedObject) => {
@@ -292,9 +276,9 @@ const PostsDataCenter = (props) => {
      */
     useSWR(
         (!isEmpty(editFormData) && !imgFieldObjCreated && isEmpty(imgFieldObj)) ?
-            [listApi+editFormData.id+'/', editFormData]
+            [props.listApiUrl+editFormData.id+'/', editFormData]
             : null,
-        () => SWR_PATCH_FETCH(listApi+editFormData.id+'/', editFormData),
+        () => SWR_PATCH_FETCH(props.listApiUrl+editFormData.id+'/', editFormData),
         {
             errorRetryCount: 1,
             onSuccess: (editedObject) => {
@@ -323,7 +307,7 @@ const PostsDataCenter = (props) => {
      */
     useSWR(
         (typeof deleteCurrentIndex === 'number' && !isEmpty(dataIdsToBeDeleted)) ?
-            [listApi + dataIdsToBeDeleted[deleteCurrentIndex] + "/", deleteCurrentIndex]
+            [props.listApiUrl + dataIdsToBeDeleted[deleteCurrentIndex] + "/", deleteCurrentIndex]
             : null,
         SWR_DELETE_FETCH,
         {
@@ -506,12 +490,14 @@ PostsDataCenter.defaultProps = {
     mainDataRequired: true,
     userDataRequired: true,
     firstApiFetchURL: POSTS_LIST_API,
+    listApiUrl: POSTS_LIST_API,
 };
 
 PostsDataCenter.propTypes = {
     postDataRequired: PropTypes.bool,
     userDataRequired: PropTypes.bool,
     firstApiFetchURL: PropTypes.string,
+    listApiUrl: PropTypes.string,
 };
 
 export default PostsDataCenter

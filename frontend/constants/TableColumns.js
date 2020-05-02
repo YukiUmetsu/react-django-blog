@@ -86,6 +86,15 @@ export const ADMIN_POST_TABLE_COLUMNS = [
         hideOnDisplay: false,
     },
     {
+        label: 'excerpt',
+        accessor: 'excerpt',
+        type: 'text',
+        editable: true,
+        showOnDelete: true,
+        formLength: 'full',
+        hideOnDisplay: false,
+    },
+    {
         label: 'category',
         accessor: 'category',
         type: 'select',

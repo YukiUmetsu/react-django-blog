@@ -21,7 +21,7 @@ const AdminPanelNewPost = (props) => {
                     <PackmanSpinner/>:
                     <Aux>
                         <h1>Write a Post</h1>
-                        <PostForm form_id_prefix='new_post' formData={POSTS_FORM_DATA} />
+                        <PostForm form_id_prefix='new_post' formData={POSTS_FORM_DATA}/>
                     </Aux>
                 }
 

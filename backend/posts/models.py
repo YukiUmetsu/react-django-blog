@@ -4,10 +4,12 @@ from tags.models import Tags
 from post_states.models import PostStates
 from files.models import Files
 from django.conf import settings
+from lib.utils import sanitize_html
 
 
 class Posts(models.Model):
     title = models.CharField(blank=False, max_length=255)
+    excerpt = models.CharField(blank=False, max_length=255)
     content = models.TextField(blank=False)
     meta_desc = models.TextField(blank=True)
     youtube_url = models.TextField(blank=True)
@@ -28,3 +30,13 @@ class Posts(models.Model):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        print(args)
+        print(kwargs)
+        # sanitize html
+        if kwargs.get('content') is not None and len(kwargs.get('content')) > 0:
+            content = sanitize_html(kwargs['content'])
+            # replace base64 image src to url
+            kwargs['content'] = content
+        super().save(*args, **kwargs)

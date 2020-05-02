@@ -32,6 +32,7 @@ def post_min_payload(category_obj, users, all_states, img_obj):
     yield {
         'title': random_string(25),
         'content': content,
+        'excerpt': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
         'meta_desc': random_string(50),
         'youtube_url': 'https://www.youtube.com/watch?v=PesqzWG0BVs',
         'category': category_obj,
@@ -46,6 +47,7 @@ def post_payload(users, category_obj, all_states, staff_tag_obj0, img_obj):
     content = random_string(25) + get_lorem()
     yield {
         'title': random_string(25),
+        'excerpt': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
         'meta_desc': random_string(50),
         'youtube_url': 'https://www.youtube.com/watch?v=PesqzWG0BVs',
         'category': category_obj.id,

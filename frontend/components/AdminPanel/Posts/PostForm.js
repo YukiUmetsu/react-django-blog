@@ -4,7 +4,7 @@ import CSRFTokenInput from "../../UI/Form/CSRFTokenInput";
 import PropTypes from 'prop-types';
 import {object as yupObj} from "yup";
 import {PostsDataCenterContext} from "./PostsDataCenter";
-import {isEmpty} from "../../../lib/utils";
+import {dClone, isEmpty} from "../../../lib/utils";
 import PackmanSpinner from "../../UI/Spinner/PackmanSpinner";
 import Alert from "../../UI/Notifications/Alert";
 import Toggle from "../../UI/Form/Toggle";
@@ -16,6 +16,7 @@ import Aux from "../../../hoc/Aux/Aux";
 import Modal from "../../UI/Modal/Modal";
 import useInterval from "../../../lib/useInterval";
 import moment from "moment";
+import {AdminAuthContext} from "../../../lib/auth/adminAuth";
 
 const DynamicTextInput = dynamic(
     () => import('../../UI/Form/FormTextInput'),
@@ -87,7 +88,13 @@ const HTML_PARSE_OPTIONS = {
 
 const PostForm = React.memo((props) => {
 
-    let {categories, postStates} = useContext(PostsDataCenterContext);
+    let {categories,
+        postStates,
+        updateNewObjFormData,
+        dataManipulationComplete,
+        updateImgFieldObj
+    } = useContext(PostsDataCenterContext);
+    let {loggedInUser} = useContext(AdminAuthContext);
 
     let initialFormDataState = useMemo(() => {
         let initialState = {};
@@ -98,7 +105,7 @@ const PostForm = React.memo((props) => {
                 defaultEmptyValue = false;
             }
             let givenValue = isEmpty(props.object) ? defaultEmptyValue : props.object[element.accessor];
-            if(givenValue === undefined || givenValue === null){
+            if(givenValue === undefined || givenValue === null || element.editable !== true){
                 continue;
             }
             initialState[element.accessor] = givenValue;
@@ -145,19 +152,51 @@ const PostForm = React.memo((props) => {
     }, [props.formError]);
 
     useEffect(() => {
-        if(props.dataManipulationComplete){
-            setLoading(false);
+        if(props.dataManipulationComplete || dataManipulationComplete){
+            setSavedStates();
         }
-    }, [props.dataManipulationComplete]);
+    }, [props.dataManipulationComplete, dataManipulationComplete]);
 
 
-    let savePost = async () => {
+    let savePost = async (givenData = formDataState) => {
         let result = await triggerAllValidation();
         if(!result || isSaved || !isEmpty(errors)){
             return;
         }
-        // TODO send data to the server!
+        let newObjData = removeIdIfEmpty(givenData);
+        parseTags(newObjData);
+        newObjData['user'] = loggedInUser['id'];
+        newObjData['content'] = contentHtml;
+        await updateNewObjFormData(newObjData);
+        await updateImgFieldObj({
+            desc: givenData['title'],
+            user: loggedInUser.id,
+            file: givenData['main_img']
+        });
         await setSavedStates();
+    };
+
+    let removeIdIfEmpty = (givenFormData) => {
+        let formDataCopy = dClone(givenFormData);
+        if(formDataCopy.hasOwnProperty('id') && formDataCopy.id === ''){
+            delete formDataCopy.id;
+        }
+        return formDataCopy;
+    };
+
+    let parseTags = (givenFormData) => {
+        if(givenFormData.hasOwnProperty('tags')){
+            givenFormData['tags'] = givenFormData['tags']
+                .split(',')
+                .map(item => {
+                    return {name: item.trim(), user: loggedInUser.id}
+                })
+                .filter(x => !isEmpty(x));
+        }
+        if(isEmpty(givenFormData['tags'])){
+            delete givenFormData.tags;
+        }
+        return givenFormData;
     };
 
     let setSavedStates = () => {
@@ -167,6 +206,7 @@ const PostForm = React.memo((props) => {
     };
 
     let updateFormDataState = (accessor, value) => {
+        setIsSaved(false);
         let updatedElement = {};
         updatedElement[accessor] = value;
         setFormDataState({...formDataState, ...updatedElement});
@@ -206,6 +246,13 @@ const PostForm = React.memo((props) => {
                     delete data[objKey];
                 }
             }
+
+        } else {
+            await savePost(data);
+        }
+
+        if(props.onSubmitCallback){
+            await props.onSubmitCallback(data);
         }
         let result = await props.onSubmitCallback(data);
         if(result){
@@ -368,13 +415,13 @@ const PostForm = React.memo((props) => {
         if(!isEmpty(errors)){
             let errorKeys = Object.keys(errors);
             return errorKeys.map((errKey) => {
-                return <p className="text-red-500 text-sm italic text-right">{errors[errKey].message}</p>
+                return <p key={errKey} className="text-red-500 text-sm italic text-right">{errors[errKey].message}</p>
             });
         }
         if(isSaved){
-            return <p className="text-gray-600 text-sm italic text-right">Saved at {lastSavedAt}</p>;
+            return <p key={`saved`} className="text-gray-600 text-sm italic text-right">Saved at {lastSavedAt}</p>;
         }
-        return <p className="text-gray-600 text-sm italic text-right">Not saved</p>;
+        return <p key={`not saved`} className="text-gray-600 text-sm italic text-right">Not saved</p>;
     };
 
     return (

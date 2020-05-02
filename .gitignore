@@ -19,3 +19,4 @@ db.sqlite3-journal
 /backend/**/migrations/**
 /frontend/contexts/DataSearchContext.js
 /backend/media/uploads/2020/04/[1-9][0-9]/**
+/backend/media/uploads/2020/05/**

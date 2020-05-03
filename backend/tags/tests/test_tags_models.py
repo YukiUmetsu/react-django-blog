@@ -109,6 +109,26 @@ class TestPrivateTagsAPI:
         tags = Tags.objects.filter(user=users['normal'][0])
         assert len(tags) == 2
 
+    def test_normal_user_cannot_create_multiple_tags_with_same_name(self, users, tag_payload):
+        self.client.force_authenticate(users['normal'][0])
+        tag_name = 'tag name v1'
+        payload = []
+        tag_payload['user'] = users['normal'][0].id
+        a_tag = {
+            'name': tag_name,
+            'user': tag_payload['user']
+        }
+        another_tag = a_tag.copy()
+        third_tag = a_tag.copy()
+        payload.append(tag_payload)
+        payload.append(another_tag)
+        response = self.client.post("/api/tags/", payload, format='json')
+        assert response.status_code == status.HTTP_201_CREATED
+        response = self.client.post("/api/tags/", [third_tag], format='json')
+        assert response.status_code == status.HTTP_201_CREATED
+        tags = Tags.objects.filter(user=users['normal'][0], name=tag_name)
+        assert len(tags) == 1
+
     def test_normal_user_cannot_create_others_tag(self, users, tag_payload):
         self.client.force_authenticate(users['normal'][0])
         tag_payload['user'] = users['normal'][1].id

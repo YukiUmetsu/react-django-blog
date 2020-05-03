@@ -100,7 +100,6 @@ class TagsField(ModifiedRelatedField):
                 serializer = TagsSerializer(data=value)
                 if serializer.is_valid(raise_exception=True):
                     new_tag = serializer.save()
-                    print(new_tag)
                     return new_tag
                 else:
                     raise serializers.ValidationError(

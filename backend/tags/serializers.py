@@ -8,3 +8,7 @@ class TagsSerializer(serializers.ModelSerializer):
         model = Tags
         fields = ('id', 'name', 'user')
         read_only_fields = ('id',)
+
+    def create(self, validated_data):
+        tag, created = Tags.objects.get_or_create(**validated_data)
+        return tag

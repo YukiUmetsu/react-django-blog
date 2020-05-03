@@ -220,6 +220,14 @@ export const convertArrayToObject = (array, key) => {
     }, initialValue);
 };
 
+export const getTagStrFromTagObjList = (tagObjList = []) => {
+    return tagObjList.filter(x => !isEmpty(x) && !isEmpty(x.name)).map(x => x.name).sort().join(', ')
+};
+
+export const strArrayEqual = (a = [], b = []) => {
+    return a.sort().join() === b.sort().join()
+};
+
 /***
  *
  * @param objects

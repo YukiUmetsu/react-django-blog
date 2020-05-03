@@ -4,7 +4,7 @@ import CSRFTokenInput from "../../UI/Form/CSRFTokenInput";
 import PropTypes from 'prop-types';
 import {object as yupObj} from "yup";
 import {PostsDataCenterContext} from "./PostsDataCenter";
-import {dClone, isEmpty} from "../../../lib/utils";
+import {dClone, getTagStrFromTagObjList, isEmpty, strArrayEqual} from "../../../lib/utils";
 import PackmanSpinner from "../../UI/Spinner/PackmanSpinner";
 import Alert from "../../UI/Notifications/Alert";
 import Toggle from "../../UI/Form/Toggle";
@@ -90,9 +90,12 @@ const PostForm = React.memo((props) => {
 
     let {categories,
         postStates,
+        createdPostObj,
         updateNewObjFormData,
+        updateEditObjFormData,
         dataManipulationComplete,
-        updateImgFieldObj
+        updateImgFieldObj,
+        updateCreatedPostObj,
     } = useContext(PostsDataCenterContext);
     let {loggedInUser} = useContext(AdminAuthContext);
 
@@ -135,6 +138,7 @@ const PostForm = React.memo((props) => {
 
     useEffect(() => {
         setFormDataState(initialFormDataState);
+        updateCreatedPostObj(props.object);
     },[props.object]);
 
     useEffect(() => {
@@ -157,6 +161,15 @@ const PostForm = React.memo((props) => {
         }
     }, [props.dataManipulationComplete, dataManipulationComplete]);
 
+    useEffect(() => {
+        if(isEmpty(createdPostObj)){
+            return;
+        }
+        let currentFormIdIsEmpty = formDataState.id === ''|| typeof formDataState.id === 'undefined';
+        if(currentFormIdIsEmpty && createdPostObj.hasOwnProperty('id') && !isEmpty(createdPostObj.id)){
+            setFormDataState({...formDataState, id: createdPostObj.id})
+        }
+    }, [createdPostObj]);
 
     let savePost = async (givenData = formDataState) => {
         let result = await triggerAllValidation();
@@ -167,13 +180,68 @@ const PostForm = React.memo((props) => {
         parseTags(newObjData);
         newObjData['user'] = loggedInUser['id'];
         newObjData['content'] = contentHtml;
-        await updateNewObjFormData(newObjData);
-        await updateImgFieldObj({
-            desc: givenData['title'],
-            user: loggedInUser.id,
-            file: givenData['main_img']
-        });
+
+        if(isEmpty(createdPostObj)){
+            await updateNewObjFormData(newObjData);
+            await updateImgFieldObj({
+                desc: givenData['title'],
+                user: loggedInUser.id,
+                file: givenData['main_img']
+            });
+            return setSavedStates();
+        }
+
+        // Editing!
+        newObjData = getChangedPostFields(newObjData);
+
+        if(isEmpty(newObjData)){
+            return setSavedStates();
+        }
+
+        if(!isEmpty(newObjData['main_img'])){
+            await updateImgFieldObj({
+                desc: newObjData['title'],
+                user: loggedInUser.id,
+                file: newObjData['main_img']
+            });
+        }
+        await updateEditObjFormData(newObjData);
         await setSavedStates();
+    };
+
+    const getChangedPostFields = (newFieldsData) => {
+        let result = {};
+        for (let i = 0; i < props.formData.elements.length; i++) {
+            let accessor = props.formData.elements[i].accessor;
+            if(accessor === 'id'){
+                continue;
+            }
+            if(accessor === 'main_img' && isEmpty(newFieldsData[accessor]) && !isEmpty(createdPostObj[accessor])){
+                continue;
+            }
+            if(accessor === 'tags'){
+                let createdTagNames = getTagStrFromTagObjList(createdPostObj[accessor]);
+                let newTagNames = getTagStrFromTagObjList(newFieldsData[accessor]);
+                if(createdTagNames === newTagNames){
+                    continue;
+                }
+            }
+            if(['category', 'user', 'post_state'].includes(accessor)){
+                if(parseInt(newFieldsData[accessor]) === createdPostObj[accessor]['id'] ){
+                    continue;
+                }
+            }
+            if(newFieldsData[accessor] === createdPostObj[accessor]){
+                // no change in this field
+                continue;
+            }
+            result[accessor] = newFieldsData[accessor];
+        }
+        if(isEmpty(result)){
+            return result;
+        }
+        result['id'] = newFieldsData['id'];
+        return result;
     };
 
     let removeIdIfEmpty = (givenFormData) => {

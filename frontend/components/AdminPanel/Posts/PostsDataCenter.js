@@ -57,6 +57,8 @@ const PostsDataCenter = (props) => {
     let [dataIdsToBeDeleted, setDataIdsToBeDeleted] = useState([]);
     let [deleteCurrentIndex, setDeleteCurrentIndex] = useState(null);
 
+    let [createdPostObj, setCreatedPostObj] = useState(null);
+
     const initialAlertProps = {
         title:"Something went wrong",
         content:`Failed to load ${objNameSm} data`,
@@ -147,7 +149,9 @@ const PostsDataCenter = (props) => {
     /**
      * Creating a new object. Create imgField first.
      */
-    const { data: fileObj } = useSWR((!isEmpty(imgFieldObj)) ? [FILES_LIST_API, imgFieldObj.desc] : null,
+    const { data: fileObj } = useSWR(
+        (!isEmpty(imgFieldObj) && isEmpty(createdPostObj) && !imgFieldObjCreated) ?
+            [FILES_LIST_API, imgFieldObj.desc] : null,
         () => SWR_POST_FILE_FETCH(
             FILES_LIST_API,
             "image",
@@ -173,6 +177,7 @@ const PostsDataCenter = (props) => {
                     cloneNewObjFormData[imgFieldName] = fileObj.id;
                     await setNewObjFormData(cloneNewObjFormData);
                 }
+                setImgFieldObj(null);
                 await setImgFieldObjCreated(true);
             },
             onError: (error) => {
@@ -184,7 +189,8 @@ const PostsDataCenter = (props) => {
     );
 
     const { data: createdObject } = useSWR(
-        (newObjFormData && typeof newObjFormData[imgFieldName] !== 'object' && imgFieldObjCreated && fileObj)? [props.listApiUrl, newObjFormData['title']]: null,
+        (newObjFormData && typeof newObjFormData[imgFieldName] !== 'object' && imgFieldObjCreated && fileObj && isEmpty(createdPostObj))?
+            [props.listApiUrl, newObjFormData['title']]: null,
         () => SWR_POST_FETCH(
             props.listApiUrl,
             {...newObjFormData, tags: Object.values(newObjFormData.tags)}
@@ -196,8 +202,10 @@ const PostsDataCenter = (props) => {
                     setDataManipulationComplete(true);
                     createAlertProps("Server connection error. ",`Unable to create a ${objNameSm}.`);
                     clearNewFormStates(true);
-                } else if(isEmpty(imgFieldObj)){
+                } else {
+                    setCreatedPostObj(createdObject);
                     setDataManipulationComplete(true);
+                    clearNewFormStates();
                     createSuccessfulAlertProps(`${objNameCp} creation`, ` ${objNameCp} was successfully created!`);
                 }
             },
@@ -216,13 +224,13 @@ const PostsDataCenter = (props) => {
      * Editing a object with image field
      */
 
-    const { data: editedFileObj } = useSWR((!isEmpty(editFormData) && !isEmpty(imgFieldObj)) ? [FILES_LIST_API, editFormData.id] : null,
+    const { data: updatedFileObj } = useSWR((!isEmpty(imgFieldObj) && !isEmpty(createdPostObj)) ? [FILES_LIST_API, imgFieldObj.desc] : null,
         () => SWR_POST_FILE_FETCH(
             FILES_LIST_API,
             "image",
-            `${editFormData[imgFileNamePrefixField]}-${moment().format('YYYY-MM-DD-HH-mm')}`,
-            editFormData.id,
-            imgFieldObj),
+            `${imgFieldObj.desc}-${moment().format('YYYY-MM-DD-HH-mm')}`,
+            imgFieldObj.user,
+            imgFieldObj.file),
         {
             errorRetryCount: 1,
             onSuccess: (fileObj) => {
@@ -247,18 +255,21 @@ const PostsDataCenter = (props) => {
     );
 
     useSWR(
-        (!isEmpty(editedFileObj) &&  !isEmpty(editFormData) && imgFieldObjCreated) ?
-            [props.listApiUrl+editFormData.id+'/', editedFileObj.id]
-            : null,
-        () => SWR_PATCH_FETCH(props.listApiUrl+editFormData.id+'/', {...editFormData, ...{[imgFieldName]: editedFileObj.id}}),
+        (!isEmpty(createdPostObj) && editFormData && !isEmpty(imgFieldObj) && imgFieldObjCreated && updatedFileObj)?
+            [props.listApiUrl + createdPostObj.id + '/', editFormData]: null,
+        () => SWR_POST_FETCH(
+            props.listApiUrl + createdPostObj.id + '/',
+            {...newObjFormData, tags: Object.values(editFormData.tags)}
+        ),
         {
             errorRetryCount: 1,
             onSuccess: (editedObject) => {
                 if(!editedObject.hasOwnProperty('id')){
-                    createAlertProps("Server connection error. ",`Unable to set the new ${imgFieldDisplayName} to the ${objNameSm}.`);
+                    createAlertProps("Server connection error. ",`Unable to update the ${objNameSm}.`);
                     clearEditFormStates(true);
                 } else {
                     replaceDataItemWithNewOne(editedObject);
+                    setCreatedPostObj(editedObject);
                     clearEditFormStates();
                     setDataManipulationComplete(true);
                     createSuccessfulAlertProps(`${objNameCp} Edit`, ` Successfully edited the ${objNameSm}.`)
@@ -275,7 +286,7 @@ const PostsDataCenter = (props) => {
      * Editing a object without image field
      */
     useSWR(
-        (!isEmpty(editFormData) && !imgFieldObjCreated && isEmpty(imgFieldObj)) ?
+        (!isEmpty(createdPostObj) && !isEmpty(editFormData) && !imgFieldObjCreated && isEmpty(imgFieldObj)) ?
             [props.listApiUrl+editFormData.id+'/', editFormData]
             : null,
         () => SWR_PATCH_FETCH(props.listApiUrl+editFormData.id+'/', editFormData),
@@ -287,6 +298,7 @@ const PostsDataCenter = (props) => {
                     clearEditFormStates(true);
                 } else {
                     replaceDataItemWithNewOne(editedObject);
+                    setCreatedPostObj(editedObject);
                     clearEditFormStates();
                     setDataManipulationComplete(true);
                     setAlertProps(
@@ -408,9 +420,9 @@ const PostsDataCenter = (props) => {
         if(!skipAlertProps){
             setAlertProps(initialAlertProps);
         }
+        setImgFieldObj(null);
         setEditFormData(null);
         setImgFieldObjCreated(false);
-        setImgFieldObj(null);
     };
 
 
@@ -456,6 +468,13 @@ const PostsDataCenter = (props) => {
         setImgFieldObj(imgFieldObj);
     };
 
+    const updateCreatedPostObj = (postObj) => {
+        if(isEmpty(postObj)){
+           return;
+        }
+        setCreatedPostObj(postObj);
+    };
+
     const resetAlertProps = () => {
         setAlertProps(initialAlertProps);
         setDataManipulationComplete(false);
@@ -470,6 +489,7 @@ const PostsDataCenter = (props) => {
         <PostsDataCenterContext.Provider value={{
             originalData: data,
             users: users,
+            createdPostObj: createdPostObj,
             categories: categories,
             postStates: postStates,
             alertProps: alertProps,
@@ -478,6 +498,7 @@ const PostsDataCenter = (props) => {
             updateEditObjFormData: updateEditObjFormData,
             updateDeletionStates: updateDeletionStates,
             updateImgFieldObj: updateImgFieldObj,
+            updateCreatedPostObj: updateCreatedPostObj,
             resetAlertProps: resetAlertProps,
             dataManipulationComplete: dataManipulationComplete,
         }}>

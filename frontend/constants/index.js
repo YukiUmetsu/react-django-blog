@@ -174,7 +174,8 @@ export const SANITIZE_HTML_OPTIONS = {
         'table', 'thead', 'caption', 'tbody', 'tr', 'th', 'td', 'pre', 'span', 'u', 'img', 'del', 'sup', 'sub', 'table', 'tbody','tr', 'td'],
     allowedAttributes: {
         a: [ 'href', 'name', 'target' ],
-        img: [ 'src' ],
+        img: [ 'src', 'data-file-name', 'data-size', 'data-proportion', 'data-rotate', 'alt', 'data-percentage',
+            'data-index', 'data-file-size', 'data-origin', 'style' ],
         span: ['style', 'class'],
         p: ['style', 'class'],
         hr: ['class']

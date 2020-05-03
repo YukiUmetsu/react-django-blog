@@ -10,7 +10,8 @@ ALLOWED_HTML_TAGS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a',
 
 ALLOWED_HTML_ATTRIBUTES = {
     'a': ['href', 'name', 'target', 'title'],
-    'img': ['src'],
+    'img': ['src', 'data-file-name', 'data-size', 'data-proportion', 'data-rotate', 'alt', 'data-percentage',
+            'data-index', 'data-file-size', 'data-origin', 'style'],
     'span': ['style', 'class'],
     'p': ['style', 'class'],
     'hr': ['class'],
@@ -33,10 +34,19 @@ ALLOWED_HTML_STYLES = ['font', 'font-size', 'font-style', 'font-weight', 'text-d
 ALLOWED_HTML_PROTOCOLS = ['https', 'http', 'data']
 
 
+def include_base64_image(string):
+    result = re.search(r'<img src=\"data:image\/.*?;base64,.*?\".*?>', string)
+    return result is not None
+
+
 def replace_base64_img_src_to_file_url_src(string, files):
-    split_list = re.split(r'<img src=\"data:image\/.*?;base64,.*?\".*?/>', string)
+    split_list = re.split(r'data:image\/.*?;base64,.*?\"', string)
     split_len = len(split_list)
+    if split_len == 1:
+        return string
+
     files_len = len(files)
+
     if split_len < 2:
         return string
 
@@ -47,7 +57,7 @@ def replace_base64_img_src_to_file_url_src(string, files):
             result_str = result_str + el
 
         else:
-            result_str = result_str + el + '<img src="' + files[count] + '"/>'
+            result_str = result_str + el + files[count] + '"'
             count += 1
 
     return result_str
@@ -70,14 +80,14 @@ def get_base64_img_info_from_str(string):
 
 
 def get_base64_data_from_str(string):
-    return re.findall(r'\<img src=\"data:image\/.*;base64,(.*?)\".*?\/\>', string)
+    return re.findall(r'\<img src=\"data:image\/.*;base64,(.*?)\".*?>', string)
 
 
 def get_base64_img_extension_from_str(string):
     return re.findall(r'src=\"data:image\/(.*);base64,', string)
 
 
-def base64_to_img(data, file_path):
+def save_base64_to_img(data, file_path):
     img_data = base64.b64decode(data)
     with open(file_path, 'wb') as f:
         f.write(img_data)

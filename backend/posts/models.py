@@ -32,11 +32,7 @@ class Posts(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
-        print(args)
-        print(kwargs)
         # sanitize html
         if kwargs.get('content') is not None and len(kwargs.get('content')) > 0:
-            content = sanitize_html(kwargs['content'])
-            # replace base64 image src to url
-            kwargs['content'] = content
+            kwargs['content'] = sanitize_html(kwargs['content'])
         super().save(*args, **kwargs)

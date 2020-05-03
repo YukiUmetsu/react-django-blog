@@ -197,7 +197,12 @@ export const getDisplayContentFromObj = (column, rowObj) => {
         return content
     } else if(isNested && !isMultiple){
         if(content.hasOwnProperty('first_name')){
-            return `${content.first_name} ${content.last_name}`;
+            let firstName = (content.first_name) ? content.first_name : '';
+            let lastName = (content.last_name) ? content.last_name : '';
+            if(firstName+lastName === ''){
+                return 'No name'
+            }
+            return `${firstName} ${lastName}`;
         }
         return content[column.displayField];
 

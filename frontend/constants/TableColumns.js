@@ -84,6 +84,7 @@ export const ADMIN_POST_TABLE_COLUMNS = [
         showOnDelete: true,
         formLength: 'full',
         hideOnDisplay: false,
+        displayClassName: 'text-sm'
     },
     {
         label: 'excerpt',
@@ -92,7 +93,7 @@ export const ADMIN_POST_TABLE_COLUMNS = [
         editable: true,
         showOnDelete: true,
         formLength: 'full',
-        hideOnDisplay: false,
+        hideOnDisplay: true,
     },
     {
         label: 'category',
@@ -104,6 +105,7 @@ export const ADMIN_POST_TABLE_COLUMNS = [
         hideOnDisplay: false,
         nested: true,
         displayField: 'name',
+        displayClassName: 'text-sm',
     },
     {
         label: 'post state',
@@ -115,6 +117,7 @@ export const ADMIN_POST_TABLE_COLUMNS = [
         hideOnDisplay: false,
         nested: true,
         displayField: 'name',
+        displayClassName: 'text-sm',
     },
     {
         label: 'content',
@@ -130,13 +133,14 @@ export const ADMIN_POST_TABLE_COLUMNS = [
         accessor: 'tags',
         type: 'text',
         editable: true,
-        showOnDelete: true,
+        showOnDelete: false,
         formLength: '1/2',
-        hideOnDisplay: false,
+        hideOnDisplay: true,
         multiple: true,
         nested: true,
         displayField: 'name',
         isTag: true,
+        displayClassName: 'text-xs',
     },
     {
         label: 'youtube url',
@@ -183,6 +187,7 @@ export const ADMIN_POST_TABLE_COLUMNS = [
         editable: false,
         showOnDelete: false,
         hideOnDisplay: false,
+        displayClassName: 'text-sm',
     },
     {
         label: 'published at',
@@ -191,6 +196,7 @@ export const ADMIN_POST_TABLE_COLUMNS = [
         editable: false,
         showOnDelete: false,
         hideOnDisplay: false,
+        displayClassName: 'text-sm',
     },
     {
         label: 'author',
@@ -200,6 +206,7 @@ export const ADMIN_POST_TABLE_COLUMNS = [
         showOnDelete: true,
         hideOnDisplay: false,
         nested: true,
-        displayField: 'first_name'
+        displayField: 'first_name',
+        displayClassName: 'text-sm',
     },
 ];

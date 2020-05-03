@@ -38,7 +38,7 @@ const SelectableTableHeaderSearchesItem = (props) => {
         return (
             <InputSearchItem
                 elementId={props.accessor}
-                placeholder={`Search by ${props.label}`}
+                placeholder={`filter ${props.label}`}
                 onChangedCallback={updateSearchState}
                 onChangedCallbackArguments={[props.accessor]}
             />

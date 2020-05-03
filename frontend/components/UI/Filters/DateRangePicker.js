@@ -23,7 +23,7 @@ const DateRangePicker = (props) => {
                 onChange={date => selectedStartDateHandler(date)}
                 selectsStart
                 showYearDropdown
-                className="shadow h-full py-1 rounded border border-gray-300"
+                className="text-center shadow h-full py-1 rounded border border-gray-300"
                 placeholderText="Start Date"
             />
             <DatePicker
@@ -32,7 +32,7 @@ const DateRangePicker = (props) => {
                 selectsEnd
                 minDate={selectedStartDate}
                 showYearDropdown
-                className="shadow h-full py-1 rounded border border-gray-300"
+                className="text-center shadow h-full py-1 rounded border border-gray-300"
                 placeholderText="End Date"
             />
         </div>

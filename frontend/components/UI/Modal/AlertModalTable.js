@@ -64,7 +64,7 @@ const AlertModalTable = (props) => {
 AlertModalTable.propTypes = {
     labels: PropTypes.array,
     data: PropTypes.array,
-    columns: PropTypes.array,
+    columns: PropTypes.object,
 };
 
 export default AlertModalTable

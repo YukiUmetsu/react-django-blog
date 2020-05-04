@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import PropTypes from 'prop-types';
 import {faAngleDown} from "@fortawesome/free-solid-svg-icons/faAngleDown";
@@ -25,6 +25,27 @@ const FormSelect = React.memo((props) => {
         }
     };
 
+    let initialValue = () => {
+        if(isEmpty(props.value)){
+            return '';
+        }
+        if(props.value.hasOwnProperty('id')){
+            return props.value.id;
+        }
+        return props.value;
+    };
+
+    let [currentValue, setCurrentValue] = useState(initialValue);
+
+    let handleOnChange = (e) => {
+        setCurrentValue(e.target.value);
+        props.updateFormDataState(props.id, e.target.value);
+    };
+
+    useEffect(() => {
+        setCurrentValue(initialValue());
+    }, [props.value]);
+
     return (
         <div className={`w-full md:w-${props.length} px-3 mb-6 md:mb-0`} key={`${props.form_id_prefix}_form_div_${props.id}`}>
 
@@ -39,7 +60,8 @@ const FormSelect = React.memo((props) => {
                     id={`${props.form_id_prefix}_form_${props.id}`}
                     name={props.id}
                     ref={props.reference}
-                    onChange={(e)=> props.updateFormDataState(props.id, e.target.value)}
+                    value={currentValue}
+                    onChange={handleOnChange}
                 >
                     {renderOptions(props.options)}
                 </select>
@@ -63,6 +85,7 @@ FormSelect.propTypes = {
     length: PropTypes.string,
     error: PropTypes.any,
     updateFormDataState: PropTypes.func,
+    value: PropTypes.any,
 };
 
 export default FormSelect

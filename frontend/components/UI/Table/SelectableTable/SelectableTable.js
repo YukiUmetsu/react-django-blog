@@ -1,4 +1,5 @@
 import React, {createContext, useContext, useEffect, useState} from 'react';
+import Router from 'next/router'
 import PropTypes from 'prop-types';
 import dynamic from 'next/dynamic'
 import TableCSS from '../Table.module.css';
@@ -94,6 +95,10 @@ const SelectableTable = (props) => {
     };
 
     let updateEditModalState = (rowObj, newIsEditOpen = null) => {
+        if(props.onEditClickedRedirect && !isEmpty(rowObj)){
+            let {url, as, options} = props.onEditClickedRedirect(rowObj);
+            return Router.push(url, as, options);
+        }
         if(newIsEditOpen !== null){
             setEditModalState({isOpen: newIsEditOpen, rowObj: rowObj});
             return;
@@ -102,6 +107,11 @@ const SelectableTable = (props) => {
     };
 
     let updateDeleteModalState = (rowObj, newIsOpen = null) => {
+        if(!isEmpty(props.onDeleteClickedRedirect) && !isEmpty(rowObj)){
+            let {url, as, options} = props.onDeleteClickedRedirect(rowObj);
+            return Router.push(url, as, options);
+        }
+
         if(newIsOpen !== null){
             setDeleteModalState({isOpen: newIsOpen, rowObj: rowObj});
             return;
@@ -221,6 +231,10 @@ const SelectableTable = (props) => {
     };
 
     const handleDataItemDeleted = (ids) => {
+        if(!isEmpty(props.onDeleteClickedRedirect)){
+            let {dlURL, dlAs, dlOptions} = props.onDeleteClickedRedirect;
+            return Router.push(dlURL, dlAs, dlOptions);
+        }
         updateDeleteModalState({}, false);
         if(!Array.isArray(ids)){
             ids = [ids];
@@ -310,7 +324,9 @@ SelectableTable.propTyles = {
     deleteObjApiUrl: PropTypes.string,
     editObjFormData: PropTypes.object,
     onEditObjFormSubmitted: PropTypes.func,
-    dataCenterContext: PropTypes.any
+    dataCenterContext: PropTypes.any,
+    onEditClickedRedirect: PropTypes.func,
+    onDeleteClickedRedirect: PropTypes.func,
 };
 
 export default SelectableTable

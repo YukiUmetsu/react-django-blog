@@ -12,7 +12,7 @@ import {PostsDataCenterContext} from "./PostsDataCenter";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPenNib} from "@fortawesome/free-solid-svg-icons/faPenNib";
 import Link from "next/link";
-import {ADMIN_NEW_POST_URL} from "../../../constants/URLs";
+import {ADMIN_EDIT_POST_AS_URL, ADMIN_EDIT_POST_URL, ADMIN_NEW_POST_URL} from "../../../constants/URLs";
 
 const AdminPanelPostsTable = (props) => {
 
@@ -88,6 +88,11 @@ const AdminPanelPostsTable = (props) => {
                         editObjFormData={editObjectFormData}
                         onEditObjFormSubmitted={(formData) => onEditObjFormSubmitted(formData)}
                         dataCenterContext={dataCenterContext}
+                        onEditClickedRedirect={
+                            (rowObj) => {
+                                return {url: {pathname: ADMIN_EDIT_POST_URL, query: {id: rowObj.id}}, as: {pathname: ADMIN_EDIT_POST_URL, query: {id: rowObj.id}}, options:{}}
+                            }
+                        }
                     />
                 </Paginator>
             </DataSearcher>

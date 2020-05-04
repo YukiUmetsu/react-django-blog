@@ -43,6 +43,8 @@ const PostsDataCenter = (props) => {
     let [usersLoadingDone, setUsersLoadingDone] = useState(!props.userDataRequired);
     let [categoriesLoadingDone, setCategoriesLoadingDone] = useState(false);
     let [postStatesLoadingDone, setPostStatesLoadingDone] = useState(false);
+    let [idsToLoad, setIdsToLoad] = useState(props.idsToLoad ? props.idsToLoad : []);
+    let [idsToLoadIndex, setIdsToLoadIndex] = useState(0);
 
     // creating a new object
     let [newObjFormData, setNewObjFormData] = useState(null);
@@ -124,6 +126,31 @@ const PostsDataCenter = (props) => {
 
                 if(isEmpty(serverData.next)){
                     await setDataLoadingStateWhenDoneLoadingData();
+                }
+            },
+            onError: () => showDefaultServerErrorAlert(),
+        }
+    );
+
+    /***
+     * Load individual objects
+     */
+    useSWR(
+        (!isEmpty(idsToLoad) && idsToLoadIndex <= idsToLoad.length-1) ?
+            [props.listApiUrl + idsToLoad[idsToLoadIndex] + '/'] : null,
+        SWR_FETCH,
+        {
+            onSuccess: async (anObj) => {
+                if(anObj.hasOwnProperty('id')){
+                    let newData = dClone(data);
+                    newData.push(anObj);
+                    setData(newData);
+                    if(idsToLoadIndex + 1 <= idsToLoad.length-1){
+                        setIdsToLoadIndex(idsToLoadIndex+1)
+                    }
+
+                } else {
+                    showDefaultServerErrorAlert();
                 }
             },
             onError: () => showDefaultServerErrorAlert(),
@@ -512,6 +539,7 @@ PostsDataCenter.defaultProps = {
     userDataRequired: true,
     firstApiFetchURL: POSTS_LIST_API,
     listApiUrl: POSTS_LIST_API,
+    idsToLoad: [],
 };
 
 PostsDataCenter.propTypes = {
@@ -519,6 +547,7 @@ PostsDataCenter.propTypes = {
     userDataRequired: PropTypes.bool,
     firstApiFetchURL: PropTypes.string,
     listApiUrl: PropTypes.string,
+    idsToLoad: PropTypes.array,
 };
 
 export default PostsDataCenter

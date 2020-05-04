@@ -52,6 +52,7 @@ const BlogEditor = (props) => {
                     name={props.name}
                     height={props.height}
                     ref={props.reference}
+                    setContents={props.content}
                 />
             </div>
         </Aux>
@@ -62,6 +63,7 @@ BlogEditor.defaultProps = {
     height: 200,
     onChangeCallback: () => {},
     onLoadCallback: () => {},
+    content: '',
 };
 
 BlogEditor.propTypes = {
@@ -69,7 +71,8 @@ BlogEditor.propTypes = {
     height: PropTypes.number,
     onChangeCallback: PropTypes.func,
     onLoadCallback: PropTypes.func,
-    reference: PropTypes.any
+    reference: PropTypes.any,
+    content: PropTypes.string,
 };
 
 export default BlogEditor

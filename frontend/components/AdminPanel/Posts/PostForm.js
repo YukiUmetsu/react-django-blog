@@ -88,7 +88,9 @@ const HTML_PARSE_OPTIONS = {
 
 const PostForm = React.memo((props) => {
 
-    let {categories,
+    let {
+        originalData,
+        categories,
         postStates,
         createdPostObj,
         updateNewObjFormData,
@@ -99,6 +101,7 @@ const PostForm = React.memo((props) => {
     } = useContext(PostsDataCenterContext);
     let {loggedInUser} = useContext(AdminAuthContext);
 
+    let [objectToEdit, setObjectToEdit] = useState(props.object);
     let initialFormDataState = useMemo(() => {
         let initialState = {};
         for (let i = 0; i < props.formData.elements.length; i++) {
@@ -107,15 +110,14 @@ const PostForm = React.memo((props) => {
             if(element.type === 'boolean'){
                 defaultEmptyValue = false;
             }
-            let givenValue = isEmpty(props.object) ? defaultEmptyValue : props.object[element.accessor];
+            let givenValue = isEmpty(objectToEdit) ? defaultEmptyValue : objectToEdit[element.accessor];
             if(givenValue === undefined || givenValue === null || element.editable !== true){
                 continue;
             }
             initialState[element.accessor] = givenValue;
         }
         return initialState;
-    }, [props.formData, props.object]);
-
+    }, [props.formData, objectToEdit]);
 
     let [formDataState, setFormDataState] = useState(initialFormDataState);
     let [loading, setLoading] = useState(props.loading ? props.loading : false);
@@ -137,6 +139,21 @@ const PostForm = React.memo((props) => {
     const { register, handleSubmit, triggerValidation, reset, errors } = useForm(formConfig);
 
     useEffect(() => {
+        if(props.idToEdit !== null && !isEmpty(originalData)){
+            let objectToEdit = null;
+            for (let i = 0; i < originalData.length; i++) {
+                if(parseInt(originalData[i].id) === parseInt(props.idToEdit)){
+                    objectToEdit = originalData[i];
+                }
+            }
+            if(!isEmpty(objectToEdit)){
+                setObjectToEdit(objectToEdit);
+            }
+        }
+    }, [props.idToEdit, originalData]);
+
+    useEffect(() => {
+        setObjectToEdit(props.object);
         setFormDataState(initialFormDataState);
         updateCreatedPostObj(props.object);
     },[props.object]);
@@ -280,6 +297,23 @@ const PostForm = React.memo((props) => {
         setFormDataState({...formDataState, ...updatedElement});
     };
 
+    let updateFormDataStateAll = object => {
+        let newState = {};
+        for (let i = 0; i < props.formData.elements.length; i++) {
+            let el = props.formData.elements[i];
+            let defaultEmptyValue = "";
+            if(el.type === 'boolean'){
+                defaultEmptyValue = false;
+            }
+            let givenValue = isEmpty(object) ? defaultEmptyValue : object[el.accessor];
+            if(givenValue === undefined || givenValue === null || el.editable !== true){
+                continue;
+            }
+            newState[el.accessor] = givenValue;
+        }
+        setFormDataState(newState)
+    };
+
     let postStatesOptions = useMemo(() => {
         if(isEmpty(postStates)){
             return [];
@@ -303,14 +337,13 @@ const PostForm = React.memo((props) => {
     }, [categories]);
 
     const onSubmit = async data => {
-        console.log('submit!!!');
         setLoading(true);
-        if(!isEmpty(props.object)){
+        if(!isEmpty(objectToEdit)){
             // this is editing form since object exist. remove unchanged values.
-            let objKeys = Object.keys(props.object);
+            let objKeys = Object.keys(objectToEdit);
             for (let i = 0; i < objKeys.length; i++) {
                 let objKey = objKeys[i];
-                if(data[objKey] === props.object[objKey]){
+                if(data[objKey] === objectToEdit[objKey]){
                     delete data[objKey];
                 }
             }
@@ -342,13 +375,16 @@ const PostForm = React.memo((props) => {
             if (!element.editable || excludedField.includes(element.accessor)) {
                 return;
             }
-            let initialValue = isEmpty(props.object) ? "" : props.object[element.accessor];
+            let initialValue = isEmpty(objectToEdit) ? "" : objectToEdit[element.accessor];
+            if(!isEmpty(objectToEdit) && element.isTag){
+                initialValue = objectToEdit[element.accessor].map(x => x.name).join(', ');
+            }
             let error = (errors[element.accessor]) ? errors[element.accessor] : null;
             if (['text', 'password', 'hidden'].includes(element.type)) {
                 return renderTextInput(element.accessor, element.label, element.type, initialValue, element.formLength, error)
             }
             if (element.type === 'boolean') {
-                if(isEmpty(props.object)){
+                if(isEmpty(objectToEdit)){
                     initialValue = false;
                 }
                 return renderToggle(element.accessor, element.label, initialValue, element.formLength, error)
@@ -363,7 +399,12 @@ const PostForm = React.memo((props) => {
     };
 
     const renderTextInput = (id, label, type, value, length, error=null) => {
-        let inputValue = (formDataState[id]) ? formDataState[id] : "";
+        let inputValue = "";
+        if(!isEmpty(value)){
+            inputValue = value;
+        } else if(formDataState[id]){
+            inputValue = formDataState[id];
+        }
         let inputClass = 'appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white';
         return (
             <DynamicTextInput
@@ -500,7 +541,13 @@ const PostForm = React.memo((props) => {
                     <div className="w-full -mb-5 pb-0">
                         {errors['content'] ? <p className="text-red-500 text-md italic text-center">*{errors['content']['message']}</p> : ""}
                     </div>
-                    <BlogEditor name='content' height={500} reference={register} onChangeCallback={(content) => editorOnChangeHandler(content)}/>
+                    <BlogEditor
+                        name='content'
+                        height={500}
+                        reference={register}
+                        onChangeCallback={(content) => editorOnChangeHandler(content)}
+                        content={(objectToEdit && objectToEdit.hasOwnProperty('content')) ? objectToEdit.content : ''}
+                    />
                     <div className="mt-0 pt-0 mx-10 w-full align-right">
                         {renderSaveStatus()}
                     </div>
@@ -541,6 +588,7 @@ PostForm.propTypes = {
     loading: PropTypes.bool,
     formError: PropTypes.object,
     dataManipulationComplete: PropTypes.bool,
+    idToEdit: PropTypes.string,
 };
 
 export default PostForm

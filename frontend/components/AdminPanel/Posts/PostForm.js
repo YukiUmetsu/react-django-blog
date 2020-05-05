@@ -209,7 +209,8 @@ const PostForm = React.memo((props) => {
     }, [createdPostObj]);
 
     let savePost = async (givenData) => {
-
+        console.log(givenData);
+        console.log(formDataState);
         if (isEmpty(givenData)) {
             // trigger validation when it is auto save
             let result = await triggerAllValidation();
@@ -229,12 +230,14 @@ const PostForm = React.memo((props) => {
         newObjData['user'] = getPostUserId();
         newObjData['content'] = contentHtml;
 
-        let main_img = newObjData['main_img'];
-        if(typeof main_img === 'object' && !main_img.hasOwnProperty('name') && main_img.hasOwnProperty('0')){
-            newObjData['main_img'] = main_img['0'];
+        if(isEmpty(newObjData['main_img'])){
+            newObjData['main_img'] = formDataState['main_img'];
         }
-        if(Array.isArray(main_img)){
-            newObjData['main_img'] = main_img[0];
+        if(Array.isArray(newObjData['main_img'])){
+            newObjData['main_img'] = newObjData['main_img'][0];
+        }
+        if(typeof newObjData['main_img'] === 'object' && newObjData['main_img'].hasOwnProperty('0')){
+            newObjData['main_img'] = newObjData['main_img']['0'];
         }
 
         if(isEmpty(createdPostObj) && isEmpty(objectToEdit)){
@@ -254,7 +257,7 @@ const PostForm = React.memo((props) => {
             await updateImgFieldObj({
                 desc: newObjData['title'],
                 user: loggedInUser.id,
-                file: newObjData['main_img'][0]
+                file: newObjData['main_img']
             });
         }
         await updateEditObjFormData(newObjData);
@@ -305,7 +308,14 @@ const PostForm = React.memo((props) => {
                 }
             }
             if(['category', 'post_state'].includes(accessor)){
-                if(newFieldsData[accessor]['id'] === previousObj[accessor]['id']){
+                console.log(newFieldsData[accessor]);
+                console.log(typeof newFieldsData[accessor]);
+                console.log(previousObj[accessor]['id']);
+                console.log(typeof previousObj[accessor]['id']);
+
+                if (typeof newFieldsData[accessor] !== 'object' && ''+newFieldsData[accessor] === ''+previousObj[accessor]['id']){
+                    continue;
+                } else if(''+newFieldsData[accessor]['id'] === ''+previousObj[accessor]['id']){
                     continue;
                 }
             }
@@ -340,7 +350,7 @@ const PostForm = React.memo((props) => {
 
     let parseTags = (givenFormData) => {
         if(isEmpty(givenFormData['tags'])){
-            givenFormData['tags'] = {name: '', user: loggedInUser.id};
+            givenFormData['tags'] = [];
             return givenFormData;
         }
 

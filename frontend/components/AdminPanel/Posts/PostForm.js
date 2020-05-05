@@ -101,25 +101,19 @@ const PostForm = React.memo((props) => {
     } = useContext(PostsDataCenterContext);
     let {loggedInUser} = useContext(AdminAuthContext);
 
-    let [objectToEdit, setObjectToEdit] = useState(props.object);
-    let initialFormDataState = useMemo(() => {
-        let initialState = {};
-        for (let i = 0; i < props.formData.elements.length; i++) {
-            let element = props.formData.elements[i];
-            let defaultEmptyValue = "";
-            if(element.type === 'boolean'){
-                defaultEmptyValue = false;
+    const getObjectToEditFromProps = () => {
+        if(props.idToEdit !== null && !isEmpty(originalData)){
+            for (let i = 0; i < originalData.length; i++) {
+                if(parseInt(originalData[i].id) === parseInt(props.idToEdit)){
+                    return originalData[i];
+                }
             }
-            let givenValue = isEmpty(objectToEdit) ? defaultEmptyValue : objectToEdit[element.accessor];
-            if(givenValue === undefined || givenValue === null || element.editable !== true){
-                continue;
-            }
-            initialState[element.accessor] = givenValue;
         }
-        return initialState;
-    }, [props.formData, objectToEdit]);
+        return null;
+    };
+    let [objectToEdit, setObjectToEdit] = useState(getObjectToEditFromProps());
+    let [formDataState, setFormDataState] = useState({});
 
-    let [formDataState, setFormDataState] = useState(initialFormDataState);
     let [loading, setLoading] = useState(props.loading ? props.loading : false);
     let [formError, setFormError] = useState(props.formError);
     let [contentHtml, setContentHtml] = useState('');
@@ -138,23 +132,40 @@ const PostForm = React.memo((props) => {
     };
     const { register, handleSubmit, triggerValidation, reset, errors } = useForm(formConfig);
 
-    useEffect(() => {
-        if(props.idToEdit !== null && !isEmpty(originalData)){
-            let objectToEdit = null;
-            for (let i = 0; i < originalData.length; i++) {
-                if(parseInt(originalData[i].id) === parseInt(props.idToEdit)){
-                    objectToEdit = originalData[i];
-                }
+    useEffect( () => {
+        let initialState = {};
+        for (let i = 0; i < props.formData.elements.length; i++) {
+            let element = props.formData.elements[i];
+            let defaultEmptyValue = "";
+            if(element.type === 'boolean'){
+                defaultEmptyValue = false;
             }
-            if(!isEmpty(objectToEdit)){
-                setObjectToEdit(objectToEdit);
+            let givenValue = isEmpty(objectToEdit) ? defaultEmptyValue : objectToEdit[element.accessor];
+            if(givenValue === undefined || givenValue === null || element.editable !== true){
+                continue;
             }
+            initialState[element.accessor] = givenValue;
         }
+        if(!isEmpty(initialState)){
+            setObjectToEdit(initialState);
+        }
+    }, []);
+    useEffect(() => {
+        let objectToEdit = getObjectToEditFromProps();
+        if(!isEmpty(objectToEdit)){
+            setObjectToEdit(objectToEdit);
+            updateFormDataStateAll(objectToEdit);
+            updateCreatedPostObj(objectToEdit);
+        }
+
     }, [props.idToEdit, originalData]);
 
     useEffect(() => {
+        if(isEmpty(props.object)){
+            return;
+        }
         setObjectToEdit(props.object);
-        setFormDataState(initialFormDataState);
+        updateFormDataStateAll(props.object);
         updateCreatedPostObj(props.object);
     },[props.object]);
 
@@ -195,10 +206,12 @@ const PostForm = React.memo((props) => {
         }
         let newObjData = removeIdIfEmpty(givenData);
         parseTags(newObjData);
-        newObjData['user'] = loggedInUser['id'];
+
+        newObjData['user'] = getPostUserId();
         newObjData['content'] = contentHtml;
 
-        if(isEmpty(createdPostObj)){
+        if(isEmpty(createdPostObj) && isEmpty(objectToEdit)){
+            // new creation
             await updateNewObjFormData(newObjData);
             await updateImgFieldObj({
                 desc: givenData['title'],
@@ -215,7 +228,7 @@ const PostForm = React.memo((props) => {
             return setSavedStates();
         }
 
-        if(!isEmpty(newObjData['main_img'])){
+        if(!isEmpty(newObjData['main_img']) && !newObjData['main_img'].hasOwnProperty('id')){
             await updateImgFieldObj({
                 desc: newObjData['title'],
                 user: loggedInUser.id,
@@ -226,29 +239,61 @@ const PostForm = React.memo((props) => {
         await setSavedStates();
     };
 
+    const getPostUserId = () => {
+        if(objectToEdit && objectToEdit.hasOwnProperty('user')){
+            return objectToEdit.user.id;
+        }
+        if(props.object && props.object.hasOwnProperty('user')){
+            return props.object.user.id;
+        }
+        return loggedInUser.id;
+    };
+
     const getChangedPostFields = (newFieldsData) => {
         let result = {};
+        let previousObj = {};
+        if(!isEmpty(createdPostObj)){
+            previousObj = createdPostObj;
+        }
+        if(!isEmpty(objectToEdit)){
+            previousObj = objectToEdit;
+        }
         for (let i = 0; i < props.formData.elements.length; i++) {
             let accessor = props.formData.elements[i].accessor;
+            if(typeof newFieldsData[accessor] === 'undefined'){
+                continue;
+            }
             if(accessor === 'id'){
                 continue;
             }
-            if(accessor === 'main_img' && isEmpty(newFieldsData[accessor]) && !isEmpty(createdPostObj[accessor])){
-                continue;
+            if(accessor === 'main_img'){
+                let isNewEmpty = isEmpty(newFieldsData[accessor]) && !isEmpty(previousObj[accessor]);
+                let newNotChanged = newFieldsData[accessor].file === previousObj[accessor].file;
+                if(isNewEmpty||newNotChanged){
+                    continue;
+                }
             }
             if(accessor === 'tags'){
-                let createdTagNames = getTagStrFromTagObjList(createdPostObj[accessor]);
+                if(isEmpty(newFieldsData[accessor].name)){
+                    continue;
+                }
+                let createdTagNames = getTagStrFromTagObjList(previousObj[accessor]);
                 let newTagNames = getTagStrFromTagObjList(newFieldsData[accessor]);
                 if(createdTagNames === newTagNames){
                     continue;
                 }
             }
-            if(['category', 'user', 'post_state'].includes(accessor)){
-                if(parseInt(newFieldsData[accessor]) === createdPostObj[accessor]['id'] ){
+            if(['category', 'post_state'].includes(accessor)){
+                if(newFieldsData[accessor]['id'] === previousObj[accessor]['id']){
                     continue;
                 }
             }
-            if(newFieldsData[accessor] === createdPostObj[accessor]){
+            if(accessor === 'user'){
+                if(parseInt(newFieldsData[accessor]) === parseInt(previousObj[accessor]['id'])){
+                    continue;
+                }
+            }
+            if(newFieldsData[accessor] === previousObj[accessor]){
                 // no change in this field
                 continue;
             }
@@ -270,7 +315,7 @@ const PostForm = React.memo((props) => {
     };
 
     let parseTags = (givenFormData) => {
-        if(givenFormData.hasOwnProperty('tags')){
+        if(givenFormData.hasOwnProperty('tags') && Array.isArray(givenFormData['tags'])){
             givenFormData['tags'] = givenFormData['tags']
                 .split(',')
                 .map(item => {
@@ -376,7 +421,7 @@ const PostForm = React.memo((props) => {
                 return;
             }
             let initialValue = isEmpty(objectToEdit) ? "" : objectToEdit[element.accessor];
-            if(!isEmpty(objectToEdit) && element.isTag){
+            if(!isEmpty(objectToEdit) && element.isTag && Array.isArray(objectToEdit[element.accessor])){
                 initialValue = objectToEdit[element.accessor].map(x => x.name).join(', ');
             }
             let error = (errors[element.accessor]) ? errors[element.accessor] : null;

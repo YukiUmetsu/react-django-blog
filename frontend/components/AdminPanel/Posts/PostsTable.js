@@ -12,7 +12,7 @@ import {PostsDataCenterContext} from "./PostsDataCenter";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPenNib} from "@fortawesome/free-solid-svg-icons/faPenNib";
 import Link from "next/link";
-import {ADMIN_EDIT_POST_AS_URL, ADMIN_EDIT_POST_URL, ADMIN_NEW_POST_URL} from "../../../constants/URLs";
+import {ADMIN_EDIT_POST_URL, ADMIN_NEW_POST_URL} from "../../../constants/URLs";
 
 const AdminPanelPostsTable = (props) => {
 

@@ -201,3 +201,19 @@ class PostsSerializer(serializers.ModelSerializer):
         model = Posts
         fields = "__all__"
         read_only_fields = ('id', 'total_likes', 'main_img')
+
+
+class PostsSerializerWithComments(serializers.ModelSerializer):
+    # Serializer for posts with comments
+    total_likes = serializers.IntegerField(required=False)
+    main_img = MainImageField(queryset=Files.objects.all(), required=True)
+    category = CategoryField(queryset=Categories.objects.all(), required=False)
+    tags = TagsField(queryset=Tags.objects.all(), many=True, required=False)
+    post_state = PostStatesField(queryset=PostStates.objects.all(), required=True)
+    user = UserField(queryset=get_user_model().objects.all(), required=True)
+    comments = CommentsSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Posts
+        fields = "__all__"
+        read_only_fields = ('id', 'total_likes', 'main_img', 'comments')

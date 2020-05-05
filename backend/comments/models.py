@@ -17,7 +17,7 @@ class Comments(models.Model):
         on_delete=models.CASCADE,
         blank=True, null=True
     )
-    post = models.ForeignKey(Posts, blank=False, null=False, on_delete=models.CASCADE)
+    post = models.ForeignKey(Posts, blank=False, null=False, on_delete=models.CASCADE, related_name='comments')
 
     @property
     def short_description(self):

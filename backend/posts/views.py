@@ -23,3 +23,8 @@ class PostsViewSet(viewsets.GenericViewSet,
         return Posts.objects.annotate(
             total_likes=Count('postlikes'),
         )
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return serializers.PostsSerializerWithComments
+        return serializers.PostsSerializer

@@ -209,8 +209,6 @@ const PostForm = React.memo((props) => {
     }, [createdPostObj]);
 
     let savePost = async (givenData) => {
-        console.log(givenData);
-        console.log(formDataState);
         if (isEmpty(givenData)) {
             // trigger validation when it is auto save
             let result = await triggerAllValidation();
@@ -308,11 +306,6 @@ const PostForm = React.memo((props) => {
                 }
             }
             if(['category', 'post_state'].includes(accessor)){
-                console.log(newFieldsData[accessor]);
-                console.log(typeof newFieldsData[accessor]);
-                console.log(previousObj[accessor]['id']);
-                console.log(typeof previousObj[accessor]['id']);
-
                 if (typeof newFieldsData[accessor] !== 'object' && ''+newFieldsData[accessor] === ''+previousObj[accessor]['id']){
                     continue;
                 } else if(''+newFieldsData[accessor]['id'] === ''+previousObj[accessor]['id']){

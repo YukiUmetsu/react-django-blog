@@ -1,6 +1,7 @@
 import {string, boolean, mixed, number} from "yup";
 import zxcvbn from 'zxcvbn';
 import {ADMIN_POST_TABLE_COLUMNS, ADMIN_USER_TABLE_COLUMNS, ICON_FILE_SIZE, ICON_SUPPORTED_FORMATS} from "./index";
+import {isEmpty} from "../lib/utils";
 
 export const checkIfFilesAreTooBig = (files) => {
     let valid = true;
@@ -135,8 +136,9 @@ export const POSTS_FORM_DATA = {
         title: string().required().min(1),
         content: string().required().min(1),
         main_img: mixed().required()
-            .test('profile img file type', 'invalid file type',value => checkIfFilesAreCorrectType(value))
-            .test('profile img file size',`file is too large (max is ${ICON_FILE_SIZE} MB)`, value => checkIfFilesAreTooBig(value)),
+            .test('main image required', 'main image is required field', value => !isEmpty(value))
+            .test('main image file type', 'invalid file type',value => checkIfFilesAreCorrectType(value))
+            .test('main image file size',`file is too large (max is ${ICON_FILE_SIZE} MB)`, value => checkIfFilesAreTooBig(value)),
         category: string().required(),
         tags: string(),
         post_state: string().required(),

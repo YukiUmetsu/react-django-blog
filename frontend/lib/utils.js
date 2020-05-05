@@ -38,6 +38,10 @@ export const isEmpty = (target) => {
     return target;
 };
 
+export const notNullUndefined = (value) => {
+    return value !== null || typeof value !== 'undefined';
+};
+
 export const formatDate = (dateObj, formatStr='MMMM Do YYYY') => {
     if(typeof dateObj === 'string'){
         dateObj = new Date(dateObj);

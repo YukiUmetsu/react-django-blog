@@ -4,7 +4,7 @@ import CSRFTokenInput from "../../UI/Form/CSRFTokenInput";
 import PropTypes from 'prop-types';
 import {object as yupObj} from "yup";
 import {PostsDataCenterContext} from "./PostsDataCenter";
-import {dClone, getTagStrFromTagObjList, isEmpty, strArrayEqual} from "../../../lib/utils";
+import {dClone, getTagStrFromTagObjList, isEmpty, notNullUndefined, strArrayEqual} from "../../../lib/utils";
 import PackmanSpinner from "../../UI/Spinner/PackmanSpinner";
 import Alert from "../../UI/Notifications/Alert";
 import Toggle from "../../UI/Form/Toggle";
@@ -102,7 +102,10 @@ const PostForm = React.memo((props) => {
     let {loggedInUser} = useContext(AdminAuthContext);
 
     const getObjectToEditFromProps = () => {
-        if(props.idToEdit !== null && !isEmpty(originalData)){
+        if(originalData.length === 1 && originalData[0] === 'data not required'){
+            return null;
+        }
+        if(notNullUndefined(props.idToEdit) && !isEmpty(originalData)){
             for (let i = 0; i < originalData.length; i++) {
                 if(parseInt(originalData[i].id) === parseInt(props.idToEdit)){
                     return originalData[i];
@@ -119,6 +122,7 @@ const PostForm = React.memo((props) => {
     let [contentHtml, setContentHtml] = useState('');
     let [previewModalOpen, setPreviewModalOpen] = useState(false);
     let [isSaved, setIsSaved] = useState(false);
+    let [isSaving, setIsSaving] = useState(false);
     let [lastSavedAt, setLastSavedAt] = useState(null);
 
     useInterval(() => savePost(), 1000*20);
@@ -130,10 +134,11 @@ const PostForm = React.memo((props) => {
         submitFocusError: true,
         validationSchema: yupObj().shape(props.formData.validationSchema),
     };
-    const { register, handleSubmit, triggerValidation, reset, errors } = useForm(formConfig);
+    const { register, handleSubmit, triggerValidation, reset, errors, clearError } = useForm(formConfig);
 
     useEffect( () => {
         let initialState = {};
+        let notEmpty = false;
         for (let i = 0; i < props.formData.elements.length; i++) {
             let element = props.formData.elements[i];
             let defaultEmptyValue = "";
@@ -144,12 +149,16 @@ const PostForm = React.memo((props) => {
             if(givenValue === undefined || givenValue === null || element.editable !== true){
                 continue;
             }
+            if(!isEmpty(givenValue)){
+                notEmpty = true;
+            }
             initialState[element.accessor] = givenValue;
         }
-        if(!isEmpty(initialState)){
+        if(notEmpty && !isEmpty(initialState)){
             setObjectToEdit(initialState);
         }
     }, []);
+
     useEffect(() => {
         let objectToEdit = getObjectToEditFromProps();
         if(!isEmpty(objectToEdit)){
@@ -199,44 +208,56 @@ const PostForm = React.memo((props) => {
         }
     }, [createdPostObj]);
 
-    let savePost = async (givenData = formDataState) => {
-        let result = await triggerAllValidation();
-        if(!result || isSaved || !isEmpty(errors)){
-            return;
+    let savePost = async (givenData) => {
+
+        if (isEmpty(givenData)) {
+            // trigger validation when it is auto save
+            let result = await triggerAllValidation();
+            if(!result || isSaved || !isEmpty(errors)){
+                setLoading(false);
+                setIsSaving(false);
+                return;
+            }
+            givenData = formDataState;
         }
+
+        setIsSaving(true);
+
         let newObjData = removeIdIfEmpty(givenData);
         parseTags(newObjData);
 
         newObjData['user'] = getPostUserId();
         newObjData['content'] = contentHtml;
 
+        let main_img = newObjData['main_img'];
+        if(typeof main_img === 'object' && !main_img.hasOwnProperty('name') && main_img.hasOwnProperty('0')){
+            newObjData['main_img'] = main_img['0'];
+        }
+        if(Array.isArray(main_img)){
+            newObjData['main_img'] = main_img[0];
+        }
+
         if(isEmpty(createdPostObj) && isEmpty(objectToEdit)){
             // new creation
             await updateNewObjFormData(newObjData);
-            await updateImgFieldObj({
-                desc: givenData['title'],
-                user: loggedInUser.id,
-                file: givenData['main_img']
-            });
-            return setSavedStates();
-        }
-
-        // Editing!
-        newObjData = getChangedPostFields(newObjData);
-
-        if(isEmpty(newObjData)){
-            return setSavedStates();
-        }
-
-        if(!isEmpty(newObjData['main_img']) && !newObjData['main_img'].hasOwnProperty('id')){
             await updateImgFieldObj({
                 desc: newObjData['title'],
                 user: loggedInUser.id,
                 file: newObjData['main_img']
             });
+            return;
+        }
+
+        // Editing!
+        newObjData = getChangedPostFields(newObjData);
+        if(!isEmpty(newObjData['main_img']) && !newObjData['main_img'].hasOwnProperty('id')){
+            await updateImgFieldObj({
+                desc: newObjData['title'],
+                user: loggedInUser.id,
+                file: newObjData['main_img'][0]
+            });
         }
         await updateEditObjFormData(newObjData);
-        await setSavedStates();
     };
 
     const getPostUserId = () => {
@@ -289,7 +310,7 @@ const PostForm = React.memo((props) => {
                 }
             }
             if(accessor === 'user'){
-                if(parseInt(newFieldsData[accessor]) === parseInt(previousObj[accessor]['id'])){
+                if(previousObj[accessor] && parseInt(newFieldsData[accessor]) === parseInt(previousObj[accessor]['id'])){
                     continue;
                 }
             }
@@ -308,14 +329,22 @@ const PostForm = React.memo((props) => {
 
     let removeIdIfEmpty = (givenFormData) => {
         let formDataCopy = dClone(givenFormData);
-        if(formDataCopy.hasOwnProperty('id') && formDataCopy.id === ''){
+        if(
+            formDataCopy.hasOwnProperty('id') &&
+            (formDataCopy.id === '' || typeof formDataCopy.id === 'undefined')
+        ){
             delete formDataCopy.id;
         }
         return formDataCopy;
     };
 
     let parseTags = (givenFormData) => {
-        if(givenFormData.hasOwnProperty('tags') && Array.isArray(givenFormData['tags'])){
+        if(isEmpty(givenFormData['tags'])){
+            givenFormData['tags'] = {name: '', user: loggedInUser.id};
+            return givenFormData;
+        }
+
+        if(givenFormData.hasOwnProperty('tags') && typeof givenFormData['tags'] === 'string'){
             givenFormData['tags'] = givenFormData['tags']
                 .split(',')
                 .map(item => {
@@ -323,15 +352,13 @@ const PostForm = React.memo((props) => {
                 })
                 .filter(x => !isEmpty(x));
         }
-        if(isEmpty(givenFormData['tags'])){
-            delete givenFormData.tags;
-        }
         return givenFormData;
     };
 
     let setSavedStates = () => {
         setLoading(false);
         setIsSaved(true);
+        setIsSaving(false);
         setLastSavedAt(moment().format('YYYY/MM/DD HH:mm'));
     };
 
@@ -382,7 +409,7 @@ const PostForm = React.memo((props) => {
     }, [categories]);
 
     const onSubmit = async data => {
-        setLoading(true);
+        clearError();
         if(!isEmpty(objectToEdit)){
             // this is editing form since object exist. remove unchanged values.
             let objKeys = Object.keys(objectToEdit);
@@ -399,10 +426,6 @@ const PostForm = React.memo((props) => {
 
         if(props.onSubmitCallback){
             await props.onSubmitCallback(data);
-        }
-        let result = await props.onSubmitCallback(data);
-        if(result){
-            setSavedStates();
         }
     };
 
@@ -587,7 +610,7 @@ const PostForm = React.memo((props) => {
                         {errors['content'] ? <p className="text-red-500 text-md italic text-center">*{errors['content']['message']}</p> : ""}
                     </div>
                     <BlogEditor
-                        name='content'
+                        name='blog-editor'
                         height={500}
                         reference={register}
                         onChangeCallback={(content) => editorOnChangeHandler(content)}
@@ -599,11 +622,15 @@ const PostForm = React.memo((props) => {
                     <textarea readOnly name='content' ref={register} className={`hidden`} value={contentHtml}/>
                 </div>
                 <CSRFTokenInput/>
-                <button type="submit" className="w-1/3 text-center py-3 rounded bg-green-600 text-white hover:bg-green-900 focus:outline-none my-1">
+                <button
+                    type="submit"
+                    disabled={loading||isSaving}
+                    className={`w-1/3 text-center py-3 rounded text-white focus:outline-none my-1 ${(loading||isSaving) ? 'disabled bg-gray-600 hover:bg-gray-600':'bg-green-600 hover:bg-green-900'}`}>
                     Save
                 </button>
                 <button
-                    className="w-1/3 mx-5 text-center py-3 rounded bg-blue-500 hover:bg-blue-700 text-white focus:outline-none my-1"
+                    disabled={loading||isSaving}
+                    className={`w-1/3 mx-5 text-center py-3 rounded text-white focus:outline-none my-1 ${(loading||isSaving) ? 'disabled bg-gray-600 hover:bg-gray-600':'bg-blue-500 hover:bg-blue-700'}`}
                     onClick={() => setPreviewModalOpen(true)}
                 >
                     Preview

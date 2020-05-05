@@ -16,11 +16,11 @@ class PostsViewSet(viewsets.GenericViewSet,
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsStaffUserOrReadOnly,)
 
-    queryset = Posts.objects.all()
+    queryset = Posts.updated_obj.all()
     serializer_class = serializers.PostsSerializer
 
     def get_queryset(self):
-        return Posts.objects.annotate(
+        return Posts.updated_obj.annotate(
             total_likes=Count('postlikes'),
         )
 

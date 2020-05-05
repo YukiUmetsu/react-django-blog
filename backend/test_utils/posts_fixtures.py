@@ -2,6 +2,7 @@ import os
 import pytest
 import random
 import string
+import datetime
 from posts.models import Posts
 from test_utils.users_fixtures import users
 from test_utils.categories_fixtures import category_payload, category_obj
@@ -9,7 +10,7 @@ from test_utils.tags_fixtures import staff_tag_obj0
 from test_utils.post_states_fixtures import all_states
 from rest_framework.test import APIClient
 from files.models import Files
-
+from django.utils.timezone import make_aware
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IMG_DIR = BASE_DIR + '/files/tests/'
@@ -63,6 +64,43 @@ def post_payload(users, category_obj, all_states, staff_tag_obj0, img_obj):
 @pytest.fixture
 def post_obj(post_min_payload, staff_tag_obj0):
     post = Posts.objects.create(**post_min_payload)
+    post.tags.set([staff_tag_obj0])
+    yield post
+
+    post.delete()
+
+
+def get_post_payload_with_scheduled_time(time, users, category_obj, all_states, img_obj):
+    return {
+        'title': random_string(25),
+        'excerpt': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
+        'category': category_obj,
+        'user': users['staff'][0],
+        'post_state': all_states[1],
+        'main_img': img_obj,
+        'content': random_string(50),
+        'scheduled_at': time
+    }
+
+
+@pytest.mark.django_db
+@pytest.fixture
+def post_scheduled_at_past(users, category_obj, all_states, staff_tag_obj0, img_obj):
+    past_time = make_aware(datetime.datetime.now() - datetime.timedelta(hours=1))
+    payload = get_post_payload_with_scheduled_time(past_time, users, category_obj, all_states, img_obj)
+    post = Posts.objects.create(**payload)
+    post.tags.set([staff_tag_obj0])
+    yield post
+
+    post.delete()
+
+
+@pytest.mark.django_db
+@pytest.fixture
+def post_scheduled_at_future(users, category_obj, all_states, staff_tag_obj0, img_obj):
+    future_time = make_aware(datetime.datetime.now() + datetime.timedelta(days=1))
+    payload = get_post_payload_with_scheduled_time(future_time, users, category_obj, all_states, img_obj)
+    post = Posts.objects.create(**payload)
     post.tags.set([staff_tag_obj0])
     yield post
 

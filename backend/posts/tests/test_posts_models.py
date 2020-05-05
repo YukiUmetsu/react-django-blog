@@ -3,10 +3,11 @@ from rest_framework import status
 from test_utils.users_fixtures import users
 from test_utils.categories_fixtures import category_payload, category_obj
 from test_utils.post_states_fixtures import all_states
-from test_utils.posts_fixtures import post_min_payload, post_payload, post_obj, img_obj
+from test_utils.posts_fixtures import post_min_payload, post_payload, post_obj, img_obj, post_scheduled_at_past, post_scheduled_at_future
 from test_utils.tags_fixtures import tag_payload, staff_tag_obj0
 from rest_framework.test import APIClient
 from posts.models import Posts
+from post_states.models import PostStates
 
 pytestmark = pytest.mark.django_db
 
@@ -50,13 +51,11 @@ class TestPrivatePostsAPI:
     def test_staff_user_can_create_posts(self, users, post_payload):
         self.client.force_authenticate(users['staff'][0])
         response = self.client.post("/api/posts/", post_payload)
-        print(response.data)
         assert response.status_code == status.HTTP_201_CREATED
 
     def test_superuser_can_create_posts(self, users, post_payload):
         self.client.force_authenticate(users['superuser'][0])
         response = self.client.post("/api/posts/", post_payload)
-        print(response.data)
         assert response.status_code == status.HTTP_201_CREATED
 
     def test_normal_user_cannot_delete_posts(self, users, post_obj):
@@ -92,3 +91,15 @@ class TestPrivatePostsAPI:
         response = self.client.put(f'/api/posts/{post_obj.id}/', post_payload)
         assert response.status_code == status.HTTP_200_OK
         assert response.data['title'] != post_obj.title
+
+    def test_post_state_update_from_scheduled_to_published(self, users, post_scheduled_at_past):
+        published_post_state = PostStates.objects.get(name='published')
+        self.client.force_authenticate(users['staff'][0])
+        response = self.client.get(f'/api/posts/{post_scheduled_at_past.id}/')
+        assert response.data.get('post_state').get('id') == published_post_state.id
+
+    def test_post_state_stays_same_if_scheduled_for_future(self, users, post_scheduled_at_future):
+        scheduled_post_state = PostStates.objects.get(name='scheduled')
+        self.client.force_authenticate(users['staff'][0])
+        response = self.client.get(f'/api/posts/{post_scheduled_at_future.id}/')
+        assert response.data.get('post_state').get('id') == scheduled_post_state.id

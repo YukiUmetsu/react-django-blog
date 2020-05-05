@@ -46,6 +46,10 @@ export const formatDate = (dateObj, formatStr='MMMM Do YYYY') => {
     if(typeof dateObj === 'string'){
         dateObj = new Date(dateObj);
     }
+    let momentObj = moment(dateObj);
+    if (!momentObj.isValid()){
+        return '';
+    }
     return moment(dateObj).format(formatStr);
 };
 

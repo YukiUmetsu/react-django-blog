@@ -328,9 +328,7 @@ const PostsDataCenter = (props) => {
                     setCreatedPostObj(editedObject);
                     clearEditFormStates();
                     setDataManipulationComplete(true);
-                    setAlertProps(
-                        {...NOTIFICATION_AFTER_DATA_EDIT,
-                            hideCallback: () => {resetAlertProps(); setDataManipulationComplete(false)}});
+                    createSuccessfulAlertProps(`${objNameCp} Edit`, ` Successfully edited the ${objNameSm}.`)
                 }
             },
             onError: (error) => {

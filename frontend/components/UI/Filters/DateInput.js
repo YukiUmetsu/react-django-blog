@@ -36,6 +36,7 @@ const DateInput = (props) => {
                 placeholderText={props.placeholderText}
                 styles={{minWidth: '100%', width: '100%'}}
                 showTimeInput
+                showTimeSelect
                 timeInputLabel="Time:"
             />
             <input type="hidden" className={`hidden invisible`} name={props.inputName} ref={props.reference} value={selectedDate ? selectedDate : ''}/>

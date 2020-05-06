@@ -149,6 +149,25 @@ export const POSTS_FORM_DATA = {
     },
 };
 
+export const POSTS_EDIT_FORM_DATA = {
+    elements: ADMIN_POST_TABLE_COLUMNS,
+    validationSchema: {
+        id: mixed().required(),
+        title: string().required().min(1),
+        content: string().required().min(1),
+        main_img: mixed()
+            .test('main image file type', 'invalid file type',value => checkIfFilesAreCorrectType(value))
+            .test('main image file size',`file is too large (max is ${ICON_FILE_SIZE} MB)`, value => checkIfFilesAreTooBig(value)),
+        category: string().required(),
+        tags: string(),
+        post_state: string().required(),
+        meta_desc: string(),
+        youtube_url: string(),
+        user: number(),
+        scheduled_at: mixed(),
+    },
+};
+
 export const POST_SCHEDULED_OBJ = {
     id: 2,
     name: 'scheduled'

@@ -6,7 +6,7 @@ import PostsDataCenter from "../../../components/AdminPanel/Posts/PostsDataCente
 import {CATEGORIES_LIST_API} from "../../../constants";
 import PostForm from "../../../components/AdminPanel/Posts/PostForm";
 import Aux from "../../../hoc/Aux/Aux";
-import {POSTS_FORM_DATA} from "../../../constants/FormDataConst";
+import {POSTS_EDIT_FORM_DATA} from "../../../constants/FormDataConst";
 import {useRouter} from "next/router";
 
 const AdminPanelEditPost = (props) => {
@@ -27,7 +27,7 @@ const AdminPanelEditPost = (props) => {
                     <PackmanSpinner/>:
                     <Aux>
                         <h1>Write a Post</h1>
-                        <PostForm form_id_prefix='new_post' formData={POSTS_FORM_DATA} idToEdit={idToEdit}/>
+                        <PostForm form_id_prefix='new_post' formData={POSTS_EDIT_FORM_DATA} idToEdit={idToEdit}/>
                     </Aux>
                 }
 

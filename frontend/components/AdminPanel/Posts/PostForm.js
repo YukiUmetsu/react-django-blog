@@ -264,6 +264,9 @@ const PostForm = React.memo((props) => {
 
         // Editing!
         newObjData = getChangedPostFields(newObjData);
+        if(isEmpty(newObjData)){
+            setIsSaving(false);
+        }
         if(!isEmpty(newObjData['main_img']) && !newObjData['main_img'].hasOwnProperty('id')){
             await updateImgFieldObj({
                 desc: newObjData['title'],
@@ -295,6 +298,7 @@ const PostForm = React.memo((props) => {
         }
         for (let i = 0; i < props.formData.elements.length; i++) {
             let accessor = props.formData.elements[i].accessor;
+            let type = props.formData.elements[i].type;
             if(typeof newFieldsData[accessor] === 'undefined'){
                 continue;
             }
@@ -327,6 +331,11 @@ const PostForm = React.memo((props) => {
             }
             if(accessor === 'user'){
                 if(previousObj[accessor] && parseInt(newFieldsData[accessor]) === parseInt(previousObj[accessor]['id'])){
+                    continue;
+                }
+            }
+            if(type === 'date'){
+                if(moment(previousObj[accessor]).unix() === moment(previousObj[accessor]).unix()){
                     continue;
                 }
             }
@@ -372,6 +381,7 @@ const PostForm = React.memo((props) => {
     };
 
     let setSavedStates = () => {
+        console.log('set saved status! ' + moment().format('YYYY/MM/DD HH:mm'));
         setLoading(false);
         setIsSaved(true);
         setIsSaving(false);
@@ -379,6 +389,8 @@ const PostForm = React.memo((props) => {
     };
 
     let updateFormDataState = (accessor, value) => {
+        console.log('updateFormDataState');
+        console.log(`${accessor} - ${value}`);
         setIsSaved(false);
         let updatedElement = {};
         updatedElement[accessor] = value;
@@ -624,8 +636,13 @@ const PostForm = React.memo((props) => {
     };
 
     let editorOnChangeHandler = (content) => {
-        setContentHtml(sanitizeHtml(content, SANITIZE_HTML_OPTIONS));
+        setContentHtml(sanitizePostHtml(content));
         setIsSaved(false);
+    };
+
+    let sanitizePostHtml = (content) => {
+        let brRegex = /<br \/>/gi;
+        return sanitizeHtml(content, SANITIZE_HTML_OPTIONS).replace(brRegex, '<br>')
     };
 
     let renderPostContentReview = () => {

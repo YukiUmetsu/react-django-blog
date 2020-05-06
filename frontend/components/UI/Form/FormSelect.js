@@ -48,6 +48,9 @@ const FormSelect = React.memo((props) => {
 
     let updateFormWithNewValue = async () => {
         let initValue = getInitialValue();
+        if(initValue === currentValue){
+            return;
+        }
         await setCurrentValue(initValue);
         if(!isEmpty(initValue)) {
             await props.updateFormDataState(props.id, initValue);

@@ -55,6 +55,6 @@ class Posts(models.Model):
 
     def save(self, *args, **kwargs):
         # sanitize html
-        if kwargs.get('content') is not None and len(kwargs.get('content')) > 0:
-            kwargs['content'] = sanitize_html(kwargs['content'])
-        super().save(*args, **kwargs)
+        if self.content is not None and len(self.content) > 0:
+            self.content = sanitize_html(self.content)
+        super(Posts, self).save(*args, **kwargs)

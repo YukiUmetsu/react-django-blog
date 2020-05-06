@@ -11,6 +11,9 @@ from post_states.models import PostStates
 
 pytestmark = pytest.mark.django_db
 
+HTML_CONTENT_SCRIPT = '<p>Lorem ipsum dolor sit amet</p><script>alert("abc")</script><p>Lorem ipsum dolor sit amet</p>'
+HTML_CONTENT_HREF = '<p>Lorem ipsum dolor sit amet</p><a href=javascript:alert(String.fromCharCode(88,83,83))>Click me!</a><p>Lorem ipsum dolor sit amet</p>'
+
 @pytest.mark.django_db
 class TestPublicPostsAPI:
 
@@ -103,3 +106,17 @@ class TestPrivatePostsAPI:
         self.client.force_authenticate(users['staff'][0])
         response = self.client.get(f'/api/posts/{post_scheduled_at_future.id}/')
         assert response.data.get('post_state').get('id') == scheduled_post_state.id
+
+    def test_sanitize_html_for_post_content_script(self, users, post_payload):
+        post_payload['content'] = HTML_CONTENT_SCRIPT
+        self.client.force_authenticate(users['staff'][0])
+        response = self.client.post("/api/posts/", post_payload)
+        assert response.status_code == status.HTTP_201_CREATED
+        assert "<script>" not in response.data.get('content', '')
+
+    def test_sanitize_html_for_post_content_javascript(self, users, post_payload):
+        post_payload['content'] = HTML_CONTENT_HREF
+        self.client.force_authenticate(users['staff'][0])
+        response = self.client.post("/api/posts/", post_payload)
+        assert response.status_code == status.HTTP_201_CREATED
+        assert "javascript" not in response.data.get('content', '')

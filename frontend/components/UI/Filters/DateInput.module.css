@@ -1,0 +1,6 @@
+.customDatePickerWidth > div {
+    width: 100%;
+}
+.customDatePickerWidth > div > div {
+    z-index: 999;
+}

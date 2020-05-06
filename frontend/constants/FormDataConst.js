@@ -145,5 +145,11 @@ export const POSTS_FORM_DATA = {
         meta_desc: string(),
         youtube_url: string(),
         user: number(),
+        scheduled_at: mixed(),
     },
+};
+
+export const POST_SCHEDULED_OBJ = {
+    id: 2,
+    name: 'scheduled'
 };

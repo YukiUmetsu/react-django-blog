@@ -27,7 +27,7 @@ const FormImageSelect = React.memo((props) => {
     };
 
     return (
-        <div key={props.id} className={`rounded-lg p-6 w-${props.length}`}>
+        <div key={props.id} className={`rounded-lg p-6 w-full md:max-w-${props.length}`}>
             {renderLabel()}
             <div
                 className={props.outerDivClassName}

@@ -25,7 +25,7 @@ const FormSelect = React.memo((props) => {
         }
     };
 
-    let initialValue = () => {
+    let getInitialValue = () => {
         if(isEmpty(props.value)){
             return '';
         }
@@ -35,19 +35,27 @@ const FormSelect = React.memo((props) => {
         return props.value;
     };
 
-    let [currentValue, setCurrentValue] = useState(initialValue);
+    let [currentValue, setCurrentValue] = useState(getInitialValue);
 
     let handleOnChange = (e) => {
         setCurrentValue(e.target.value);
         props.updateFormDataState(props.id, e.target.value);
     };
 
-    useEffect(() => {
-        setCurrentValue(initialValue());
+    useEffect( () => {
+        updateFormWithNewValue()
     }, [props.value]);
 
+    let updateFormWithNewValue = async () => {
+        let initValue = getInitialValue();
+        await setCurrentValue(initValue);
+        if(!isEmpty(initValue)) {
+            await props.updateFormDataState(props.id, initValue);
+        }
+    };
+
     return (
-        <div className={`w-full md:w-${props.length} px-3 mb-6 md:mb-0`} key={`${props.form_id_prefix}_form_div_${props.id}`}>
+        <div className={`min-w-full md:min-w-${props.length} mt-4 px-3 mb-6 md:mb-0`} key={`${props.form_id_prefix}_form_div_${props.id}`}>
 
             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                    htmlFor={props.id}>

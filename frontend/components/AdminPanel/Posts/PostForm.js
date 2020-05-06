@@ -8,15 +8,16 @@ import {dClone, getTagStrFromTagObjList, isEmpty, notNullUndefined, strArrayEqua
 import PackmanSpinner from "../../UI/Spinner/PackmanSpinner";
 import Alert from "../../UI/Notifications/Alert";
 import Toggle from "../../UI/Form/Toggle";
-import {API_BASE, DEFAULT_POST_MAIN_PHOTO, SANITIZE_HTML_OPTIONS} from "../../../constants";
+import {API_BASE, DEFAULT_POST_MAIN_PHOTO, DJANGO_TIME_FORMAT, SANITIZE_HTML_OPTIONS} from "../../../constants";
 import dynamic from "next/dynamic";
 import parse, {domToReact} from 'html-react-parser';
 import sanitizeHtml from 'sanitize-html';
 import Aux from "../../../hoc/Aux/Aux";
 import Modal from "../../UI/Modal/Modal";
 import useInterval from "../../../lib/useInterval";
-import moment from "moment";
+import moment from 'moment-timezone';
 import {AdminAuthContext} from "../../../lib/auth/adminAuth";
+import {POST_SCHEDULED_OBJ} from "../../../constants/FormDataConst";
 
 const DynamicTextInput = dynamic(
     () => import('../../UI/Form/FormTextInput'),
@@ -32,6 +33,10 @@ const DynamicImageSelect = dynamic(
 );
 const BlogEditor = dynamic(
     () => import('../../UI/BlogEditer/BlogEditor'),
+    { ssr: false }
+);
+const DateInput = dynamic(
+    () => import('../../UI/Filters/DateInput'),
     { ssr: false }
 );
 
@@ -124,6 +129,7 @@ const PostForm = React.memo((props) => {
     let [isSaved, setIsSaved] = useState(false);
     let [isSaving, setIsSaving] = useState(false);
     let [lastSavedAt, setLastSavedAt] = useState(null);
+    let [scheduledDate, setScheduledDate] = useState('');
 
     useInterval(() => savePost(), 1000*20);
 
@@ -208,6 +214,9 @@ const PostForm = React.memo((props) => {
         }
     }, [createdPostObj]);
 
+    // set default timezone
+    moment.tz.setDefault(moment.tz.guess());
+
     let savePost = async (givenData) => {
         if (isEmpty(givenData)) {
             // trigger validation when it is auto save
@@ -236,6 +245,10 @@ const PostForm = React.memo((props) => {
         }
         if(typeof newObjData['main_img'] === 'object' && newObjData['main_img'].hasOwnProperty('0')){
             newObjData['main_img'] = newObjData['main_img']['0'];
+        }
+
+        if(!isEmpty(newObjData['scheduled_at'])){
+            newObjData['scheduled_at'] = moment(newObjData['scheduled_at']).format(DJANGO_TIME_FORMAT);
         }
 
         if(isEmpty(createdPostObj) && isEmpty(objectToEdit)){
@@ -463,8 +476,11 @@ const PostForm = React.memo((props) => {
             if (element.type === 'select') {
                 return renderSelectOptions(element.accessor, element.label, initialValue, element.options, element.formLength, error)
             }
-            if(element.type === "image"){
+            if(element.type === 'image'){
                 return renderImageIcon(element.accessor, element.label, initialValue, element.multiple, element.accept, element.formLength, error)
+            }
+            if(element.type === 'date'){
+                return renderDatePicker(element.accessor, element.label, initialValue, element.formLength, error)
             }
         }).filter(x => x !== undefined);
     };
@@ -521,12 +537,13 @@ const PostForm = React.memo((props) => {
         } else if(id === 'post_state'){
             options = postStatesOptions
         }
+
         return (
             <DynamicSelect
                 key={id}
                 id={id}
                 label={label}
-                value={value}
+                value={(id === 'post_state' && !isEmpty(scheduledDate)) ? POST_SCHEDULED_OBJ : value}
                 options={options}
                 length={length}
                 error={error}
@@ -568,6 +585,32 @@ const PostForm = React.memo((props) => {
                 overlayPCameraIconClassName={`mt-4`}
             />
         );
+    };
+
+    let renderDatePicker = (id, label, value, length, error = null) => {
+        let onDateChanged = () => {}
+        if(id === 'scheduled_at'){
+            onDateChanged = onScheduleDateChanged
+        }
+        return (
+            <DateInput
+                key={id}
+                inputName={id}
+                label={label}
+                error={error}
+                length={length}
+                defaultDate={value}
+                reference={register}
+                onDateChanged={(date) => onDateChanged(date)}
+            />
+            );
+    };
+
+    let onScheduleDateChanged = (date) => {
+        if(!isEmpty(date)){
+            setScheduledDate(date);
+            updateFormDataState('scheduled_at', date)
+        }
     };
 
     let triggerAllValidation = async () => {

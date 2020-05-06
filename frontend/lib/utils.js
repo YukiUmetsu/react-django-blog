@@ -133,6 +133,11 @@ export const dClone = (o) => {
     output = Array.isArray(o) ? [] : {};
     for (key in o) {
         v = o[key];
+        if(typeof v === "object" && typeof v.getTime === 'function'){
+            // date object
+            output[key] = new Date(v.getTime());
+            continue;
+        }
         output[key] = (typeof v === "object") ? Object.assign({}, v) : v;
     }
     return output;

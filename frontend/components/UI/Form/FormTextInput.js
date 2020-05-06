@@ -26,7 +26,7 @@ const FormTextInput = React.memo((props) => {
 
     let renderInput = () => {
         return (
-            <div key={props.id} className={`w-full md:w-${props.length} px-3 mt-4 mb-6 md:mb-0`}>
+            <div key={props.id} className={`w-full md:max-w-${props.length} px-3 mt-4 mb-6 md:mb-0 h-min-content`}>
                 <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor={props.id}>
                     {props.label}
                 </label>

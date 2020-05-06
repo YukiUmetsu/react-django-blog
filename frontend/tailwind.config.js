@@ -87,6 +87,9 @@ module.exports = {
       'auto': 'auto',
     },
     extend: {
+      height: {
+        'min-content': 'min-content',
+      },
       spacing: {
         '26': '6.5rem',
         '1/2': '50%',

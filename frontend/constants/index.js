@@ -205,6 +205,8 @@ export const SANITIZE_HTML_OPTIONS = {
     }
 };
 
+export const DJANGO_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ssZ';
+
 export * from './SWR';
 export * from './DummyData';
 export * from './API';

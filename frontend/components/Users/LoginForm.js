@@ -26,7 +26,7 @@ const LoginForm = (props) => {
             return;
         }
         let responseData = await loginFetch(data);
-        if (!responseData.response.ok) {
+        if (!responseData.token) {
            props.onServerError();
            cookie.set('login_fail', current_login_fail+1, { expires: 1 });
         }

@@ -55,7 +55,7 @@ const SelectableTableRow = React.memo((props) => {
     let renderActions = () => {
         if(props.isActionsRequired) {
             return (
-                <td className="whitespace-no-wrap">
+                <td className="table-actions whitespace-no-wrap">
                     <ItemActions
                         object={props.rowObj}
                         onEditClicked={() => updateEditModalState(rowObj)}

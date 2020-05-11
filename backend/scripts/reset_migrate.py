@@ -51,8 +51,11 @@ def create_test_users():
 def load_initial_data():
     print("loading fixtures...")
     os.system("python3 manage.py loaddata */fixtures/*.json")
+    print("loading posts fixtures...")
     os.system("python3 manage.py loaddata */posts_fixtures/*.json")
+    print("loading post likes fixtures...")
     os.system("python3 manage.py loaddata */post_likes_fixtures/*.json")
+    print("loading comments fixtures...")
     os.system("python3 manage.py loaddata */comments_fixtures/*.json")
 
 # CAUTION! reset whole database and remove migration files!!!

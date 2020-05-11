@@ -79,7 +79,6 @@ const AdminLogin = (props) => {
                             onServerError={() => setHasServerError(true)}
                             maxLoginFailure={10}
                             onMaxLoginFailureCallback={() => setOverMaxLoginFailure(true)}
-                            angoKey={props.angoKey}
                             />
                         }
                     </div>

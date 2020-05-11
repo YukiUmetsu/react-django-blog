@@ -147,3 +147,13 @@ component:
  <button className={styles.error} >click</button>
 ```
 
+# End to End testing with Cypress
+Automated browser testing with cypress.<br>
+If you start e2e with cypress for the first time, go to "/blog/frontend" in your host machine<br>
+<code>npm install --save-dev cypress cypress-file-upload</code><br>
+In order to start cypress test, <br>
+<code>npm test</code><br>
+this will start the new window. select the test js file to execute. test files are in frontend/cypress.<br>
+For more info: https://docs.cypress.io/api/api/table-of-contents.html<br>
+
+

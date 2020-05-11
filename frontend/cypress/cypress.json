@@ -1,0 +1,7 @@
+{
+  "watchForFileChanges": true,
+  "baseUrl": "http://localhost:3000",
+  "defaultCommandTimeout": 60000,
+  "pageLoadTimeout": 100000,
+  "browser": "chrome"
+}

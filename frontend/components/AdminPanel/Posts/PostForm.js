@@ -687,6 +687,7 @@ const PostForm = React.memo((props) => {
                 <CSRFTokenInput/>
                 <button
                     type="submit"
+                    id="save-btn"
                     disabled={loading||isSaving}
                     className={`w-1/3 text-center py-3 rounded text-white focus:outline-none my-1 ${(loading||isSaving) ? 'disabled bg-gray-600 hover:bg-gray-600':'bg-green-600 hover:bg-green-900'}`}>
                     Save

@@ -8,20 +8,25 @@ from lib.utils import sanitize_html
 from django.db.models import Q
 import datetime
 from django.utils.timezone import make_aware
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class UpdatePostStatusManager(models.Manager):
     def get_queryset(self):
         # update scheduled posts that should be published because the time passed.
         current_time = make_aware(datetime.datetime.now())
-        post_state_scheduled = PostStates.objects.get(name='scheduled')
-        post_state_published = PostStates.objects.get(name='published')
 
-        posts_to_update = super().get_queryset()\
-            .filter(post_state=post_state_scheduled)\
-            .filter(Q(scheduled_at__lte=current_time))
-        posts_to_update.update(post_state=post_state_published)
-        return super().get_queryset().all()
+        try:
+            post_state_scheduled = PostStates.objects.get(name='scheduled')
+            post_state_published = PostStates.objects.get(name='published')
+            posts_to_update = super().get_queryset() \
+                .filter(post_state=post_state_scheduled) \
+                .filter(Q(scheduled_at__lte=current_time))
+            posts_to_update.update(post_state=post_state_published)
+            return super().get_queryset().all()
+
+        except ObjectDoesNotExist:
+            return super().get_queryset().all()
 
 
 class Posts(models.Model):

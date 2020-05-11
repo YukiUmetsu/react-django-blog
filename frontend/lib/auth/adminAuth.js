@@ -89,7 +89,7 @@ export const AdminLoginFetch = async (data) => {
     let loginRespond = await loginFetch(data, true);
     let wasLoginSuccess = !isEmpty(loginRespond.token);
     if(!wasLoginSuccess){
-        return error;
+        return loginRespond;
     }
     cookie.set('token', loginRespond.token, { expires: 1 });
     let csrf_token = cookie.get('csrf_token');
@@ -111,6 +111,7 @@ export const AdminLoginFetch = async (data) => {
             return {userData: userData, response: response};
         } else {
             let error = new Error(response.statusText);
+            console.log(response);
             error.response = response;
             throw error
         }

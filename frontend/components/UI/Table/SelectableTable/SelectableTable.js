@@ -287,6 +287,7 @@ const SelectableTable = (props) => {
 
             <OutsideComponentAlerter callback={() => updateDeleteModalState({}, false)}>
                 <DynamicAlertModal
+                    modalId="delete-item"
                     modalOpen={deleteModalState.isOpen}
                     onCloseCallback={() => updateDeleteModalState({}, false)}
                     title="Are you sure to delete?"
@@ -298,6 +299,7 @@ const SelectableTable = (props) => {
 
             <OutsideComponentAlerter callback={() => setBunchDeleteModalOpen(false)}>
                 <DynamicAlertModal
+                    modalId="delete-multi-items"
                     modalOpen={bunchDeleteModalOpen}
                     onCloseCallback={() => setBunchDeleteModalOpen(false)}
                     title="Are you sure to delete?"

@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "next",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test": "./node_modules/.bin/cypress open"
   },
   "author": "Yuki Umetsu",
   "license": "ISC",
@@ -48,6 +49,8 @@
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
+    "cypress": "^4.5.0",
+    "cypress-file-upload": "^4.0.6",
     "faker": "^4.1.0",
     "rosie": "^2.0.1"
   }

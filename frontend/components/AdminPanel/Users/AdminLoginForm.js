@@ -25,8 +25,8 @@ const AdminLoginForm = (props) => {
             await props.onMaxLoginFailureCallback();
             return;
         }
-        let responseData = await AdminLoginFetch(data, props.angoKey);
-        if (!responseData.response.ok) {
+        let responseData = await AdminLoginFetch(data);
+        if (!responseData.hasOwnProperty('userData')) {
            props.onServerError();
            cookie.set('login_fail', current_login_fail+1, { expires: 1 });
         }

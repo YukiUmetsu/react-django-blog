@@ -67,7 +67,7 @@ const AdminPanelPostsTable = (props) => {
             <div className="px-6 py-2 mb-3 float-none">
                 <div className="float-left font-bold text-xl">{pageTitle}</div>
                 <Link href={ADMIN_NEW_POST_URL}>
-                    <button className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded float-right`}>
+                    <button id="new-post-btn" className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded float-right`}>
                         <FontAwesomeIcon icon={faPenNib} className="pr-1"/>  Write a post
                     </button>
                 </Link>

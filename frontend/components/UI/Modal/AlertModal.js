@@ -39,7 +39,7 @@ const AlertModal = (props) => {
     return (
         <Aux>
             <div
-                id="modal"
+                id={props.modalId}
                 className={`fixed opacity-${opacity} top-0 right-0 bottom-0 left-0 z-100 w-full h-full flex items-center justify-center ${modalOpen? "": "hidden"} transition duration-500 ease-in-out transition-opacity`}>
                 <div
                     id="modal-overlay"
@@ -56,10 +56,10 @@ const AlertModal = (props) => {
                         <div className="border border-t-0 border-red-400 rounded-b px-4 py-3 text-gray-700">
                             {props.children}
                             <div className="mx-auto flex justify-center mt-6">
-                                <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mx-2" onClick={() => confirmedHandler()}>
+                                <button className="alert-confirm bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mx-2" onClick={() => confirmedHandler()}>
                                     Confirm
                                 </button>
-                                <button className="bg-blue-400 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mx-2" onClick={() => closeModalHandler()}>
+                                <button className="alert-cancel bg-blue-400 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mx-2" onClick={() => closeModalHandler()}>
                                     Cancel
                                 </button>
                             </div>
@@ -67,7 +67,7 @@ const AlertModal = (props) => {
                     </div>
 
 
-                    <span className="absolute top-0 right-0 px-3 py-2 z-900 text-white" onClick={() => closeModalHandler()}>
+                    <span className="absolute top-0 right-0 px-3 py-0 z-900 text-white" onClick={() => closeModalHandler()}>
                         <FontAwesomeIcon icon={faTimes} className={`h-12 w-12 text-white fill-current ${props.closeButtonClassNames}`}/>
                     </span>
                 </div>
@@ -77,6 +77,7 @@ const AlertModal = (props) => {
 };
 
 AlertModal.defaultProps = {
+    modalId: 'modal',
     modalOpen: false,
     overlayClassNames: 'bg-gray-800',
     closeButtonClassNames: 'text-gray-900',
@@ -87,6 +88,7 @@ AlertModal.defaultProps = {
 };
 
 AlertModal.propTypes = {
+    modalId: PropTypes.string,
     title: PropTypes.string,
     modalOpen: PropTypes.bool,
     overlayClassNames: PropTypes.string,

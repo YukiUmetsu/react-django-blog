@@ -327,8 +327,8 @@ const PostsDataCenter = (props) => {
                     replaceDataItemWithNewOne(editedObject);
                     setCreatedPostObj(editedObject);
                     clearEditFormStates();
+                    createSuccessfulAlertProps(`${objNameCp} Edit`, ` Successfully edited the ${objNameSm}.`);
                     setDataManipulationComplete(true);
-                    createSuccessfulAlertProps(`${objNameCp} Edit`, ` Successfully edited the ${objNameSm}.`)
                 }
             },
             onError: (error) => {

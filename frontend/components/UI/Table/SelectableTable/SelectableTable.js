@@ -178,6 +178,7 @@ const SelectableTable = (props) => {
                     </select>
                 </div>
                 <button
+                    id="multi-action-confirm-btn"
                     onClick={() => bunchActionConfirmed()}
                     className="flex-1 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded
                     ">
@@ -275,12 +276,17 @@ const SelectableTable = (props) => {
                     modalOpen={editModalState.isOpen}
                     onOpenCallback={() => setResetEditForm(false)}>
                     <DynamicForm
+                        form_element_id="object-edit-form"
                         object={editModalState.rowObj}
                         formData={props.editObjFormData}
                         form_id_prefix="edit"
                         onSubmitCallback={(data) => props.onEditObjFormSubmitted(data)}
                         resetForm={resetEditForm}
                         dataManipulationComplete={dataManipulationComplete}
+                        mx={'0'}
+                        my={'0'}
+                        px={'10'}
+                        py={'10'}
                     />
                 </DynamicModal>
             </OutsideComponentAlerter>

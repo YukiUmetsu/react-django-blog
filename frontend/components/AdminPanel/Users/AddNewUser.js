@@ -71,17 +71,25 @@ const AddNewUser = React.memo((props) => {
 
     return (
         <Aux>
-            <button className={`${props.btnClassNames} ${props.additionalBtnClassNames}`} onClick={()=>setIsNewUserModalOpen(true)}>
+            <button
+                id="add-new-user-btn"
+                className={`${props.btnClassNames} ${props.additionalBtnClassNames}`}
+                onClick={()=>setIsNewUserModalOpen(true)}>
                 <FontAwesomeIcon icon={faPlus} className="pr-1"/>  {props.btnTitle}
             </button>
             <Modal modalOpen={isNewUserModalOpen} onCloseCallback={() => setIsNewUserModalOpen(false)}>
                 <DynamicForm
+                    form_element_id='new_user_form'
                     form_id_prefix={props.form_id_prefix}
                     formData={props.formData}
                     onSubmitCallback={submitHandler}
                     loading={formLoading}
                     formError={dataUpdateError}
                     object={null}
+                    mx={'0'}
+                    my={'0'}
+                    px={'20'}
+                    py={'20'}
                 />
             </Modal>
         </Aux>

@@ -216,7 +216,10 @@ const Form = (props) => {
     };
 
     return (
-        <form className="w-full max-w-lg mx-5 my-5" onSubmit={handleSubmit(onSubmit)}>
+        <form
+            id={props.form_element_id}
+            className={`w-full max-w-lg mx-${props.mx} my-${props.my} px-${props.px} py-${props.py}`}
+            onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-wrap -mx-3 mb-6">
                 {renderFormElements()}
             </div>
@@ -226,6 +229,14 @@ const Form = (props) => {
             </button>
         </form>
     );
+};
+
+Form.defaultProps = {
+    form_element_id: 'form',
+    mx: '5',
+    my: '5',
+    px: '0',
+    py: '0',
 };
 
 Form.propTypes = {
@@ -239,6 +250,11 @@ Form.propTypes = {
     loading: PropTypes.bool,
     formError: PropTypes.object,
     dataManipulationComplete: PropTypes.bool,
+    form_element_id: PropTypes.string,
+    mx: PropTypes.string,
+    my: PropTypes.string,
+    px: PropTypes.string,
+    py: PropTypes.string,
 };
 
 export default Form

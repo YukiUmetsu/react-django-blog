@@ -381,7 +381,6 @@ const PostForm = React.memo((props) => {
     };
 
     let setSavedStates = () => {
-        console.log('set saved status! ' + moment().format('YYYY/MM/DD HH:mm'));
         setLoading(false);
         setIsSaved(true);
         setIsSaving(false);
@@ -389,8 +388,6 @@ const PostForm = React.memo((props) => {
     };
 
     let updateFormDataState = (accessor, value) => {
-        console.log('updateFormDataState');
-        console.log(`${accessor} - ${value}`);
         setIsSaved(false);
         let updatedElement = {};
         updatedElement[accessor] = value;
@@ -437,24 +434,33 @@ const PostForm = React.memo((props) => {
     }, [categories]);
 
     const onSubmit = async data => {
-        clearError();
-        if(!isEmpty(objectToEdit)){
-            // this is editing form since object exist. remove unchanged values.
-            let objKeys = Object.keys(objectToEdit);
-            for (let i = 0; i < objKeys.length; i++) {
-                let objKey = objKeys[i];
-                if(data[objKey] === objectToEdit[objKey]){
-                    delete data[objKey];
-                }
-            }
-
-        } else {
-            await savePost(data);
-        }
+        await clearError();
+        data = await removeUnchangedValues(data);
+        await savePost(data);
 
         if(props.onSubmitCallback){
             await props.onSubmitCallback(data);
         }
+    };
+
+    const removeUnchangedValues = (data) => {
+        if(isEmpty(objectToEdit)){
+            // new creation
+           return data;
+        }
+
+        // editing
+        let objKeys = Object.keys(objectToEdit);
+        for (let i = 0; i < objKeys.length; i++) {
+            let objKey = objKeys[i];
+            if(data[objKey] === objectToEdit[objKey]){
+                delete data[objKey];
+            }
+            if(isEmpty(data[objKey]) && isEmpty(objectToEdit[objKey])){
+                delete data[objKey];
+            }
+        }
+        return data;
     };
 
     const renderFormElements = () => {

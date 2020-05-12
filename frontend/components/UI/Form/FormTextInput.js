@@ -1,8 +1,19 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import PasswordStrengthMeter from "./PasswordStrengthMeter";
 
 const FormTextInput = React.memo((props) => {
+
+    let [wasChanged, setWasChanged] = useState(false);
+    let [elValue, setElValue] = useState(props.inputValue);
+
+    useEffect(() => {
+        if(wasChanged){
+            setElValue(props.formDataState[props.id]);
+        } else {
+            setElValue(props.inputValue);
+        }
+    }, [props.inputValue, wasChanged, props.formDataState]);
 
     let renderHiddenInput = () => {
         return (
@@ -13,7 +24,7 @@ const FormTextInput = React.memo((props) => {
                 name={props.id}
                 key={props.id}
                 type={props.type}
-                value={props.inputValue}
+                value={elValue}
                 ref={props.reference}
                 placeholder={props.label}
             />
@@ -22,6 +33,9 @@ const FormTextInput = React.memo((props) => {
 
     let onInputChangeHandler = (e) => {
         props.updateFormDataState(props.id, e.target.value);
+        if(!wasChanged){
+            setWasChanged(true);
+        }
     };
 
     let renderInput = () => {
@@ -35,7 +49,7 @@ const FormTextInput = React.memo((props) => {
                     id={`${props.form_id_prefix}_form_${props.id}`}
                     name={props.id}
                     type={props.type}
-                    value={props.inputValue}
+                    value={elValue}
                     ref={props.reference}
                     placeholder={props.label}
                     onChange={(e)=> onInputChangeHandler(e)}

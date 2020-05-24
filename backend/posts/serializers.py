@@ -13,7 +13,6 @@ from users.serializers import UserSerializer
 from files.serializers import FilesSerializer
 from files.models import Files
 from comments.models import Comments
-from comments.serializers import CommentsSerializer
 from django.core.exceptions import ObjectDoesNotExist
 
 
@@ -204,6 +203,8 @@ class PostsSerializer(serializers.ModelSerializer):
 
 
 class PostsSerializerWithComments(serializers.ModelSerializer):
+    # import here to avoid circular import in comments.serializers
+    from comments.serializers import CommentsSerializer
     # Serializer for posts with comments
     total_likes = serializers.IntegerField(required=False)
     main_img = MainImageField(queryset=Files.objects.all(), required=True)

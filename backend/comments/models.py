@@ -11,6 +11,7 @@ class Comments(models.Model):
     email = models.EmailField(blank=True, null=True, max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
     is_hidden = models.BooleanField(default=False)
+    replied = models.BooleanField(default=False)
     parent = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

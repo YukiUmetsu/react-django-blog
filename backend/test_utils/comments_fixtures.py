@@ -6,7 +6,7 @@ from test_utils.users_fixtures import users
 from test_utils.categories_fixtures import category_payload, category_obj
 from test_utils.tags_fixtures import staff_tag_obj0, tag_payload
 from test_utils.post_states_fixtures import all_states
-from test_utils.posts_fixtures import post_min_payload, post_obj
+from test_utils.posts_fixtures import img_obj, post_min_payload, post_obj
 from blacklist_words.models import BlacklistWords
 
 

@@ -10,3 +10,8 @@ class CommentsViewSet(viewsets.ModelViewSet):
     permission_classes = (OwnerCanUpdateOrReadOnly,)
     queryset = Comments.objects.all()
     serializer_class = serializers.CommentsSerializer
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['depth'] = self.request.query_params.get('depth', 1)
+        return context

@@ -7,7 +7,7 @@ from test_utils.categories_fixtures import category_payload, category_obj
 from test_utils.tags_fixtures import tag_payload, staff_tag_obj0
 from test_utils.post_states_fixtures import all_states
 from test_utils.comments_fixtures import comment_payload, comment_min_payload, comment_obj, blacklist_word_obj0
-from test_utils.posts_fixtures import post_min_payload, post_obj
+from test_utils.posts_fixtures import img_obj, post_min_payload, post_obj
 
 
 pytestmark = pytest.mark.django_db
@@ -61,7 +61,6 @@ class TestPublicCommentsAPI:
         comment_min_payload['post'] = comment_min_payload['post'].id
         comment_min_payload["content"] += f" {blacklist_word_obj0.content} "
         response = self.client.post('/api/comments/', comment_min_payload)
-        print(response.data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
@@ -133,3 +132,10 @@ class TestPrivateCommentsAPI:
         comment_payload['content'] = "test1" + comment_payload['content']
         response = self.client.put(f'/api/comments/{comment_obj.id}/', comment_payload)
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_comments_depth_parameter(self, users, comment_obj):
+        self.client.force_authenticate(users['staff'][0])
+        response1 = self.client.get(f'/api/comments/?depth=1')
+        assert response1.status_code == status.HTTP_200_OK
+        assert response1.data.get("results")[0]["post"]["title"] is not None
+

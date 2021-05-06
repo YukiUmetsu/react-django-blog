@@ -41,7 +41,7 @@
     "react-hook-form": "^5.3.1",
     "react-hot-loader": "^4.12.20",
     "react-transition-group": "^4.3.0",
-    "sanitize-html": "^1.23.0",
+    "sanitize-html": "^2.3.2",
     "suneditor-react": "^2.10.0",
     "swr": "^0.2.0",
     "tailwindcss": "^1.2.0",
